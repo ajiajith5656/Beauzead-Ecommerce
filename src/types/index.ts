@@ -41,3 +41,22 @@ export interface Order {
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   created_at: string;
 }
+
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  product_image: string;
+  quantity: number;
+  price: number;
+  currency: string;
+}
+
+export interface OrderSummary extends Order {
+  items: OrderItem[];
+  shipping_address?: string;
+  payment_method?: string;
+}
