@@ -1,14 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import '../lib/amplifyConfig'; // Initialize Amplify
 import amplifyAuthService, { type AuthUser } from '../lib/amplifyAuth';
+import apiClient from '../lib/api';
 import type { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
   currentAuthUser: AuthUser | null;
+  authRole: User['role'] | null;
   loading: boolean;
   signUp: (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
+  signIn: (
+    email: string,
+    password: string
+  ) => Promise<{ success: boolean; isSignedIn?: boolean; role?: User['role'] | null; error?: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<any>;
   confirmPasswordReset: (email: string, code: string, newPassword: string) => Promise<any>;
@@ -20,7 +25,45 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [currentAuthUser, setCurrentAuthUser] = useState<AuthUser | null>(null);
+  const [authRole, setAuthRole] = useState<User['role'] | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const decodeJwtPayload = (token?: string | null): Record<string, any> | null => {
+    if (!token) return null;
+    try {
+      const payload = token.split('.')[1];
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(normalized);
+      return JSON.parse(decoded);
+    } catch (error) {
+      console.error('Failed to decode JWT payload:', error);
+      return null;
+    }
+  };
+
+  const resolveRoleFromSession = async (): Promise<User['role'] | null> => {
+    try {
+      const session = await amplifyAuthService.getAuthSession();
+      const idToken = session?.tokens?.idToken?.toString();
+      const payload = decodeJwtPayload(idToken);
+      const roleFromToken =
+        (payload?.['custom:role'] as User['role'] | undefined) ||
+        (payload?.role as User['role'] | undefined) ||
+        (Array.isArray(payload?.['cognito:groups'])
+          ? (payload?.['cognito:groups']?.[0] as User['role'] | undefined)
+          : undefined) ||
+        null;
+
+      if (roleFromToken) {
+        setAuthRole(roleFromToken);
+      }
+
+      return roleFromToken;
+    } catch (error) {
+      console.error('Failed to resolve role from session:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     // Check if user is already signed in
@@ -28,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const authUser = await amplifyAuthService.getCurrentAuthUser();
         setCurrentAuthUser(authUser);
+        await resolveRoleFromSession();
         if (authUser) {
           // Fetch additional user profile from your backend
           await fetchUserProfile(authUser.username);
@@ -42,16 +86,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuthStatus();
   }, []);
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
-      // TODO: Replace with your backend API call
-      // const response = await fetch(`/api/users/${userId}`);
-      // const userData = await response.json();
-      // setUser(userData);
-      console.log('Fetching profile for user:', userId);
+      const { data, error } = await apiClient.get<User>(`/users/${userId}`);
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
+
+      if (data) {
+        setUser(data);
+        if (data.role) {
+          setAuthRole(data.role);
+        }
+        return data;
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
+    return null;
   };
 
   const signUp = async (email: string, password: string, _role: 'user' | 'seller' | 'admin', fullName: string) => {
@@ -79,11 +132,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const authUser = await amplifyAuthService.getCurrentAuthUser();
       setCurrentAuthUser(authUser);
 
+      const roleFromSession = await resolveRoleFromSession();
+      let profile: User | null = null;
+
       if (authUser) {
-        await fetchUserProfile(authUser.username);
+        profile = await fetchUserProfile(authUser.username);
       }
 
-      return { success: true, isSignedIn: result.isSignedIn };
+      return {
+        success: true,
+        isSignedIn: result.isSignedIn,
+        role: profile?.role || roleFromSession || null,
+      };
     } catch (error) {
       console.error('Signin error:', error);
       return { success: false, error };
@@ -95,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await amplifyAuthService.signout();
       setUser(null);
       setCurrentAuthUser(null);
+      setAuthRole(null);
     } catch (error) {
       console.error('Signout error:', error);
     }
@@ -141,6 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     currentAuthUser,
+    authRole,
     loading,
     signUp,
     signIn,

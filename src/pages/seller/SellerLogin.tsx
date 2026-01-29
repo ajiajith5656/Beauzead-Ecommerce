@@ -17,7 +17,7 @@ const SellerLogin: React.FC = () => {
     setError('');
     setIsLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
+    const { error: signInError, role } = await signIn(email, password);
 
     setIsLoading(false);
     if (signInError) {
@@ -25,7 +25,17 @@ const SellerLogin: React.FC = () => {
       return;
     }
 
-    navigate('/seller/dashboard');
+    if (role === 'admin') {
+      navigate('/admin');
+      return;
+    }
+
+    if (role === 'seller') {
+      navigate('/seller/dashboard');
+      return;
+    }
+
+    navigate('/');
   };
 
   return (

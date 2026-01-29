@@ -80,4 +80,5 @@ class APIClient {
   }
 }
 
+export { APIClient };
 export default new APIClient();

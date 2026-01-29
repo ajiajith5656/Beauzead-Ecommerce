@@ -6,12 +6,27 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 import { UserDashboard } from './pages/user/UserDashboard';
-import { SellerDashboard } from './pages/seller/SellerDashboard';
+import SellerDashboard from './pages/seller/SellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerLogin from './pages/seller/SellerLogin';
 import SellerForgotPassword from './pages/seller/SellerForgotPassword';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminLayout } from './pages/admin/AdminLayout';
+import { AdminOverview } from './pages/admin/modules/AdminOverview';
+import { UserManagement } from './pages/admin/modules/UserManagement';
+import { SellerManagement } from './pages/admin/modules/SellerManagement';
+import { ProductManagement } from './pages/admin/modules/ProductManagement';
+import { OrderManagement } from './pages/admin/modules/OrderManagement';
+import { CategoryManagement } from './pages/admin/modules/CategoryManagement';
+import { BannerManagement } from './pages/admin/modules/BannerManagement';
+import { PromotionManagement } from './pages/admin/modules/PromotionManagement';
+import { ReviewManagement } from './pages/admin/modules/ReviewManagement';
+import { ComplaintManagement } from './pages/admin/modules/ComplaintManagement';
+import { AccountsManagement } from './pages/admin/modules/AccountsManagement';
+import { ReportsManagement } from './pages/admin/modules/ReportsManagement';
+import { AdminManagement } from './pages/admin/modules/AdminManagement';
+import { ProfilePage } from './pages/admin/modules/ProfilePage';
+import { SettingsPage } from './pages/admin/modules/SettingsPage';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 
@@ -39,9 +54,27 @@ function App() {
                 <Route path="/seller/dashboard" element={<SellerDashboard />} />
                 
                 {/* Admin Routes */}
-                <Route path="/admin/login" element={<Login role="admin" />} />
-                <Route path="/admin/signup" element={<Signup role="admin" />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/login" element={<Navigate to="/seller/login" replace />} />
+                <Route path="/admin/signup" element={<Navigate to="/seller/login" replace />} />
+                
+                {/* Admin Layout Routes */}
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin" element={<AdminOverview />} />
+                  <Route path="/admin/users" element={<UserManagement />} />
+                  <Route path="/admin/sellers" element={<SellerManagement />} />
+                  <Route path="/admin/products" element={<ProductManagement />} />
+                  <Route path="/admin/orders" element={<OrderManagement />} />
+                  <Route path="/admin/categories" element={<CategoryManagement />} />
+                  <Route path="/admin/banners" element={<BannerManagement />} />
+                  <Route path="/admin/promotions" element={<PromotionManagement />} />
+                  <Route path="/admin/reviews" element={<ReviewManagement />} />
+                  <Route path="/admin/complaints" element={<ComplaintManagement />} />
+                  <Route path="/admin/accounts" element={<AccountsManagement />} />
+                  <Route path="/admin/reports" element={<ReportsManagement />} />
+                  <Route path="/admin/admins" element={<AdminManagement />} />
+                  <Route path="/admin/profile" element={<ProfilePage />} />
+                  <Route path="/admin/settings" element={<SettingsPage />} />
+                </Route>
                 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" />} />

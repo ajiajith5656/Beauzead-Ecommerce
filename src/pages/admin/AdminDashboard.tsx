@@ -2,41 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-
-interface PendingUser {
-  id: string;
-  email: string;
-  full_name: string;
-  role: string;
-  created_at: string;
-}
+import { getPendingUsers, approveUser, rejectUser, getDashboardMetrics } from '../../services/admin/adminApiService';
+import type { User, DashboardData } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<User[]>([]);
+  const [metrics, setMetrics] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    fetchPendingUsers();
+    fetchData();
   }, []);
 
-  const fetchPendingUsers = async () => {
+  const fetchData = async () => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('approved', false)
-        .in('role', ['seller', 'admin']);
-
-      if (error) throw error;
-      setPendingUsers(data || []);
+      setLoading(true);
       setErrorMessage('');
+      
+      const [users, metricsData] = await Promise.all([
+        getPendingUsers(),
+        getDashboardMetrics(),
+      ]);
+      
+      setPendingUsers(users || []);
+      setMetrics(metricsData);
     } catch (error) {
-      console.error('Error fetching pending users:', error);
-      setErrorMessage('Failed to load pending users. Please try again.');
+      console.error('Error fetching dashboard data:', error);
+      setErrorMessage('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -45,15 +40,13 @@ export const AdminDashboard: React.FC = () => {
   const handleApprove = async (userId: string) => {
     try {
       setErrorMessage('');
-      const { error } = await supabase
-        .from('users')
-        .update({ approved: true })
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      // Refresh the list
-      fetchPendingUsers();
+      const result = await approveUser(userId);
+      if (result) {
+        // Refresh the list
+        fetchData();
+      } else {
+        setErrorMessage('Failed to approve user. Please try again.');
+      }
     } catch (error) {
       console.error('Error approving user:', error);
       setErrorMessage('Failed to approve user. Please try again.');
@@ -63,15 +56,13 @@ export const AdminDashboard: React.FC = () => {
   const handleReject = async (userId: string) => {
     try {
       setErrorMessage('');
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      // Refresh the list
-      fetchPendingUsers();
+      const result = await rejectUser(userId);
+      if (result) {
+        // Refresh the list
+        fetchData();
+      } else {
+        setErrorMessage('Failed to reject user. Please try again.');
+      }
     } catch (error) {
       console.error('Error rejecting user:', error);
       setErrorMessage('Failed to reject user. Please try again.');
@@ -130,7 +121,7 @@ export const AdminDashboard: React.FC = () => {
               <h3 className="text-xl font-semibold text-white">Total Users</h3>
               <Users className="h-8 w-8 text-gold" />
             </div>
-            <p className="text-3xl font-bold text-gold">0</p>
+            <p className="text-3xl font-bold text-gold">{metrics?.metrics?.total_users || 0}</p>
             <p className="text-gray-400 text-sm mt-2">Registered users</p>
           </div>
 
@@ -139,7 +130,7 @@ export const AdminDashboard: React.FC = () => {
               <h3 className="text-xl font-semibold text-white">Total Products</h3>
               <Package className="h-8 w-8 text-gold" />
             </div>
-            <p className="text-3xl font-bold text-gold">0</p>
+            <p className="text-3xl font-bold text-gold">{metrics?.metrics?.total_products || 0}</p>
             <p className="text-gray-400 text-sm mt-2">Listed products</p>
           </div>
 
@@ -148,8 +139,8 @@ export const AdminDashboard: React.FC = () => {
               <h3 className="text-xl font-semibold text-white">Total Orders</h3>
               <ShoppingCart className="h-8 w-8 text-gold" />
             </div>
-            <p className="text-3xl font-bold text-gold">0</p>
-            <p className="text-gray-400 text-sm mt-2">All orders</p>
+            <p className="text-3xl font-bold text-gold">{metrics?.metrics?.ongoing_orders || 0}</p>
+            <p className="text-gray-400 text-sm mt-2">Ongoing orders</p>
           </div>
         </div>
 
