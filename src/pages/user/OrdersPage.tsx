@@ -31,6 +31,8 @@ const OrdersPage: React.FC = () => {
           currency: 'USD',
           status: 'delivered',
           created_at: '2024-01-15T10:30:00Z',
+          seller_id: 'seller1',
+          seller_name: 'Premium Electronics Store',
           items: [
             {
               id: 'item1',
@@ -44,7 +46,12 @@ const OrdersPage: React.FC = () => {
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
-          payment_method: 'Credit Card'
+          payment_method: 'Credit Card',
+          cancellation_policy: {
+            allow_pending: true,
+            allow_processing: true,
+            allow_shipped: false
+          }
         },
         {
           id: 'ORD002',
@@ -53,6 +60,8 @@ const OrdersPage: React.FC = () => {
           currency: 'USD',
           status: 'shipped',
           created_at: '2024-01-20T14:15:00Z',
+          seller_id: 'seller2',
+          seller_name: 'Tech Gadgets Hub',
           items: [
             {
               id: 'item2',
@@ -66,7 +75,12 @@ const OrdersPage: React.FC = () => {
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
-          payment_method: 'PayPal'
+          payment_method: 'PayPal',
+          cancellation_policy: {
+            allow_pending: true,
+            allow_processing: true,
+            allow_shipped: true
+          }
         },
         {
           id: 'ORD003',
@@ -75,6 +89,8 @@ const OrdersPage: React.FC = () => {
           currency: 'USD',
           status: 'processing',
           created_at: '2024-01-25T09:00:00Z',
+          seller_id: 'seller3',
+          seller_name: 'Audio World',
           items: [
             {
               id: 'item3',
@@ -88,7 +104,12 @@ const OrdersPage: React.FC = () => {
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
-          payment_method: 'Credit Card'
+          payment_method: 'Credit Card',
+          cancellation_policy: {
+            allow_pending: true,
+            allow_processing: true,
+            allow_shipped: false
+          }
         }
       ];
       
@@ -297,10 +318,7 @@ const OrdersPage: React.FC = () => {
                 {/* Order Footer */}
                 <div className="p-4 border-t border-gray-800 bg-gray-900/50">
                   <button 
-                    onClick={() => {
-                      // TODO: Implement order detail page
-                      console.log('View order details:', order.id);
-                    }}
+                    onClick={() => navigate(`/user/orders/${order.id}`)}
                     className="flex items-center justify-center space-x-2 w-full md:w-auto px-6 py-2 bg-gold text-black font-medium rounded-lg hover:bg-gold-light transition-colors"
                   >
                     <span>View Details</span>

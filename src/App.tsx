@@ -10,6 +10,8 @@ import { SellerDashboard } from './pages/seller/SellerDashboard';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { NewHome } from './pages/NewHome';
 import OrdersPage from './pages/user/OrdersPage';
+import OrderDetailPage from './pages/user/OrderDetailPage';
+import OrderCancellation from './pages/user/OrderCancellation';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
                 <Route path="/signup" element={<Signup role="user" />} />
                 <Route path="/user/dashboard" element={<UserDashboard />} />
                 <Route path="/user/orders" element={<OrdersPage />} />
+                <Route path="/user/orders/:orderId" element={<OrderDetailPage />} />
+                <Route path="/user/orders/:orderId/cancel" element={<OrderCancellation />} />
                 
                 {/* Seller Routes */}
                 <Route path="/seller/login" element={<Login role="seller" />} />

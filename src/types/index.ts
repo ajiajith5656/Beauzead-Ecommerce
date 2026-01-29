@@ -33,6 +33,20 @@ export interface CartItem {
   product?: Product;
 }
 
+export interface Seller {
+  id: string;
+  name: string;
+  email: string;
+  cancellation_policy: SellerCancellationPolicy;
+}
+
+export interface SellerCancellationPolicy {
+  allow_pending: boolean;
+  allow_processing: boolean;
+  allow_shipped: boolean;
+  policy_text?: string;
+}
+
 export interface Order {
   id: string;
   user_id: string;
@@ -57,4 +71,24 @@ export interface OrderSummary extends Order {
   items: OrderItem[];
   shipping_address?: string;
   payment_method?: string;
+  seller_id?: string;
+  seller_name?: string;
+  cancellation_policy?: SellerCancellationPolicy;
+}
+
+export type CancellationStatus = 'pending' | 'approved' | 'rejected';
+export type RefundStatus = 'pending' | 'processing' | 'completed';
+
+export interface OrderCancellation {
+  id: string;
+  order_id: string;
+  user_id: string;
+  reason: string;
+  other_reason?: string;
+  status: CancellationStatus;
+  seller_response?: string;
+  refund_status?: RefundStatus;
+  refund_completed_date?: string;
+  created_at: string;
+  updated_at: string;
 }
