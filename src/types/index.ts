@@ -19,6 +19,10 @@ export interface Product {
   stock: number;
   approved: boolean;
   created_at: string;
+  brand?: string;
+  rating?: number;
+  discount?: number;
+  isNew?: boolean;
 }
 
 export interface CartItem {
