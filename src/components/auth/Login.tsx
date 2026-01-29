@@ -28,14 +28,18 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
       return;
     }
 
-    // Redirect based on role
-    if (role === 'admin') {
-      navigate('/admin/dashboard');
-    } else if (role === 'seller') {
-      navigate('/seller/dashboard');
-    } else {
-      navigate('/user/dashboard');
-    }
+    // Wait a moment for the user profile to be fetched
+    setTimeout(() => {
+      // Redirect based on role - the AuthContext will handle role verification
+      if (role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (role === 'seller') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/user/dashboard');
+      }
+      setLoading(false);
+    }, 500);
   };
 
   const getRoleTitle = () => {

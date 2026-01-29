@@ -17,6 +17,7 @@ export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     fetchPendingUsers();
@@ -32,8 +33,10 @@ export const AdminDashboard: React.FC = () => {
 
       if (error) throw error;
       setPendingUsers(data || []);
+      setErrorMessage('');
     } catch (error) {
       console.error('Error fetching pending users:', error);
+      setErrorMessage('Failed to load pending users. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,6 +44,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleApprove = async (userId: string) => {
     try {
+      setErrorMessage('');
       const { error } = await supabase
         .from('users')
         .update({ approved: true })
@@ -52,11 +56,13 @@ export const AdminDashboard: React.FC = () => {
       fetchPendingUsers();
     } catch (error) {
       console.error('Error approving user:', error);
+      setErrorMessage('Failed to approve user. Please try again.');
     }
   };
 
   const handleReject = async (userId: string) => {
     try {
+      setErrorMessage('');
       const { error } = await supabase
         .from('users')
         .delete()
@@ -68,6 +74,7 @@ export const AdminDashboard: React.FC = () => {
       fetchPendingUsers();
     } catch (error) {
       console.error('Error rejecting user:', error);
+      setErrorMessage('Failed to reject user. Please try again.');
     }
   };
 
@@ -150,6 +157,12 @@ export const AdminDashboard: React.FC = () => {
           <h3 className="text-2xl font-semibold text-gold mb-4">
             Pending Approvals ({pendingUsers.length})
           </h3>
+          
+          {errorMessage && (
+            <div className="mb-4 rounded-md bg-red-900 bg-opacity-20 p-4 border border-red-700">
+              <p className="text-sm text-red-400">{errorMessage}</p>
+            </div>
+          )}
           
           {loading ? (
             <div className="text-center text-gray-400 py-8">Loading...</div>

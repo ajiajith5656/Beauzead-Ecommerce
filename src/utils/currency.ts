@@ -47,6 +47,18 @@ export const convertCurrency = async (
 
   const rates = await fetchExchangeRates();
   
+  // Validate that both currencies exist in the rates
+  if (!rates[fromCurrency] || !rates[toCurrency]) {
+    console.warn(`Currency conversion: Missing rate for ${fromCurrency} or ${toCurrency}`);
+    return amount; // Return original amount if conversion not possible
+  }
+
+  // Validate that rates are valid numbers greater than 0
+  if (rates[fromCurrency] <= 0 || rates[toCurrency] <= 0) {
+    console.warn(`Currency conversion: Invalid rate value`);
+    return amount;
+  }
+  
   // Convert to USD first, then to target currency
   const amountInUSD = fromCurrency === 'USD' ? amount : amount / rates[fromCurrency];
   const convertedAmount = toCurrency === 'USD' ? amountInUSD : amountInUSD * rates[toCurrency];
