@@ -1,161 +1,153 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import '../lib/amplifyConfig'; // Initialize Amplify
+import amplifyAuthService, { type AuthUser } from '../lib/amplifyAuth';
 import type { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
-  session: SupabaseUser | null;
+  currentAuthUser: AuthUser | null;
   loading: boolean;
   signUp: (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<any>;
-  verifyOTP: (email: string, token: string) => Promise<any>;
+  confirmPasswordReset: (email: string, code: string, newPassword: string) => Promise<any>;
+  confirmSignUp: (email: string, code: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<SupabaseUser | null>(null);
+  const [currentAuthUser, setCurrentAuthUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session?.user ?? null);
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
-      } else {
+    // Check if user is already signed in
+    const checkAuthStatus = async () => {
+      try {
+        const authUser = await amplifyAuthService.getCurrentAuthUser();
+        setCurrentAuthUser(authUser);
+        if (authUser) {
+          // Fetch additional user profile from your backend
+          await fetchUserProfile(authUser.username);
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      } finally {
         setLoading(false);
       }
-    });
+    };
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session?.user ?? null);
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
-      } else {
-        setUser(null);
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    checkAuthStatus();
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-      setUser(data);
+      // TODO: Replace with your backend API call
+      // const response = await fetch(`/api/users/${userId}`);
+      // const userData = await response.json();
+      // setUser(userData);
+      console.log('Fetching profile for user:', userId);
     } catch (error) {
       console.error('Error fetching user profile:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string) => {
+  const signUp = async (email: string, password: string, _role: 'user' | 'seller' | 'admin', fullName: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const result = await amplifyAuthService.signup({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/verify`,
-        },
+        name: fullName,
       });
 
-      if (error) throw error;
-
-      if (data.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: data.user.id,
-              email: email,
-              role: role,
-              full_name: fullName,
-              approved: role === 'user' ? true : false, // Users auto-approved, sellers/admins need approval
-            },
-          ]);
-
-        if (profileError) throw profileError;
-      }
-
-      return { data, error: null };
+      return { success: true, userId: result.userId, isSignUpComplete: result.isSignUpComplete };
     } catch (error) {
-      return { data: null, error };
+      console.error('Signup error:', error);
+      return { success: false, error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const result = await amplifyAuthService.signin({
         email,
         password,
       });
 
-      if (error) throw error;
+      const authUser = await amplifyAuthService.getCurrentAuthUser();
+      setCurrentAuthUser(authUser);
 
-      return { data, error: null };
+      if (authUser) {
+        await fetchUserProfile(authUser.username);
+      }
+
+      return { success: true, isSignedIn: result.isSignedIn };
     } catch (error) {
-      return { data: null, error };
+      console.error('Signin error:', error);
+      return { success: false, error };
     }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
+    try {
+      await amplifyAuthService.signout();
+      setUser(null);
+      setCurrentAuthUser(null);
+    } catch (error) {
+      console.error('Signout error:', error);
+    }
   };
 
   const resetPassword = async (email: string) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
-      return { error: null };
+      const result = await amplifyAuthService.initiatePasswordReset(email);
+      return { success: true, ...result };
     } catch (error) {
-      return { error };
+      console.error('Password reset error:', error);
+      return { success: false, error };
     }
   };
 
-  const verifyOTP = async (email: string, token: string) => {
+  const confirmPasswordReset = async (email: string, code: string, newPassword: string) => {
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email,
-        token,
-        type: 'email',
-      });
-
-      if (error) throw error;
-      return { data, error: null };
+      await amplifyAuthService.confirmPasswordReset(email, code, newPassword);
+      return { success: true };
     } catch (error) {
-      return { data: null, error };
+      console.error('Confirm password reset error:', error);
+      return { success: false, error };
+    }
+  };
+
+  const confirmSignUp = async (email: string, code: string) => {
+    try {
+      const result = await amplifyAuthService.confirmSignUp(email, code);
+      
+      const authUser = await amplifyAuthService.getCurrentAuthUser();
+      setCurrentAuthUser(authUser);
+
+      if (authUser) {
+        await fetchUserProfile(authUser.username);
+      }
+
+      return { success: true, ...result };
+    } catch (error) {
+      console.error('Confirm signup error:', error);
+      return { success: false, error };
     }
   };
 
   const value = {
     user,
-    session,
+    currentAuthUser,
     loading,
     signUp,
     signIn,
     signOut,
     resetPassword,
-    verifyOTP,
+    confirmPasswordReset,
+    confirmSignUp,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
