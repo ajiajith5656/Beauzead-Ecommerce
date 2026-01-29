@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const banners = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
-  image: `/images/banners/adbanner${i + 1}.png`,
+  image: `/images/banners/banner${i + 1}.png`,
   alt: `Banner ${i + 1}`,
 }));
 
