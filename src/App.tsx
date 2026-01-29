@@ -9,6 +9,7 @@ import { UserDashboard } from './pages/user/UserDashboard';
 import { SellerDashboard } from './pages/seller/SellerDashboard';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { NewHome } from './pages/NewHome';
+import OrdersPage from './pages/user/OrdersPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/login" element={<Login role="user" />} />
                 <Route path="/signup" element={<Signup role="user" />} />
                 <Route path="/user/dashboard" element={<UserDashboard />} />
+                <Route path="/user/orders" element={<OrdersPage onNavigate={(view) => window.location.href = `/user/${view}`} />} />
                 
                 {/* Seller Routes */}
                 <Route path="/seller/login" element={<Login role="seller" />} />

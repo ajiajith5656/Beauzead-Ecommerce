@@ -38,7 +38,10 @@ export const UserDashboard: React.FC = () => {
         <h2 className="text-3xl font-bold text-gold mb-8">User Dashboard</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card cursor-pointer hover:border-gold transition-colors">
+          <div 
+            onClick={() => navigate('/user/orders')}
+            className="card cursor-pointer hover:border-gold transition-colors"
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold text-white">My Orders</h3>
               <Package className="h-8 w-8 text-gold" />
