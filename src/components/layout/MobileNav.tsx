@@ -1,18 +1,29 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, User, Bell, Package } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const MobileNav: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleAccountClick = () => {
+    if (user) {
+      navigate('/user/dashboard');
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gold z-50">
       <div className="flex items-center justify-around py-2">
         <Link
           to="/"
-          className={`flex flex-col items-center space-y-1 px-4 py-2 ${
+          className={`flex flex-col items-center space-y-1 px-4 py-2 transition-all duration-300 ${
             isActive('/') ? 'text-gold' : 'text-gray-400'
           }`}
         >
@@ -22,7 +33,7 @@ export const MobileNav: React.FC = () => {
 
         <Link
           to="/orders"
-          className={`flex flex-col items-center space-y-1 px-4 py-2 ${
+          className={`flex flex-col items-center space-y-1 px-4 py-2 transition-all duration-300 ${
             isActive('/orders') ? 'text-gold' : 'text-gray-400'
           }`}
         >
@@ -32,7 +43,7 @@ export const MobileNav: React.FC = () => {
 
         <Link
           to="/notifications"
-          className={`flex flex-col items-center space-y-1 px-4 py-2 relative ${
+          className={`flex flex-col items-center space-y-1 px-4 py-2 relative transition-all duration-300 ${
             isActive('/notifications') ? 'text-gold' : 'text-gray-400'
           }`}
         >
@@ -44,15 +55,15 @@ export const MobileNav: React.FC = () => {
           </span>
         </Link>
 
-        <Link
-          to="/user/dashboard"
-          className={`flex flex-col items-center space-y-1 px-4 py-2 ${
-            isActive('/user/dashboard') ? 'text-gold' : 'text-gray-400'
+        <button
+          onClick={handleAccountClick}
+          className={`flex flex-col items-center space-y-1 px-4 py-2 transition-all duration-300 ${
+            isActive('/user/dashboard') || isActive('/login') ? 'text-gold' : 'text-gray-400'
           }`}
         >
           <User className="h-6 w-6" />
-          <span className="text-xs">Account</span>
-        </Link>
+          <span className="text-xs">{user ? 'Account' : 'Login'}</span>
+        </button>
       </div>
     </nav>
   );
