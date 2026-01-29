@@ -42,8 +42,6 @@ export interface Order {
   created_at: string;
 }
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-
 export interface OrderItem {
   id: string;
   order_id: string;

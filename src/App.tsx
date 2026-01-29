@@ -25,7 +25,7 @@ function App() {
                 <Route path="/login" element={<Login role="user" />} />
                 <Route path="/signup" element={<Signup role="user" />} />
                 <Route path="/user/dashboard" element={<UserDashboard />} />
-                <Route path="/user/orders" element={<OrdersPage onNavigate={(view) => window.location.href = `/user/${view}`} />} />
+                <Route path="/user/orders" element={<OrdersPage />} />
                 
                 {/* Seller Routes */}
                 <Route path="/seller/login" element={<Login role="seller" />} />

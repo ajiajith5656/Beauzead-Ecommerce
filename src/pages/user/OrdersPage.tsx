@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, ArrowLeft, ShieldCheck, ChevronRight, ShoppingBag, Clock, Package, CheckCircle, XCircle, Truck
 } from 'lucide-react';
-import type { OrderSummary, OrderStatus } from '../../types';
+import type { OrderSummary, Order } from '../../types';
 import { formatPrice } from '../../constants';
 
-interface OrdersPageProps {
-  onNavigate: (view: string, data?: { orderId?: string }) => void;
-  countryCode?: string;
-}
+type OrderStatus = Order['status'];
 
-const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
+const OrdersPage: React.FC = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
@@ -29,7 +28,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
           id: 'ORD001',
           user_id: 'user1',
           total: 299.99,
-          currency: countryCode || 'USD',
+          currency: 'USD',
           status: 'delivered',
           created_at: '2024-01-15T10:30:00Z',
           items: [
@@ -41,7 +40,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
               product_image: 'https://via.placeholder.com/100',
               quantity: 1,
               price: 299.99,
-              currency: countryCode || 'USD'
+              currency: 'USD'
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
@@ -51,7 +50,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
           id: 'ORD002',
           user_id: 'user1',
           total: 149.50,
-          currency: countryCode || 'USD',
+          currency: 'USD',
           status: 'shipped',
           created_at: '2024-01-20T14:15:00Z',
           items: [
@@ -63,7 +62,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
               product_image: 'https://via.placeholder.com/100',
               quantity: 1,
               price: 149.50,
-              currency: countryCode || 'USD'
+              currency: 'USD'
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
@@ -73,7 +72,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
           id: 'ORD003',
           user_id: 'user1',
           total: 89.99,
-          currency: countryCode || 'USD',
+          currency: 'USD',
           status: 'processing',
           created_at: '2024-01-25T09:00:00Z',
           items: [
@@ -85,7 +84,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
               product_image: 'https://via.placeholder.com/100',
               quantity: 2,
               price: 44.99,
-              currency: countryCode || 'USD'
+              currency: 'USD'
             }
           ],
           shipping_address: '123 Main St, New York, NY 10001',
@@ -98,7 +97,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
     };
 
     fetchOrders();
-  }, [countryCode]);
+  }, []);
 
   // Filter orders based on search and status using useMemo
   const filteredOrders = useMemo(() => {
@@ -173,7 +172,7 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button 
-                onClick={() => onNavigate('dashboard')}
+                onClick={() => navigate('/user/dashboard')}
                 className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -298,7 +297,10 @@ const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
                 {/* Order Footer */}
                 <div className="p-4 border-t border-gray-800 bg-gray-900/50">
                   <button 
-                    onClick={() => onNavigate('orderDetail', { orderId: order.id })}
+                    onClick={() => {
+                      // TODO: Implement order detail page
+                      console.log('View order details:', order.id);
+                    }}
                     className="flex items-center justify-center space-x-2 w-full md:w-auto px-6 py-2 bg-gold text-black font-medium rounded-lg hover:bg-gold-light transition-colors"
                   >
                     <span>View Details</span>
