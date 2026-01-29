@@ -87,7 +87,7 @@ const SellerLogin: React.FC = () => {
             </div>
             <div className="flex justify-end">
               <Link
-                to="/reset-password"
+                to="/seller/forgot-password"
                 className="text-xs font-semibold text-gray-500 hover:text-black"
               >
                 Forgot Key?

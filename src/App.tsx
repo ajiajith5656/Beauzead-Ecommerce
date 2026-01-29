@@ -10,6 +10,7 @@ import { SellerDashboard } from './pages/seller/SellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerLogin from './pages/seller/SellerLogin';
+import SellerForgotPassword from './pages/seller/SellerForgotPassword';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/seller" element={<SellerLanding />} />
                 <Route path="/seller/login" element={<SellerLogin />} />
                 <Route path="/seller/signup" element={<SellerSignup />} />
+                <Route path="/seller/forgot-password" element={<SellerForgotPassword />} />
                 <Route path="/seller/dashboard" element={<SellerDashboard />} />
                 
                 {/* Admin Routes */}
