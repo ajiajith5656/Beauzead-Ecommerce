@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Search, ArrowLeft, ShieldCheck, ChevronRight, ShoppingBag, Clock, Package, CheckCircle, XCircle, Truck
 } from 'lucide-react';
-import { OrderSummary, OrderStatus } from '../../types';
+import type { OrderSummary, OrderStatus } from '../../types';
 import { formatPrice } from '../../constants';
 
-const OrdersPage: React.FC<{ onNavigate: (view: any, data?: any) => void, countryCode?: string }> = ({ onNavigate, countryCode }) => {
+interface OrdersPageProps {
+  onNavigate: (view: string, data?: { orderId?: string }) => void;
+  countryCode?: string;
+}
+
+const OrdersPage: React.FC<OrdersPageProps> = ({ onNavigate, countryCode }) => {
   const [orders, setOrders] = useState<OrderSummary[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<OrderSummary[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [loading, setLoading] = useState(true);
@@ -90,15 +94,14 @@ const OrdersPage: React.FC<{ onNavigate: (view: any, data?: any) => void, countr
       ];
       
       setOrders(mockOrders);
-      setFilteredOrders(mockOrders);
       setLoading(false);
     };
 
     fetchOrders();
   }, [countryCode]);
 
-  // Filter orders based on search and status
-  useEffect(() => {
+  // Filter orders based on search and status using useMemo
+  const filteredOrders = useMemo(() => {
     let filtered = orders;
 
     // Filter by status
@@ -116,7 +119,7 @@ const OrdersPage: React.FC<{ onNavigate: (view: any, data?: any) => void, countr
       );
     }
 
-    setFilteredOrders(filtered);
+    return filtered;
   }, [searchQuery, statusFilter, orders]);
 
   const getStatusIcon = (status: OrderStatus) => {
