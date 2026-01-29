@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import type { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
@@ -14,7 +15,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { currency, convertPrice } = useCurrency();
-  const [isHovered, setIsHovered] = useState(false);
   const inWishlist = isInWishlist(product.id);
 
   const convertedPrice = convertPrice(product.price, product.currency);
@@ -24,6 +24,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (inWishlist) {
       removeFromWishlist(product.id);
     } else {
@@ -33,14 +34,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     addToCart(product);
   };
 
   return (
-    <div
-      className="relative bg-gray-900 border border-gray-800 rounded-lg overflow-hidden group cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <Link
+      to={`/products/${product.id}`}
+      className="relative bg-gray-900 border border-gray-800 rounded-lg overflow-hidden group cursor-pointer block"
     >
       {/* Badges */}
       <div className="absolute top-2 left-2 z-10 flex flex-col space-y-1">
@@ -69,13 +70,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </button>
 
       {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-gray-800">
+      <div className="relative aspect-[4/5] md:aspect-square overflow-hidden bg-gray-800">
         <img
           src={product.image_url}
           alt={product.name}
-          className={`w-full h-full object-cover transition-transform duration-300 ${
-            isHovered ? 'scale-110' : 'scale-100'
-          }`}
+          className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-110"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/400x400/1f2937/eab308?text=Product';
           }}
@@ -83,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-4">
+      <div className="p-3 md:p-4">
         {/* Rating & Brand */}
         <div className="flex items-center justify-between mb-2">
           {product.rating && (
@@ -98,40 +97,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Product Title */}
-        <h3 className="text-white font-medium text-sm mb-1 line-clamp-2 h-10">
+        <h3 className="text-white font-medium text-sm mb-1 line-clamp-2 h-9 md:h-10">
           {product.name}
         </h3>
 
         {/* Category */}
-        <p className="text-xs text-gray-400 mb-2">{product.category}</p>
+        <p className="text-[11px] md:text-xs text-gray-400 mb-2">{product.category}</p>
 
         {/* Price */}
         <div className="flex items-center space-x-2 mb-3">
-          <span className="text-gold font-bold text-lg">
+          <span className="text-gold font-bold text-base md:text-lg">
             {formatCurrency(convertedPrice, currency)}
           </span>
           {product.discount && product.discount > 0 && (
-            <span className="text-gray-500 text-sm line-through">
+            <span className="text-gray-500 text-xs md:text-sm line-through">
               {formatCurrency(originalPrice, currency)}
             </span>
           )}
         </div>
 
         {/* Add to Cart Button - Slides up on hover */}
-        <div
-          className={`transition-all duration-300 ${
-            isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-          }`}
-        >
+        <div className="transition-all duration-300 md:translate-y-4 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
           <button
             onClick={handleAddToCart}
-            className="w-full btn-primary flex items-center justify-center space-x-2 py-2"
+            className="w-full btn-primary flex items-center justify-center space-x-2 py-1.5 text-xs md:text-sm"
           >
             <ShoppingCart className="h-4 w-4" />
             <span>Add to Cart</span>
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

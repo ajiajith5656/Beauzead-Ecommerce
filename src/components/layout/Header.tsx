@@ -89,7 +89,7 @@ export const Header: React.FC = () => {
 
             {/* Become a Seller Button */}
             <Link
-              to="/seller/signup"
+              to="/seller"
               className="text-sm font-medium text-gold hover:text-gold-light transition-all duration-300"
             >
               Become a Seller

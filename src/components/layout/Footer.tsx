@@ -90,20 +90,20 @@ export const Footer: React.FC = () => {
               <li className="flex items-start space-x-2">
                 <MapPin className="h-5 w-5 text-gold flex-shrink-0 mt-0.5" />
                 <span className="text-gray-400 text-sm">
-                  123 Commerce Street,<br />
-                  London, UK EC1A 1BB
+                  23, MK6 5HH<br />
+                  United Kingdom
                 </span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="h-5 w-5 text-gold" />
-                <a href="tel:+442012345678" className="text-gray-400 hover:text-gold transition-colors text-sm">
-                  +44 20 1234 5678
+                <a href="tel:+447555394997" className="text-gray-400 hover:text-gold transition-colors text-sm">
+                  +447555394997
                 </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail className="h-5 w-5 text-gold" />
-                <a href="mailto:support@beauzead.com" className="text-gray-400 hover:text-gold transition-colors text-sm">
-                  support@beauzead.com
+                <a href="mailto:info@beauzead.com" className="text-gray-400 hover:text-gold transition-colors text-sm">
+                  info@beauzead.com
                 </a>
               </li>
             </ul>
