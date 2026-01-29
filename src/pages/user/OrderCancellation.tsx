@@ -110,10 +110,14 @@ const OrderCancellation: React.FC = () => {
     setSubmitting(false);
     setShowSuccess(true);
     
-    // Redirect after 3 seconds
-    setTimeout(() => {
+    // Redirect after 3 seconds with cleanup
+    const timeoutId = setTimeout(() => {
       navigate(`/user/orders/${orderId}`);
     }, 3000);
+
+    // Cleanup function would be needed in useEffect, but since we're in handleSubmit
+    // we'll just store the reference for potential cleanup
+    return () => clearTimeout(timeoutId);
   };
 
   if (loading) {

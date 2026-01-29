@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, Package, MapPin, CreditCard, X, CheckCircle, XCircle, Clock
@@ -58,10 +58,14 @@ const OrderDetailPage: React.FC = () => {
     fetchOrderDetails();
   }, [orderId]);
 
-  const canCancelOrder = () => {
+  const canCancelOrder = useMemo(() => {
     if (!order || !order.cancellation_policy) return false;
     
     const { status } = order;
+    
+    // Can't cancel if already cancelled or delivered
+    if (status === 'cancelled' || status === 'delivered') return false;
+    
     const { allow_pending, allow_processing, allow_shipped } = order.cancellation_policy;
 
     if (status === 'pending' && allow_pending) return true;
@@ -69,7 +73,7 @@ const OrderDetailPage: React.FC = () => {
     if (status === 'shipped' && allow_shipped) return true;
     
     return false;
-  };
+  }, [order]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -332,10 +336,11 @@ const OrderDetailPage: React.FC = () => {
             {/* Cancel Order Button */}
             {!cancellation && (
               <div className="card">
-                {canCancelOrder() ? (
+                {canCancelOrder ? (
                   <button
                     onClick={() => navigate(`/user/orders/${order.id}/cancel`)}
                     className="w-full btn-secondary flex items-center justify-center space-x-2"
+                    aria-label="Cancel this order"
                   >
                     <X className="h-4 w-4" />
                     <span>Cancel Order</span>
@@ -345,10 +350,12 @@ const OrderDetailPage: React.FC = () => {
                     <button
                       disabled
                       className="w-full bg-gray-800 text-gray-500 font-semibold py-2 px-6 rounded-lg cursor-not-allowed mb-2"
+                      aria-label="Cancel order not available"
+                      aria-describedby="cancel-order-reason"
                     >
                       Cancel Order
                     </button>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p id="cancel-order-reason" className="text-xs text-gray-400 mt-2">
                       Cancellation is not available for this order as per seller policy.
                     </p>
                   </div>
