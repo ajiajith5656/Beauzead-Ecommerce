@@ -49,7 +49,7 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
   };
 
   const getSignupLink = () => {
-    if (role === 'admin') return '/admin/signup';
+    if (role === 'admin') return null; // Admin signup disabled - create via AWS CLI only
     if (role === 'seller') return '/seller/signup';
     return '/signup';
   };
@@ -135,12 +135,20 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
             </button>
           </div>
 
-          <div className="text-center text-sm">
-            <span className="text-gray-400">Don't have an account? </span>
-            <Link to={getSignupLink()} className="font-medium text-gold hover:text-gold-light">
-              Sign up
-            </Link>
-          </div>
+          {getSignupLink() && (
+            <div className="text-center text-sm">
+              <span className="text-gray-400">Don't have an account? </span>
+              <Link to={getSignupLink()!} className="font-medium text-gold hover:text-gold-light">
+                Sign up
+              </Link>
+            </div>
+          )}
+          
+          {role === 'admin' && !getSignupLink() && (
+            <div className="text-center text-sm text-gray-400">
+              Admin accounts are created via AWS CLI only.
+            </div>
+          )}
         </form>
       </div>
     </div>
