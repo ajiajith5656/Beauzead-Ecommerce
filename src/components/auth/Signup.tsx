@@ -129,8 +129,23 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
     }
 
     setLoading(true);
-    setStep('otp');
-    setLoading(false);
+
+    try {
+      const result = await signUp(email, password, role, fullName, selectedCountry?.currency);
+
+      if (result.success) {
+        // Store email for OTP verification
+        sessionStorage.setItem('signupEmail', email);
+        setLoading(false);
+        setStep('otp');
+      } else {
+        setError(result.error?.message || 'Failed to sign up');
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during signup');
+      setLoading(false);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -152,20 +167,30 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpValue = otp.join('');
-    if (otpValue.length < 6) return;
-
-    setLoading(true);
-
-    const result = await signUp(email, password, role, fullName, selectedCountry?.currency);
-
-    if (result.error) {
-      setError(result.error.message || 'Failed to sign up');
-      setLoading(false);
+    if (otpValue.length < 6) {
+      setError('Please enter the complete 6-digit code');
       return;
     }
 
-    setSuccess(true);
-    setLoading(false);
+    setLoading(true);
+
+    try {
+      const signupEmail = sessionStorage.getItem('signupEmail') || email;
+      const result = await useAuth().confirmSignUp(signupEmail, otpValue);
+
+      if (result.success) {
+        setSuccess(true);
+        setLoading(false);
+        // Clear signup data
+        sessionStorage.removeItem('signupEmail');
+      } else {
+        setError(result.error?.message || 'Failed to verify OTP');
+        setLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to verify OTP');
+      setLoading(false);
+    }
   };
 
   const getLoginLink = () => {
