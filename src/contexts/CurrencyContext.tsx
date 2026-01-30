@@ -16,11 +16,28 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [rates, setRates] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
 
-  // Load currency preference from localStorage
+  // Load currency preference from localStorage and auth
   useEffect(() => {
+    // First check if there's a user-specific currency (from signup)
     const savedCurrency = localStorage.getItem('beauzead_currency');
+    const currentAuthUser = localStorage.getItem('current_auth_user');
+    
     if (savedCurrency) {
       setCurrencyState(savedCurrency);
+    }
+    
+    // If no saved currency but user is logged in, try to get from user-specific storage
+    if (!savedCurrency && currentAuthUser) {
+      try {
+        const userData = JSON.parse(currentAuthUser);
+        const userCurrency = localStorage.getItem(`currency_${userData.username}`);
+        if (userCurrency) {
+          setCurrencyState(userCurrency);
+          localStorage.setItem('beauzead_currency', userCurrency);
+        }
+      } catch (e) {
+        console.log('Could not parse auth user data');
+      }
     }
   }, []);
 
