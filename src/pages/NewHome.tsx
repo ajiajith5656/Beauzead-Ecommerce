@@ -71,19 +71,19 @@ export const NewHome: React.FC = () => {
       <ProductSection title="Featured Products" products={mockProducts} />
 
       {/* Ad Banner 1 */}
-      <AdBanner src="/images/banners/ad1.png" alt="Advertisement 1" />
+      <AdBanner src="/images/banners/ad-banner-1.png" alt="Advertisement 1" />
 
       {/* Hot Deals */}
       <ProductSection title="Hot Deals 🔥" products={hotDeals} />
 
       {/* Ad Banner 2 */}
-      <AdBanner src="/images/banners/ad2.png" alt="Advertisement 2" />
+      <AdBanner src="/images/banners/ad-banner-2.png" alt="Advertisement 2" />
 
       {/* Trending Deals */}
       <ProductSection title="Trending Now 📈" products={trendingDeals} />
 
       {/* Ad Banner 3 */}
-      <AdBanner src="/images/banners/ad3.png" alt="Advertisement 3" />
+      <AdBanner src="/images/banners/ad-banner-3.png" alt="Advertisement 3" />
 
       {/* Become a Seller CTA */}
       <div className="bg-gradient-to-r from-gray-900 to-black py-16 my-12">

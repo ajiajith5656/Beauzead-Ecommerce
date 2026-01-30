@@ -6,6 +6,7 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 import { UserDashboard } from './pages/user/UserDashboard';
+import ForgotPassword from './pages/user/ForgotPassword';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
@@ -44,6 +45,7 @@ function App() {
                 {/* User Routes */}
                 <Route path="/login" element={<Login role="user" />} />
                 <Route path="/signup" element={<Signup role="user" />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/user/dashboard" element={<UserDashboard />} />
                 
                 {/* Seller Routes */}

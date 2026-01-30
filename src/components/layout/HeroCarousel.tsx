@@ -27,12 +27,12 @@ export const HeroCarousel: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full bg-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="relative overflow-hidden rounded-lg" style={{ height: '150px' }}>
+    <div className="relative w-full bg-black my-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-lg w-full" style={{ aspectRatio: '16/3', minHeight: '120px' }}>
           {/* Banners */}
           <div
-            className="flex transition-transform duration-500 ease-in-out h-full"
+            className="flex transition-transform duration-500 ease-in-out w-full h-full"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {banners.map((banner) => (
@@ -43,7 +43,7 @@ export const HeroCarousel: React.FC = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     // Fallback to placeholder
-                    e.currentTarget.src = `https://via.placeholder.com/1500x150/1f2937/eab308?text=Ad+Banner+${banner.id}`;
+                    e.currentTarget.src = `https://via.placeholder.com/1500x150/1f2937/eab308?text=Banner+${banner.id}`;
                   }}
                 />
               </div>
@@ -53,19 +53,19 @@ export const HeroCarousel: React.FC = () => {
           {/* Navigation Buttons */}
           <button
             onClick={prevSlide}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-gold rounded-full hover:bg-opacity-75 transition-all"
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-gold rounded-full hover:bg-opacity-75 transition-all z-10"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-gold rounded-full hover:bg-opacity-75 transition-all"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black bg-opacity-50 text-gold rounded-full hover:bg-opacity-75 transition-all z-10"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
 
           {/* Dots Indicator */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
             {banners.map((_, index) => (
               <button
                 key={index}
