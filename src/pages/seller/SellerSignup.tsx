@@ -9,6 +9,9 @@ import {
   Phone,
   CheckCircle2,
   ChevronDown,
+  Eye,
+  EyeOff,
+  AlertCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
@@ -36,12 +39,15 @@ const SellerSignup: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     countryId: '',
     businessTypeId: '',
     mobile: '',
+    password: '',
   });
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -83,8 +89,50 @@ const SellerSignup: React.FC = () => {
 
   const selectedCountry = countries.find((c) => c.id === formData.countryId);
 
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters');
+    }
+    if (password.length > 16) {
+      errors.push('Password must not exceed 16 characters');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Must contain at least one uppercase letter');
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('Must contain at least one lowercase letter');
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push('Must contain at least one number');
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push('Must contain at least one special character (!@#$%^&*...)');
+    }
+    
+    return errors;
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setFormData({ ...formData, password: value });
+    if (value) {
+      setPasswordErrors(validatePassword(value));
+    } else {
+      setPasswordErrors([]);
+    }
+  };
+
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate password
+    const errors = validatePassword(formData.password);
+    if (errors.length > 0) {
+      setPasswordErrors(errors);
+      return;
+    }
+
     setIsLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
     setIsLoading(false);
@@ -125,13 +173,24 @@ const SellerSignup: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-4 z-[9999] text-white font-sans overflow-y-auto">
       {step !== 'success' && (
-        <button
-          onClick={step === 'details' ? () => navigate('/seller') : () => setStep('details')}
-          className="absolute top-8 left-8 flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-semibold group"
-        >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          {step === 'details' ? 'Exit Application' : 'Back To Details'}
-        </button>
+        <div className="absolute top-8 left-8 flex flex-col gap-3">
+          <button
+            onClick={() => navigate('/seller')}
+            className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-semibold group"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            Back to Seller Home
+          </button>
+          {step === 'otp' && (
+            <button
+              onClick={() => setStep('details')}
+              className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-semibold group"
+            >
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              Back To Details
+            </button>
+          )}
+        </div>
       )}
 
       <div className="w-full max-w-[480px] animate-in fade-in zoom-in-95 duration-500">
@@ -253,13 +312,85 @@ const SellerSignup: React.FC = () => {
                   </div>
                 </div>
 
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-500 ml-1">Password</label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-yellow-500 transition-colors">
+                      <User size={18} />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Min 8 chars, mix of upper/lower, number, special char"
+                      value={formData.password}
+                      onChange={(e) => handlePasswordChange(e.target.value)}
+                      className={`w-full bg-black border-2 text-white rounded-xl pl-12 pr-12 py-3.5 text-sm focus:outline-none transition-all placeholder:text-gray-800 ${
+                        passwordErrors.length > 0 ? 'border-red-500 focus:border-red-500' : 'border-gray-900 focus:border-yellow-500'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-yellow-500 transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  
+                  {passwordErrors.length > 0 && (
+                    <div className="space-y-1 mt-2">
+                      {passwordErrors.map((error, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs text-red-400">
+                          <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
+                          <span>{error}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-500 ml-1">Mobile Number</label>
+                  <div className="flex gap-2">
+                    <div className="w-24 bg-[#1a1a1a] border-2 border-gray-900 text-gray-500 rounded-xl px-4 py-3.5 text-sm font-semibold flex items-center justify-center select-none">
+                      {selectedCountry?.dialCode || '+0'}
+                    </div>
+                    <div className="relative group flex-1">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-yellow-500 transition-colors">
+                        <Phone size={18} />
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="Mobile number"
+                        value={formData.mobile}
+                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                        className="w-full bg-black border-2 border-gray-900 text-white rounded-xl pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-yellow-500 transition-all placeholder:text-gray-800"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || passwordErrors.length > 0}
                   className="w-full bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-xl font-semibold transition-all shadow-[0_15px_30px_rgba(234,179,8,0.15)] active:scale-95 flex items-center justify-center h-14 disabled:opacity-50 mt-4"
                 >
                   {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Send OTP'}
                 </button>
+                
+                <div className="text-center mt-6">
+                  <p className="text-gray-400 text-xs font-medium">
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/seller/login')}
+                      className="text-yellow-500 hover:text-yellow-400 font-semibold transition-colors"
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </div>
               </form>
             </div>
           </>
