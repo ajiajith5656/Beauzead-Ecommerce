@@ -1,3 +1,11 @@
+// Utility function to format prices
+export const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(price);
+};
+
 export const COUNTRIES_ALLOWED = [
   { code: 'US', name: 'United States', dialCode: '+1' },
   { code: 'GB', name: 'United Kingdom', dialCode: '+44' },
