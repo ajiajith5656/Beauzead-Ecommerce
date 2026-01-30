@@ -3,9 +3,27 @@ import {
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, Plus, Filter, Eye,
   Trash2, Edit3, CheckCircle2, AlertTriangle, Clock, TrendingUp,
-  Star, Image as ImageIcon, Search, Tag, Layers, Box
+  Star, Image as ImageIcon, Search
 } from 'lucide-react';
 import { ALL_PRODUCTS, formatPrice } from '../../constants';
+
+interface SellerProduct {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  stockCount: number;
+  inStock: boolean;
+  approved: boolean;
+  revenue: number;
+  orders: number;
+  views: number;
+  rating: number | string;
+  image: string;
+  brand?: string;
+  reviewCount?: number;
+  discount?: number;
+}
 
 interface SellerProductListingProps {
   onLogout: () => void;
@@ -13,13 +31,13 @@ interface SellerProductListingProps {
   onNavigate: (view: any) => void;
 }
 
-const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, sellerEmail, onNavigate }) => {
+const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 
   // Mock seller products (in real app, filter by seller_id)
-  const sellerProducts = ALL_PRODUCTS.map((product, index) => ({
+  const sellerProducts: SellerProduct[] = ALL_PRODUCTS.map((product: any, index: number) => ({
     ...product,
     stockCount: product.stockCount || Math.floor(Math.random() * 100) + 1,
     brand: product.brand || 'BeauZead',
@@ -31,9 +49,9 @@ const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, s
     revenue: product.price * (Math.floor(Math.random() * 200) + 10)
   }));
 
-  const filteredProducts = sellerProducts.filter(product => {
+  const filteredProducts = sellerProducts.filter((product: SellerProduct) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.id.toLowerCase().includes(searchQuery.toLowerCase());
+                         product.id.toString().toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'active' && product.approved && product.inStock) ||
@@ -43,15 +61,15 @@ const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, s
   });
 
   const stats = {
-    active: sellerProducts.filter(p => p.approved && p.inStock).length,
-    lowStock: sellerProducts.filter(p => p.stockCount < 10).length,
-    pending: sellerProducts.filter(p => !p.approved).length,
-    totalRevenue: sellerProducts.reduce((sum, p) => sum + p.revenue, 0),
-    totalOrders: sellerProducts.reduce((sum, p) => sum + p.orders, 0),
-    totalViews: sellerProducts.reduce((sum, p) => sum + p.views, 0)
+    active: sellerProducts.filter((p: SellerProduct) => p.approved && p.inStock).length,
+    lowStock: sellerProducts.filter((p: SellerProduct) => p.stockCount < 10).length,
+    pending: sellerProducts.filter((p: SellerProduct) => !p.approved).length,
+    totalRevenue: sellerProducts.reduce((sum: number, p: SellerProduct) => sum + p.revenue, 0),
+    totalOrders: sellerProducts.reduce((sum: number, p: SellerProduct) => sum + p.orders, 0),
+    totalViews: sellerProducts.reduce((sum: number, p: SellerProduct) => sum + p.views, 0)
   };
 
-  const categories = Array.from(new Set(sellerProducts.map(p => p.category)));
+  const categories: string[] = Array.from(new Set(sellerProducts.map((p: SellerProduct) => p.category)));
 
   return (
     <div className="min-h-screen bg-black text-white flex font-sans">
@@ -145,7 +163,7 @@ const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, s
               className="w-full bg-black border border-gray-800 rounded-2xl px-4 py-4 text-sm text-white focus:outline-none focus:border-yellow-500 transition-colors cursor-pointer appearance-none"
             >
               <option value="all">All Categories</option>
-              {categories.map(cat => (
+              {categories.map((cat: string) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -205,7 +223,7 @@ const SellerProductListing: React.FC<SellerProductListingProps> = ({ onLogout, s
 
         {/* Listing Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-           {filteredProducts.map((product) => (
+           {filteredProducts.map((product: SellerProduct) => (
              <div key={product.id} className="bg-[#0a0a0a] border border-gray-900 rounded-[2.5rem] p-8 group hover:border-yellow-500/30 transition-all relative overflow-hidden">
                 {/* Status Badge */}
                 {!product.approved && (

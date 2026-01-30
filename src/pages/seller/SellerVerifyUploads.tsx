@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { 
   ArrowLeft, CheckCircle2, X, Loader2, Image, 
-  FileStack, CreditCard, Landmark, FileText, Upload
+  FileStack, CreditCard, Landmark, Upload
 } from 'lucide-react';
 
 interface SellerVerifyUploadsProps {

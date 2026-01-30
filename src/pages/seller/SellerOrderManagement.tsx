@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
-  Settings, LogOut, CheckCircle, XCircle, Clock, 
-  Truck, MapPin, User, Phone, Mail, TrendingUp,
+  Settings, LogOut, CheckCircle, XCircle,
+  Truck, MapPin, User, Phone, TrendingUp,
   Search, Filter, Download, Eye, AlertCircle, PackageCheck
 } from 'lucide-react';
 import { formatPrice } from '../../constants';

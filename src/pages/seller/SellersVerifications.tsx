@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, Building2, User, Phone, Mail, 
-  MapPin, Landmark, FileText, ChevronRight, Globe
+import React, { useState } from 'react';
+import {
+  ArrowLeft, Building2, User, Mail,
+  Landmark, FileText, ChevronRight
 } from 'lucide-react';
 import { COUNTRIES_ALLOWED, BUSINESS_TYPES } from '../../constants';
 

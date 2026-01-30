@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-beauzeadecommerce-dev-33f4b-authRole",
+      "UnauthRoleArn": "arn:aws:iam::422287834049:role/amplify-beauzeadecommerce-dev-33f4b-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::422287834049:role/amplify-beauzeadecommerce-dev-33f4b-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-beauzeadecommerce-dev-33f4b-deployment",
+      "UnauthRoleName": "amplify-beauzeadecommerce-dev-33f4b-unauthRole",
+      "StackName": "amplify-beauzeadecommerce-dev-33f4b",
+      "StackId": "arn:aws:cloudformation:us-east-1:422287834049:stack/amplify-beauzeadecommerce-dev-33f4b/79895fa0-fe20-11f0-a628-0e6492ae4d33",
+      "AmplifyAppId": "d9zynv3b1wp98"
+    },
+    "categories": {
+      "api": {
+        "beauzeadecommerce": {}
+      }
+    }
+  }
+}

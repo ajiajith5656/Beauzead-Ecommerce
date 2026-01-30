@@ -51,7 +51,21 @@ function App() {
                 <Route path="/seller/login" element={<SellerLogin />} />
                 <Route path="/seller/signup" element={<SellerSignup />} />
                 <Route path="/seller/forgot-password" element={<SellerForgotPassword />} />
-                <Route path="/seller/dashboard" element={<SellerDashboard />} />
+                <Route 
+                  path="/seller/dashboard" 
+                  element={
+                    <SellerDashboard 
+                      onLogout={() => window.location.href = '/seller/login'}
+                      sellerEmail="seller@example.com"
+                      onNavigate={(view: string) => {
+                        if (view === 'seller-dashboard') window.location.href = '/seller/dashboard';
+                        if (view === 'seller-verify') window.location.href = '/seller/verify';
+                        if (view === 'seller-product-listing') window.location.href = '/seller/products';
+                      }}
+                      verificationStatus="unverified"
+                    />
+                  } 
+                />
                 
                 {/* Admin Routes */}
                 <Route path="/admin/login" element={<Navigate to="/seller/login" replace />} />

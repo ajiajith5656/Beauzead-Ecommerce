@@ -132,7 +132,7 @@ export const ReportsManagement: React.FC = () => {
         <div className="mt-6">
           <button
             onClick={handleGenerate}
-            disabled={loading || (startDate && !endDate) || (!startDate && endDate)}
+            disabled={loading || (!!startDate && !endDate) || (!startDate && !!endDate)}
             className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? 'Generating...' : 'Generate Report'}

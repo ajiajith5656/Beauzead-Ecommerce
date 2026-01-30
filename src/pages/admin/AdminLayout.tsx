@@ -26,7 +26,7 @@ export const AdminLayout: React.FC = () => {
   }
 
   const adminName = user?.full_name || currentAuthUser?.username || 'Admin';
-  const adminId = user?.id || currentAuthUser?.userId || 'Unknown';
+  const adminId = user?.id || (currentAuthUser as any)?.userId || 'Unknown';
 
   return (
     <div className="flex h-screen bg-gray-100">

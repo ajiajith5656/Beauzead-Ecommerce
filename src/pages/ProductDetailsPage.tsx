@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Star, Heart, ShoppingCart, ShieldCheck,
-  Truck, CreditCard, CheckCircle, ChevronRight,
-  ChevronLeft, Info, MapPin, Mail, X, Share2,
-  Lock, Loader2, ArrowLeft
+  Truck, CreditCard, ChevronRight,
+  Info, MapPin, Mail, X,
+  Lock, ArrowLeft
 } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
@@ -39,7 +39,6 @@ const ProductDetailsPage: React.FC = () => {
   const product = allProducts.find((item) => item.id === productId);
 
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('Free Size');
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewFormData, setReviewFormData] = useState({ rating: 0, heading: '', text: '' });

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, TrendingUp, TrendingDown, 
-  Download, Calendar, CreditCard, AlertCircle, 
+  Download, AlertCircle, 
   CheckCircle, Clock, ArrowUpRight, ArrowDownRight,
-  Wallet, RefreshCw, Filter, Search
+  Wallet, RefreshCw, Search
 } from 'lucide-react';
 import { formatPrice } from '../../constants';
 

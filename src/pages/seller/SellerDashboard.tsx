@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { 
   LayoutDashboard, ShoppingBag, DollarSign, BarChart2, 
   Package, Settings, LogOut, Bell, TrendingUp, 
-  Plus, Search, Filter, MoreVertical, CheckCircle2, 
-  Clock, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  ShieldCheck, Globe, CreditCard, ChevronRight, X, Info,
-  Eye, Wallet, TrendingDown
+  MoreVertical, Clock, AlertTriangle, ArrowUpRight, ArrowDownRight,
+  ShieldCheck, X, Info, Menu
 } from 'lucide-react';
-import { formatPrice } from '../../constants';
 
 interface SellerDashboardProps {
   onLogout: () => void;
@@ -18,18 +15,50 @@ interface SellerDashboardProps {
 
 type DashboardSection = 'overview' | 'products' | 'orders' | 'sales' | 'payouts' | 'settings';
 
-const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail, onNavigate, verificationStatus }) => {
+const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, onNavigate, verificationStatus }) => {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const isPending = verificationStatus === 'pending';
   const isVerified = verificationStatus === 'verified';
 
+  // Prevent body scroll when mobile menu is open
+  React.useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <div className="min-h-screen bg-black text-white flex font-sans">
-      <aside className="w-72 border-r border-gray-900 hidden lg:flex flex-col p-8 sticky top-0 h-screen">
-        <div className="mb-12 cursor-pointer" onClick={() => onNavigate('seller-dashboard')}>
-          <h1 className="text-2xl font-semibold text-white">Seller Hub</h1>
-          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Merchant Portal</p>
+      {/* Mobile Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`w-72 bg-black border-r border-gray-900 flex flex-col p-6 sm:p-8 top-0 h-screen transition-transform duration-300 z-50 ${
+        mobileMenuOpen ? 'fixed translate-x-0' : 'fixed -translate-x-full lg:sticky lg:relative lg:translate-x-0'
+      }`}>
+        <div className="flex items-start justify-between mb-8 sm:mb-12">
+          <div className="cursor-pointer" onClick={() => onNavigate('seller-dashboard')}>
+            <h1 className="text-2xl font-semibold text-white">Seller Hub</h1>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Merchant Portal</p>
+          </div>
+          <button 
+            onClick={() => setMobileMenuOpen(false)}
+            className="lg:hidden p-2 hover:bg-gray-900 rounded-lg transition-colors"
+          >
+            <X size={24} />
+          </button>
         </div>
 
         <nav className="space-y-3 flex-1">
@@ -37,41 +66,41 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail
             icon={<LayoutDashboard />} 
             label="Overview" 
             active={activeSection === 'overview'} 
-            onClick={() => setActiveSection('overview')} 
+            onClick={() => { setActiveSection('overview'); setMobileMenuOpen(false); }} 
           />
           <NavItem 
             icon={<Package />} 
             label="My Products" 
             active={activeSection === 'products'} 
-            onClick={() => onNavigate('seller-product-listing')} 
+            onClick={() => { onNavigate('seller-product-listing'); setMobileMenuOpen(false); }} 
             disabled={!isVerified}
           />
           <NavItem 
             icon={<ShoppingBag />} 
             label="Order Tracking" 
             active={activeSection === 'orders'} 
-            onClick={() => setActiveSection('orders')} 
+            onClick={() => { setActiveSection('orders'); setMobileMenuOpen(false); }} 
             disabled={!isVerified}
           />
           <NavItem 
             icon={<BarChart2 />} 
             label="Sales Reports" 
             active={activeSection === 'sales'} 
-            onClick={() => setActiveSection('sales')} 
+            onClick={() => { setActiveSection('sales'); setMobileMenuOpen(false); }} 
             disabled={!isVerified}
           />
           <NavItem 
             icon={<DollarSign />} 
             label="Payout Info" 
             active={activeSection === 'payouts'} 
-            onClick={() => setActiveSection('payouts')} 
+            onClick={() => { setActiveSection('payouts'); setMobileMenuOpen(false); }} 
             disabled={!isVerified}
           />
           <NavItem 
             icon={<Settings />} 
             label="Store Settings" 
             active={activeSection === 'settings'} 
-            onClick={() => setActiveSection('settings')} 
+            onClick={() => { setActiveSection('settings'); setMobileMenuOpen(false); }} 
           />
         </nav>
 
@@ -83,47 +112,55 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail
         </div>
       </aside>
 
-      <main className="flex-1 p-10 md:p-16 overflow-y-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
-          <div>
-            <h2 className="text-4xl font-semibold text-white tracking-tight">
-              {activeSection === 'overview' ? 'Overview' : activeSection.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}
-            </h2>
-            <p className="text-gray-500 text-sm font-medium mt-1">Manage your premium marketplace presence</p>
+      <main className="flex-1 w-full max-w-full overflow-x-hidden p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16 overflow-y-auto">
+        <header className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-12">
+          <div className="flex items-center gap-3 sm:gap-4 w-full">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-3 bg-gray-900 border border-gray-800 rounded-xl hover:bg-gray-800 transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-tight truncate">
+                {activeSection === 'overview' ? 'Overview' : activeSection.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}
+              </h2>
+              <p className="text-gray-500 text-xs sm:text-sm font-medium mt-0.5 sm:mt-1">Manage your premium marketplace presence</p>
+            </div>
           </div>
           
-          <div className="flex items-center gap-5 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             {verificationStatus === 'unverified' && (
               <button 
                 onClick={() => onNavigate('seller-verify')}
-                className="flex-1 md:flex-none bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl transition-all shadow-lg shadow-yellow-500/10 flex items-center justify-center gap-3 text-[10px] uppercase tracking-widest animate-pulse"
+                className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl transition-all shadow-lg shadow-yellow-500/10 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest animate-pulse"
               >
-                <ShieldCheck size={18} />
-                Verify My Store
+                <ShieldCheck size={16} />
+                <span>Verify My Store</span>
               </button>
             )}
 
             {isPending && (
-              <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-8 py-4 rounded-xl flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
-                <Clock size={18} />
-                Pending Approval
+              <div className="w-full sm:w-auto bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest justify-center">
+                <Clock size={16} />
+                <span>Pending</span>
               </div>
             )}
             
-            <div className="flex items-center gap-4">
-              <button className="p-4 bg-gray-900 border border-gray-800 rounded-2xl relative text-gray-400 hover:text-white transition-colors">
-                <Bell size={22} />
-                <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-yellow-500 rounded-full border-2 border-black"></span>
+            <div className="flex items-center gap-2 sm:gap-3 justify-between sm:justify-start w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
+              <button className="p-2.5 sm:p-3 bg-gray-900 border border-gray-800 rounded-lg sm:rounded-xl relative text-gray-400 hover:text-white transition-colors">
+                <Bell size={18} className="sm:w-5 sm:h-5" />
+                <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-500 rounded-full border border-black"></span>
               </button>
-              <div className="h-12 w-px bg-gray-900 mx-2"></div>
-              <div className="flex items-center gap-4">
-                <div className="text-right hidden sm:block">
-                  <p className="text-xs font-bold text-white uppercase tracking-wider">Merchant Elite</p>
-                  <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${isVerified ? 'text-green-500' : isPending ? 'text-blue-500' : 'text-gray-600'}`}>
-                    {isVerified ? 'Verified Partner' : isPending ? 'Review In Progress' : 'Unverified Status'}
+              <div className="h-8 sm:h-10 w-px bg-gray-900"></div>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-right hidden md:block">
+                  <p className="text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider">Merchant Elite</p>
+                  <p className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-widest mt-0.5 ${isVerified ? 'text-green-500' : isPending ? 'text-blue-500' : 'text-gray-600'}`}>
+                    {isVerified ? 'Verified' : isPending ? 'Pending' : 'Unverified'}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center text-yellow-500 font-bold text-lg">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center text-yellow-500 font-bold text-sm sm:text-base">
                   BZ
                 </div>
               </div>
@@ -134,16 +171,16 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail
         {activeSection === 'overview' && renderOverview(verificationStatus, onNavigate)}
         
         {activeSection !== 'overview' && activeSection !== 'settings' && !isVerified && (
-          <div className="bg-[#0a0a0a] border border-gray-900 rounded-[3rem] p-20 text-center animate-in fade-in duration-500">
-             <div className="w-24 h-24 bg-gray-900 border border-gray-800 rounded-[2rem] flex items-center justify-center mx-auto mb-10 text-gray-600">
-               <ShieldCheck size={48} />
+          <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center animate-in fade-in duration-500">
+             <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-900 border border-gray-800 rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-gray-600">
+               <ShieldCheck size={32} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
              </div>
-             <h3 className="text-3xl font-semibold mb-3">Access Restricted</h3>
-             <p className="text-gray-500 text-base font-medium mb-12 max-w-lg mx-auto leading-relaxed">Full dashboard capabilities are unlocked once your business verification is completed and approved by our administration team.</p>
+             <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3">Access Restricted</h3>
+             <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium mb-6 sm:mb-8 md:mb-10 lg:mb-12 max-w-lg mx-auto leading-relaxed">Full dashboard capabilities are unlocked once your business verification is completed and approved by our administration team.</p>
              {verificationStatus === 'unverified' && (
                <button 
                  onClick={() => onNavigate('seller-verify')}
-                 className="bg-white text-black font-bold px-12 py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all shadow-2xl"
+                 className="bg-white text-black font-bold px-8 sm:px-10 md:px-12 py-3 sm:py-4 md:py-5 rounded-lg sm:rounded-xl md:rounded-2xl text-[10px] uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all shadow-2xl"
                >
                  Start Verification Now
                </button>
@@ -152,10 +189,10 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail
         )}
 
         {activeSection === 'settings' && (
-          <div className="bg-[#0a0a0a] border border-gray-900 rounded-[3rem] p-20 text-center">
-            <Settings size={64} className="mx-auto mb-8 text-gray-800" />
-            <h3 className="text-3xl font-semibold mb-3">Store Configuration</h3>
-            <p className="text-gray-500 text-base font-medium">Store profile and policy settings are being updated for production.</p>
+          <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center">
+            <Settings size={40} className="mx-auto mb-4 sm:mb-6 md:mb-8 text-gray-800 sm:w-12 sm:h-12 md:w-16 md:h-16" />
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3">Store Configuration</h3>
+            <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium">Store profile and policy settings are being updated for production.</p>
           </div>
         )}
       </main>
@@ -166,19 +203,19 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, sellerEmail
 const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigate: (v: any) => void) => (
   <div className="animate-in fade-in duration-500">
     {status === 'unverified' && (
-      <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-[2.5rem] p-10 mb-12 flex flex-col md:flex-row items-center justify-between gap-8 transition-all hover:bg-yellow-500/10">
-        <div className="flex items-center gap-8">
-          <div className="w-20 h-20 bg-yellow-500 rounded-[1.5rem] flex items-center justify-center text-black shadow-2xl shadow-yellow-500/20">
-            <AlertTriangle size={36} />
+      <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 md:mb-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 transition-all hover:bg-yellow-500/10">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-yellow-500 rounded-lg sm:rounded-xl flex items-center justify-center text-black shadow-2xl shadow-yellow-500/20 flex-shrink-0">
+            <AlertTriangle size={28} className="sm:w-8 sm:h-8" />
           </div>
-          <div>
-            <h4 className="text-2xl font-semibold">Store Verification Required</h4>
-            <p className="text-gray-500 text-base font-medium mt-1">Verify your business identity to list products and access global customers.</p>
+          <div className="flex-1">
+            <h4 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1">Store Verification Required</h4>
+            <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium">Verify your business identity to list products and access global customers.</p>
           </div>
         </div>
         <button 
           onClick={() => onNavigate('seller-verify')}
-          className="bg-white text-black font-bold px-10 py-4 rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all active:scale-95 shadow-2xl"
+          className="w-full sm:w-auto bg-white text-black font-bold px-6 sm:px-8 py-3 rounded-lg sm:rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all active:scale-95 shadow-2xl whitespace-nowrap"
         >
           Begin Verification
         </button>
@@ -186,39 +223,39 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
     )}
 
     {status === 'pending' && (
-      <div className="bg-blue-500/5 border border-blue-500/20 rounded-[2.5rem] p-10 mb-12 flex flex-col md:flex-row items-center justify-between gap-8">
-        <div className="flex items-center gap-8">
-          <div className="w-20 h-20 bg-blue-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-blue-500/20">
-            <Clock size={36} />
+      <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 md:mb-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-blue-500 rounded-lg sm:rounded-xl flex items-center justify-center text-white shadow-2xl shadow-blue-500/20 flex-shrink-0">
+            <Clock size={28} className="sm:w-8 sm:h-8" />
           </div>
-          <div>
-            <h4 className="text-2xl font-semibold">Review In Progress</h4>
-            <p className="text-gray-500 text-base font-medium mt-1">Our compliance team is reviewing your documents. Turnaround is typically 48-72 hours.</p>
+          <div className="flex-1">
+            <h4 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1">Review In Progress</h4>
+            <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium">Our compliance team is reviewing your documents. Turnaround is typically 48-72 hours.</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-blue-400 font-bold text-[10px] uppercase tracking-[0.2em] bg-blue-500/10 px-8 py-4 rounded-xl border border-blue-500/20">
-           <Info size={18} /> Pending Approval
+        <div className="flex items-center gap-2 text-blue-400 font-bold text-[10px] uppercase tracking-[0.2em] bg-blue-500/10 px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-blue-500/20">
+           <Info size={16} /> Pending Approval
         </div>
       </div>
     )}
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 mb-16">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
       <MerchantStat label="Total Payouts" value={status === 'verified' ? "$12,850.00" : "$0.00"} trend={status === 'verified' ? "+14.2%" : "0%"} icon={<DollarSign />} positive />
       <MerchantStat label="Active Orders" value={status === 'verified' ? "28" : "0"} trend={status === 'verified' ? "+5.1%" : "0%"} icon={<Package />} positive />
       <MerchantStat label="Store Visits" value={status === 'verified' ? "5.2k" : "0"} trend={status === 'verified' ? "-2.4%" : "0%"} icon={<BarChart2 />} positive={status === 'verified' ? false : true} />
       <MerchantStat label="Growth Rate" value={status === 'verified' ? "24%" : "0%"} trend={status === 'verified' ? "+12.1%" : "0%"} icon={<TrendingUp />} positive />
     </div>
 
-    <div className="grid lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 bg-[#0a0a0a] border border-gray-900 rounded-[3rem] p-12 flex flex-col justify-center items-center text-center group hover:border-yellow-500/20 transition-all">
-        <div className="w-24 h-24 bg-gray-900 rounded-[2rem] flex items-center justify-center text-gray-700 mb-8 border border-gray-800 group-hover:scale-110 transition-transform">
-          <BarChart2 size={48} />
+    <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+      <div className="lg:col-span-2 bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center items-center text-center group hover:border-yellow-500/20 transition-all">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-900 rounded-xl sm:rounded-2xl flex items-center justify-center text-gray-700 mb-4 sm:mb-6 md:mb-8 border border-gray-800 group-hover:scale-110 transition-transform">
+          <BarChart2 size={32} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
         </div>
-        <h3 className="text-2xl font-semibold text-white mb-2">Performance Analytics</h3>
-        <p className="text-gray-500 text-base font-medium max-w-sm leading-relaxed">Deep-learning sales insights and global traffic trends will be available once your store is active.</p>
+        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2">Performance Analytics</h3>
+        <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium max-w-sm leading-relaxed">Deep-learning sales insights and global traffic trends will be available once your store is active.</p>
       </div>
       
-      <div className="bg-[#0a0a0a] border border-gray-900 rounded-[3rem] p-12 flex flex-col">
+      <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col">
         <h3 className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] mb-10 flex items-center justify-between">
           Recent Orders
           <button className="text-yellow-500 hover:text-white transition-colors"><MoreVertical size={18} /></button>
@@ -259,18 +296,18 @@ const NavItem = ({ icon, label, active, onClick, disabled = false }: { icon: Rea
 );
 
 const MerchantStat = ({ label, value, trend, icon, positive }: { label: string, value: string, trend: string, icon: React.ReactNode, positive: boolean }) => (
-  <div className="bg-[#0a0a0a] border border-gray-900 p-10 rounded-[2.5rem] hover:border-yellow-500/30 transition-all group">
-    <div className="flex justify-between items-start mb-8">
-      <div className="w-14 h-14 bg-black border border-gray-800 rounded-2xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
-        {React.cloneElement(icon as React.ReactElement<any>, { size: 28 })}
+  <div className="bg-[#0a0a0a] border border-gray-900 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl hover:border-yellow-500/30 transition-all group">
+    <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-6">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-black border border-gray-800 rounded-lg sm:rounded-xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
+        {React.cloneElement(icon as React.ReactElement<any>, { size: 20, className: 'sm:w-6 sm:h-6' })}
       </div>
-      <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg ${positive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-        {positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+      <div className={`flex items-center gap-1 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg ${positive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+        {positive ? <ArrowUpRight size={10} className="sm:w-3 sm:h-3" /> : <ArrowDownRight size={10} className="sm:w-3 sm:h-3" />}
         {trend}
       </div>
     </div>
-    <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-1">{label}</p>
-    <h3 className="text-3xl font-semibold text-white tracking-tight">{value}</h3>
+    <p className="text-[9px] sm:text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-0.5 sm:mb-1">{label}</p>
+    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white tracking-tight">{value}</h3>
   </div>
 );
 

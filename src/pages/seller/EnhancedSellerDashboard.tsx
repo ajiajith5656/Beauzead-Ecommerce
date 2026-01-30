@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   LayoutDashboard, ShoppingBag, DollarSign, Package, 
   Settings, LogOut, Bell, TrendingUp, CheckCircle2, 
-  Clock, AlertTriangle, ShieldCheck, Info, Eye, Wallet,
-  TrendingDown, ArrowUpRight, Calendar, FileText, Plus
+  Clock, AlertTriangle, ShieldCheck, Info, Wallet,
+  TrendingDown, FileText, Plus
 } from 'lucide-react';
 import { formatPrice } from '../../constants';
 
@@ -21,7 +21,6 @@ const EnhancedSellerDashboard: React.FC<EnhancedSellerDashboardProps> = ({
   verificationStatus 
 }) => {
   const isVerified = verificationStatus === 'verified';
-  const isPending = verificationStatus === 'pending';
 
   // Mock data
   const dashboardData = {
