@@ -14,6 +14,10 @@
     "categories": {
       "api": {
         "beauzeadecommerce": {}
+      },
+      "auth": {
+        "beauzeadecommerce374a392f": {},
+        "userPoolGroups": {}
       }
     }
   }

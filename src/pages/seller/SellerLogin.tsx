@@ -48,8 +48,8 @@ const SellerLogin: React.FC = () => {
           Back to Home
         </Link>
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold">Sign in to your account</h1>
-          <p className="text-gray-500 text-sm mt-2">Enter your email and password to continue.</p>
+          <h1 className="text-2xl md:text-3xl font-semibold">Seller & Admin Login</h1>
+          <p className="text-gray-500 text-sm mt-2">Enter your email and password to access your account.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
