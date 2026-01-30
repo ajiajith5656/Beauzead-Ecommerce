@@ -42,12 +42,6 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
     }, 500);
   };
 
-  const getRoleTitle = () => {
-    if (role === 'admin') return 'Admin';
-    if (role === 'seller') return 'Seller';
-    return 'User';
-  };
-
   const getSignupLink = () => {
     if (role === 'admin') return null; // Admin signup disabled - create via AWS CLI only
     if (role === 'seller') return '/seller/signup';
@@ -55,97 +49,93 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-4xl font-extrabold text-gold">
-            Beauzead
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            {getRoleTitle()} Login
-          </p>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10 relative">
+        <Link
+          to="/"
+          className="absolute top-4 left-4 text-xs font-semibold text-gray-500 hover:text-black"
+        >
+          Back to Home
+        </Link>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl md:text-3xl font-semibold">Sign in to your account</h1>
+          <p className="text-gray-500 text-sm mt-2">Enter your email and password to continue.</p>
         </div>
-        <form className="mt-8 space-y-6 card" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-900 bg-opacity-20 p-4 border border-red-700">
-              <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-400" />
-                <div className="ml-3">
-                  <p className="text-sm text-red-400">{error}</p>
-                </div>
+            <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                <span>{error}</span>
               </div>
             </div>
           )}
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-field pl-10 w-full"
-                  placeholder="Enter your email"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-500" />
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pl-10 w-full"
-                  placeholder="Enter your password"
-                />
-              </div>
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-2 focus:ring-black/10 outline-none text-sm"
+                placeholder="you@example.com"
+              />
             </div>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-gold hover:text-gold-light">
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-2 focus:ring-black/10 outline-none text-sm"
+                placeholder="Enter your password"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-xs font-semibold text-gray-500 hover:text-black"
+              >
                 Forgot password?
               </Link>
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors disabled:opacity-60"
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
 
           {getSignupLink() && (
-            <div className="text-center text-sm">
-              <span className="text-gray-400">Don't have an account? </span>
-              <Link to={getSignupLink()!} className="font-medium text-gold hover:text-gold-light">
-                Sign up
+            <div className="text-center text-sm text-gray-600">
+              New here?{' '}
+              <Link to={getSignupLink()!} className="font-semibold text-black hover:underline">
+                Create your account
               </Link>
             </div>
           )}
-          
+
           {role === 'admin' && !getSignupLink() && (
-            <div className="text-center text-sm text-gray-400">
+            <div className="text-center text-sm text-gray-500">
               Admin accounts are created via AWS CLI only.
             </div>
           )}

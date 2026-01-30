@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  ArrowLeft,
   Loader2,
   Mail,
   User,
@@ -13,7 +12,7 @@ import {
   EyeOff,
   AlertCircle,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 // @ts-ignore
 import { listCountryListBzdcores, listBusinessTypeBzdcores } from '../../graphql/queries';
@@ -171,33 +170,19 @@ const SellerSignup: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-4 z-[9999] text-white font-sans overflow-y-auto">
-      {step !== 'success' && (
-        <div className="absolute top-8 left-8 flex flex-col gap-3">
-          <button
-            onClick={() => navigate('/seller')}
-            className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-semibold group"
-          >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-            Back to Seller Home
-          </button>
-          {step === 'otp' && (
-            <button
-              onClick={() => setStep('details')}
-              className="flex items-center gap-2 text-gray-500 hover:text-white transition-colors text-xs font-semibold group"
-            >
-              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-              Back To Details
-            </button>
-          )}
-        </div>
-      )}
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10 relative">
+        <Link
+          to="/"
+          className="absolute top-4 left-4 text-xs font-semibold text-gray-500 hover:text-black"
+        >
+          Back to Home
+        </Link>
 
-      <div className="w-full max-w-[480px] animate-in fade-in zoom-in-95 duration-500">
         {step === 'details' && (
           <>
-            <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-4xl font-semibold mb-3 text-white">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-semibold mb-3 text-black">
                 Create My Store
               </h1>
               <p className="text-gray-500 text-sm font-medium leading-relaxed">
@@ -205,8 +190,7 @@ const SellerSignup: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-[#0d0d0d] rounded-2xl p-8 md:p-10 border border-gray-900 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
+            <div className="bg-transparent p-0">
               <form onSubmit={handleDetailsSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-500 ml-1">Business Country</label>
@@ -398,8 +382,8 @@ const SellerSignup: React.FC = () => {
 
         {step === 'otp' && (
           <>
-            <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-4xl font-semibold mb-3 text-white">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl font-semibold mb-3 text-black">
                 Verify Your Email
               </h1>
               <p className="text-gray-500 text-sm font-medium leading-relaxed">
@@ -407,8 +391,7 @@ const SellerSignup: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-[#0d0d0d] rounded-2xl p-8 md:p-10 border border-gray-900 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50"></div>
+            <div className="bg-transparent p-0">
               <form onSubmit={handleVerifyOtp} className="space-y-8">
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
                   {otp.map((digit, i) => (
@@ -423,7 +406,7 @@ const SellerSignup: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleOtpChange(i, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                      className="w-full aspect-square bg-black border-2 border-gray-900 rounded-xl text-center text-xl font-semibold text-white focus:border-yellow-500 focus:outline-none transition-all"
+                      className="w-full py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-2 focus:ring-black/10 outline-none text-center text-xl font-semibold"
                     />
                   ))}
                 </div>
@@ -432,17 +415,26 @@ const SellerSignup: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading || otp.join('').length < 6}
-                    className="w-full bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-xl font-semibold transition-all shadow-[0_15px_30px_rgba(234,179,8,0.15)] active:scale-95 flex items-center justify-center h-14 disabled:opacity-50"
+                    className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors disabled:opacity-50"
                   >
                     {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Verify OTP'}
                   </button>
-                  <div className="text-center">
+                  <div className="text-center space-y-2">
                     <button
                       type="button"
-                      className="text-xs font-semibold text-yellow-500/60 hover:text-yellow-500 transition-colors"
+                      className="text-xs font-semibold text-gray-500 hover:text-black transition-colors"
                     >
                       Resend Code
                     </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => setStep('details')}
+                        className="text-xs font-semibold text-gray-500 hover:text-black transition-colors"
+                      >
+                        Back to Details
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -460,7 +452,7 @@ const SellerSignup: React.FC = () => {
                 <CheckCircle2 size={48} className="animate-bounce" />
               </div>
             </div>
-            <h1 className="text-3xl md:text-4xl font-semibold mb-4 text-white">
+            <h1 className="text-3xl md:text-4xl font-semibold mb-4 text-black">
               Verification Successful
             </h1>
             <p className="text-gray-500 text-sm font-medium mb-12 leading-relaxed">
@@ -468,7 +460,7 @@ const SellerSignup: React.FC = () => {
             </p>
             <button
               onClick={finalizeSignup}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 text-black py-5 rounded-xl font-semibold transition-all shadow-2xl active:scale-95"
+              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
             >
               Enter Seller Dashboard
             </button>

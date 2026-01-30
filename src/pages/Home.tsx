@@ -19,9 +19,6 @@ export const Home: React.FC = () => {
               <Link to="/seller/login" className="text-gold hover:text-gold-light font-medium">
                 Seller Login
               </Link>
-              <Link to="/admin/login" className="text-gold hover:text-gold-light font-medium">
-                Admin Login
-              </Link>
             </div>
           </div>
         </div>

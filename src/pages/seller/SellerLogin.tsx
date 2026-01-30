@@ -40,10 +40,16 @@ const SellerLogin: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10">
+      <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10 relative">
+        <Link
+          to="/"
+          className="absolute top-4 left-4 text-xs font-semibold text-gray-500 hover:text-black"
+        >
+          Back to Home
+        </Link>
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold">Access Your Store & Sell Globally</h1>
-          <p className="text-gray-500 text-sm mt-2">Sign in to manage your store and orders.</p>
+          <h1 className="text-2xl md:text-3xl font-semibold">Sign in to your account</h1>
+          <p className="text-gray-500 text-sm mt-2">Enter your email and password to continue.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -65,7 +71,7 @@ const SellerLogin: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="merchant@beauzead.store"
+                placeholder="you@example.com"
                 className="w-full pl-10 pr-3 py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-2 focus:ring-black/10 outline-none text-sm"
               />
             </div>
@@ -117,7 +123,7 @@ const SellerLogin: React.FC = () => {
         <div className="text-center mt-6 text-sm text-gray-600">
           New here?{' '}
           <Link to="/seller/signup" className="font-semibold text-black hover:underline">
-            Create your global store
+            Create your account
           </Link>
         </div>
       </div>
