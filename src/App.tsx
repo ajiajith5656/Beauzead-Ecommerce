@@ -7,6 +7,11 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 import { UserDashboard } from './pages/user/UserDashboard';
+import { MyOrders } from './pages/user/MyOrders';
+import { NotificationsPage } from './pages/user/Notifications';
+import { WishlistPage } from './pages/user/Wishlist';
+import { CartPage } from './pages/user/Cart';
+import { UserSettings } from './pages/user/Settings';
 import ForgotPassword from './pages/user/ForgotPassword';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
@@ -92,6 +97,11 @@ function App() {
                   <Route path="/signup" element={<Signup role="user" />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/user/dashboard" element={<UserDashboard />} />
+                  <Route path="/orders" element={<MyOrders />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/settings" element={<UserSettings />} />
                   
                   {/* Seller Routes */}
                   <Route path="/seller" element={<SellerLanding />} />

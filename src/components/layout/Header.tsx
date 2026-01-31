@@ -16,6 +16,8 @@ export const Header: React.FC = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [navigationLoading, setNavigationLoading] = useState(false);
+  const [loadingLink, setLoadingLink] = useState<string | null>(null);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +37,20 @@ export const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleNavigation = async (link: string) => {
+    setLoadingLink(link);
+    setNavigationLoading(true);
+    setShowProfileDropdown(false);
+    setShowMobileMenu(false);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      navigate(link);
+      setNavigationLoading(false);
+      setLoadingLink(null);
+    }, 300);
+  };
+
   const handleSignOut = async () => {
     // Show confirmation dialog
     const confirmed = window.confirm('Are you sure you want to logout?');
@@ -43,10 +59,14 @@ export const Header: React.FC = () => {
       return; // User canceled
     }
     
+    setNavigationLoading(true);
     await signOut();
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
-    navigate('/');
+    setTimeout(() => {
+      navigate('/');
+      setNavigationLoading(false);
+    }, 300);
   };
 
   // Get display name from user
@@ -112,12 +132,17 @@ export const Header: React.FC = () => {
                 if (!isLoggedIn) {
                   requireLogin(false);
                 } else {
-                  window.location.href = '/wishlist';
+                  handleNavigation('/wishlist');
                 }
               }}
-              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300"
+              disabled={navigationLoading}
+              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300 disabled:opacity-50"
             >
-              <Heart className="h-6 w-6 text-gold" />
+              {loadingLink === '/wishlist' ? (
+                <Loader2 className="h-6 w-6 text-gold animate-spin" />
+              ) : (
+                <Heart className="h-6 w-6 text-gold" />
+              )}
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems.length}
@@ -131,12 +156,17 @@ export const Header: React.FC = () => {
                 if (!isLoggedIn) {
                   requireLogin(false);
                 } else {
-                  window.location.href = '/cart';
+                  handleNavigation('/cart');
                 }
               }}
-              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300"
+              disabled={navigationLoading}
+              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300 disabled:opacity-50"
             >
-              <ShoppingCart className="h-6 w-6 text-gold" />
+              {loadingLink === '/cart' ? (
+                <Loader2 className="h-6 w-6 text-gold animate-spin" />
+              ) : (
+                <ShoppingCart className="h-6 w-6 text-gold" />
+              )}
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {totalItems}
@@ -151,8 +181,13 @@ export const Header: React.FC = () => {
                   onMouseEnter={() => setShowProfileDropdown(true)}
                   onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                   className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-gray-900"
+                  disabled={navigationLoading}
                 >
-                  <User className="h-5 w-5 text-gold" />
+                  {navigationLoading && loadingLink?.startsWith('/') ? (
+                    <Loader2 className="h-5 w-5 text-gold animate-spin" />
+                  ) : (
+                    <User className="h-5 w-5 text-gold" />
+                  )}
                   <span className="text-white font-medium text-sm">
                     Account
                   </span>
@@ -164,45 +199,91 @@ export const Header: React.FC = () => {
                     className="absolute right-0 mt-2 w-52 bg-gray-900 border-2 border-gold rounded-lg shadow-xl py-2 animate-fadeIn"
                     onMouseLeave={() => setShowProfileDropdown(false)}
                   >
-                    <Link
-                      to="/orders"
-                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
-                      onClick={() => setShowProfileDropdown(false)}
+                    <button
+                      onClick={() => handleNavigation('/orders')}
+                      disabled={navigationLoading}
+                      className="w-full text-left block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <Package className="inline h-4 w-4 mr-3 text-gold" />
-                      My Orders
-                    </Link>
-                    <Link
-                      to="/user/dashboard"
-                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
-                      onClick={() => setShowProfileDropdown(false)}
+                      {loadingLink === '/orders' ? (
+                        <>
+                          <Loader2 className="inline h-4 w-4 text-gold animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Package className="h-4 w-4 text-gold" />
+                          My Orders
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('/user/dashboard')}
+                      disabled={navigationLoading}
+                      className="w-full text-left block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <User className="inline h-4 w-4 mr-3 text-gold" />
-                      My Account
-                    </Link>
-                    <Link
-                      to="/notifications"
-                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
-                      onClick={() => setShowProfileDropdown(false)}
+                      {loadingLink === '/user/dashboard' ? (
+                        <>
+                          <Loader2 className="inline h-4 w-4 text-gold animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <User className="h-4 w-4 text-gold" />
+                          My Account
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('/notifications')}
+                      disabled={navigationLoading}
+                      className="w-full text-left block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <Bell className="inline h-4 w-4 mr-3 text-gold" />
-                      Notifications
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
-                      onClick={() => setShowProfileDropdown(false)}
+                      {loadingLink === '/notifications' ? (
+                        <>
+                          <Loader2 className="h-4 w-4 text-gold animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Bell className="h-4 w-4 text-gold" />
+                          Notifications
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('/settings')}
+                      disabled={navigationLoading}
+                      className="w-full text-left block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <Settings className="inline h-4 w-4 mr-3 text-gold" />
-                      Settings
-                    </Link>
+                      {loadingLink === '/settings' ? (
+                        <>
+                          <Loader2 className="h-4 w-4 text-gold animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Settings className="h-4 w-4 text-gold" />
+                          Settings
+                        </>
+                      )}
+                    </button>
                     <div className="border-t border-gray-700 my-1"></div>
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-gray-800 hover:text-red-300 transition-all duration-300"
+                      disabled={navigationLoading}
+                      className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-gray-800 hover:text-red-300 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      <LogOut className="inline h-4 w-4 mr-3" />
-                      Logout
+                      {navigationLoading && loadingLink === 'logout' ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Logging out...
+                        </>
+                      ) : (
+                        <>
+                          <LogOut className="h-4 w-4" />
+                          Logout
+                        </>
+                      )}
                     </button>
                   </div>
                 )}
