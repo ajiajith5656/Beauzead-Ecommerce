@@ -1,4 +1,5 @@
 import apiClient from '../../lib/api';
+import categoryService from '../categoryService';
 import type {
   Admin,
   User,
@@ -470,59 +471,76 @@ export const processReturn = async (orderId: string, reason: string): Promise<bo
 
 // ============ CATEGORY MANAGEMENT ============
 export const getAllCategories = async (
-  page?: number,
+  _page?: number,
   limit?: number
 ): Promise<{ categories: Category[]; total: number } | null> => {
-  const params = new URLSearchParams();
-  if (page) params.append('page', page.toString());
-  if (limit) params.append('limit', limit.toString());
-
-  const { data, error } = await apiClient.request<{ categories: Category[]; total: number }>(
-    `/admin/categories?${params.toString()}`
-  );
-  if (error) {
+  try {
+    const categories = await categoryService.getAllCategories(limit || 100);
+    if (categories) {
+      return {
+        categories,
+        total: categories.length,
+      };
+    }
+    return null;
+  } catch (error) {
     console.error('Failed to fetch categories:', error);
     return null;
   }
-  return data || null;
 };
 
 export const createCategory = async (categoryData: Partial<Category>): Promise<Category | null> => {
-  const { data, error } = await apiClient.request<Category>('/admin/categories', {
-    method: 'POST',
-    body: categoryData,
-  });
-  if (error) {
+  try {
+    const result = await categoryService.createNewCategory({
+      name: categoryData.name || '',
+      description: categoryData.description,
+      imageUrl: categoryData.image_url,
+      isActive: categoryData.is_active !== false,
+    });
+    return result;
+  } catch (error) {
     console.error('Failed to create category:', error);
     return null;
   }
-  return data || null;
 };
 
 export const updateCategory = async (
   categoryId: string,
   categoryData: Partial<Category>
 ): Promise<Category | null> => {
-  const { data, error } = await apiClient.request<Category>(`/admin/categories/${categoryId}`, {
-    method: 'PUT',
-    body: categoryData,
-  });
-  if (error) {
+  try {
+    const result = await categoryService.updateExistingCategory(categoryId, {
+      name: categoryData.name,
+      description: categoryData.description,
+      imageUrl: categoryData.image_url,
+      isActive: categoryData.is_active,
+    });
+    return result;
+  } catch (error) {
     console.error('Failed to update category:', error);
     return null;
   }
-  return data || null;
 };
 
 export const deleteCategory = async (categoryId: string): Promise<boolean> => {
-  const { error } = await apiClient.request(`/admin/categories/${categoryId}`, {
-    method: 'DELETE',
-  });
-  if (error) {
+  try {
+    return await categoryService.deleteExistingCategory(categoryId);
+  } catch (error) {
     console.error('Failed to delete category:', error);
     return false;
   }
-  return true;
+};
+
+export const toggleCategoryStatus = async (
+  categoryId: string,
+  isActive: boolean
+): Promise<Category | null> => {
+  try {
+    return await categoryService.toggleCategoryStatus(categoryId, isActive);
+  } catch (error) {
+    console.error('Failed to toggle category status:', error);
+    return null;
+  }
 };
 
 // ============ BANNER MANAGEMENT ============

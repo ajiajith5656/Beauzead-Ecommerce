@@ -15,3 +15,89 @@ type BusinessTypeBzdcore @model {
   typeName: String!
   description: String
 }
+
+# Category Management
+type Category @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  description: String
+  imageUrl: String
+  isActive: Boolean! @default(value: "true")
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Product Management
+type Product @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  currency: String!
+  imageUrl: String
+  sellerId: String!
+  categoryId: String!
+  stock: Int!
+  approved: Boolean! @default(value: "false")
+  createdAt: AWSDateTime!
+  approvalStatus: String @default(value: "pending") # pending, approved, rejected
+  isActive: Boolean! @default(value: "true")
+  updatedAt: AWSDateTime!
+}
+
+# Order Management
+type Order @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  userId: String!
+  total: Float!
+  currency: String!
+  status: String! @default(value: "new") # new, processing, shipped, delivered, cancelled, return_requested, returned
+  createdAt: AWSDateTime!
+  address: String
+  phone: String
+  paymentStatus: String @default(value: "pending") # pending, completed, failed
+  updatedAt: AWSDateTime!
+}
+
+# Review Management
+type Review @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  productId: String!
+  userId: String!
+  rating: Int!
+  comment: String!
+  createdAt: AWSDateTime!
+  isVerified: Boolean
+  isFlagged: Boolean @default(value: "false")
+}
+
+# Complaint Management
+type Complaint @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  userId: String!
+  subject: String!
+  description: String!
+  status: String! @default(value: "open") # open, in_progress, resolved, closed
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  assignedTo: String
+  resolution: String
+}
+
+# Dashboard Metrics
+type DashboardMetrics @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  totalSales: Float!
+  totalExpenses: Float!
+  totalProducts: Int!
+  totalUsers: Int!
+  totalSellers: Int!
+  totalBookings: Int!
+  ongoingOrders: Int!
+  returnsCancellations: Int!
+  userRegistrations: Int!
+  primeMembers: Int!
+  sellerRegistrations: Int!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}

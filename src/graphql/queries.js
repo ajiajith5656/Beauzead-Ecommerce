@@ -77,3 +77,45 @@ export const listBusinessTypeBzdcores = /* GraphQL */ `
     }
   }
 `;
+// Category Queries
+export const getCategory = /* GraphQL */ `
+  query GetCategory($id: ID!) {
+    getCategory(id: $id) {
+      id
+      name
+      description
+      imageUrl
+      isActive
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+
+export const listCategories = /* GraphQL */ `
+  query ListCategories(
+    $filter: ModelCategoryFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listCategories(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        name
+        description
+        imageUrl
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
