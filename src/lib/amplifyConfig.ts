@@ -4,10 +4,10 @@ import { signUp, signIn, signOut, getCurrentUser, resetPassword, confirmResetPas
 const amplifyConfig = {
   Auth: {
     Cognito: {
-      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
-      userPoolId: import.meta.env.VITE_AWS_USER_POOL_ID,
-      userPoolClientId: import.meta.env.VITE_AWS_USER_POOL_CLIENT_ID,
-      identityPoolId: import.meta.env.VITE_AWS_IDENTITY_POOL_ID,
+      region: 'us-east-1',
+      userPoolId: 'us-east-1_PPPmNH7HL',
+      userPoolClientId: '3hk6tg9hduv7fkotlo2h99jpin',
+      identityPoolId: 'us-east-1:f2d8fd71-baf1-4b52-85d4-5f22fbb3098f',
       signUpVerificationMethod: 'code' as const, // 'code' or 'link'
       loginWith: {
         email: true,
@@ -17,13 +17,16 @@ const amplifyConfig = {
     },
   },
   API: {
-    REST: {
-      endpoint: import.meta.env.VITE_API_ENDPOINT || '',
+    GraphQL: {
+      endpoint: 'https://woqi3tosm5a2jnj4w6zit2mfye.appsync-api.us-east-1.amazonaws.com/graphql',
+      region: 'us-east-1',
+      defaultAuthMode: 'apiKey' as const,
+      apiKey: 'da2-hgvpvqv72jcj3o2sglactpt3gq',
     },
   },
   Storage: {
     S3: {
-      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+      region: 'us-east-1',
       bucket: import.meta.env.VITE_S3_BUCKET || '',
     },
   },
