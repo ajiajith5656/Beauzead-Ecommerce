@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "auth": {
+    "userPoolGroups": {
+      "postConfirmation": [
+        "BeauzeadPostConfirmation"
+      ]
+    }
+  },
+  "lambda": {
+    "BeauzeadPostConfirmation": {
+      "deploymentBucket": {
+        "bucketName": "beauzead-ecommerce-deployment",
+        "region": "us-east-1"
+      },
+      "environment": {
+        "USER_POOL_ID": "us-east-1_PPPmNH7HL"
+      },
+      "layers": [],
+      "runtime": "nodejs18.x",
+      "handler": "src/index.handler",
+      "timeout": 60,
+      "memorySize": 256
+    }
+  }
+}

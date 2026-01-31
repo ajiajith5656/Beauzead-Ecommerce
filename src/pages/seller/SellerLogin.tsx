@@ -41,6 +41,11 @@ const SellerLogin: React.FC = () => {
       return;
     }
 
+    // Wait a moment for role to be properly set
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    console.log('Seller login - User role:', role); // Debug log
+
     if (role === 'admin') {
       navigate('/admin');
       return;
@@ -51,6 +56,7 @@ const SellerLogin: React.FC = () => {
       return;
     }
 
+    // Fallback - if no role detected, navigate to homepage
     navigate('/');
   };
 

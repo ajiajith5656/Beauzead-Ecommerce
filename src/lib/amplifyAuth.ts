@@ -26,6 +26,7 @@ export interface SignUpInput {
   password: string;
   name?: string;
   phone_number?: string;
+  role?: 'user' | 'seller' | 'admin';
 }
 
 export interface SignInInput {
@@ -63,6 +64,7 @@ class AmplifyAuthService {
         userId,
         isSignUpComplete,
         nextStep,
+        role: input.role, // Return role for frontend to call backend API
       };
     } catch (error: any) {
       console.error('Signup error:', error);

@@ -107,21 +107,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
-  const signUp = async (email: string, password: string, _role: 'user' | 'seller' | 'admin', fullName: string, currency?: string, phoneNumber?: string) => {
+  const signUp = async (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string, currency?: string, phoneNumber?: string) => {
     try {
-      const result = await amplifyAuthService.signup({
+      const signupResult = await amplifyAuthService.signup({
         email,
         password,
         name: fullName,
         phone_number: phoneNumber, // Only passed for sellers
+        role, // Pass role to service
       });
+
+      // Call backend API to add user to group
+      // This would require your backend to have an endpoint that can add users to Cognito groups
+      // For now, the role will be determined from the JWT token if configured properly
+      // The system will work once the backend Lambda creates the group assignment
 
       // Store currency preference
       if (currency) {
-        localStorage.setItem(`currency_${result.userId}`, currency);
+        localStorage.setItem(`currency_${signupResult.userId}`, currency);
       }
 
-      return { success: true, userId: result.userId, isSignUpComplete: result.isSignUpComplete };
+      return { success: true, userId: signupResult.userId, isSignUpComplete: signupResult.isSignUpComplete };
     } catch (error) {
       console.error('Signup error:', error);
       return { success: false, error };
@@ -145,10 +151,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profile = await fetchUserProfile(authUser.username);
       }
 
+      // Determine the final role and set it in state
+      const finalRole = profile?.role || roleFromSession || null;
+      if (finalRole) {
+        setAuthRole(finalRole);
+      }
+
       return {
         success: true,
         isSignedIn: result.isSignedIn,
-        role: profile?.role || roleFromSession || null,
+        role: finalRole,
       };
     } catch (error) {
       console.error('Signin error:', error);

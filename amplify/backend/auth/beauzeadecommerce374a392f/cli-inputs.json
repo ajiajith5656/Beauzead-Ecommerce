@@ -62,6 +62,11 @@
     ],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true
+    "useEnabledMfas": true,
+    "lambdaConfig": {
+      "PostConfirmation": [
+        "BeauzeadPostConfirmation"
+      ]
+    }
   }
 }

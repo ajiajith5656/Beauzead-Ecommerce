@@ -395,28 +395,6 @@ const SellerSignup: React.FC = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-500 ml-1">Mobile Number</label>
-                  <div className="flex gap-2">
-                    <div className="w-24 bg-[#1a1a1a] border-2 border-gray-900 text-gray-500 rounded-xl px-4 py-3.5 text-sm font-semibold flex items-center justify-center select-none">
-                      {selectedCountry?.dialCode || '+0'}
-                    </div>
-                    <div className="relative group flex-1">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-yellow-500 transition-colors">
-                        <Phone size={18} />
-                      </div>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="Mobile number"
-                        value={formData.mobile}
-                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                        className="w-full bg-black border-2 border-gray-900 text-white rounded-xl pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-yellow-500 transition-all placeholder:text-gray-800"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 <button
                   type="submit"
                   disabled={isLoading || passwordErrors.length > 0}

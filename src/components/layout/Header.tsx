@@ -35,6 +35,13 @@ export const Header: React.FC = () => {
   }, []);
 
   const handleSignOut = async () => {
+    // Show confirmation dialog
+    const confirmed = window.confirm('Are you sure you want to logout?');
+    
+    if (!confirmed) {
+      return; // User canceled
+    }
+    
     await signOut();
     setShowProfileDropdown(false);
     setShowMobileMenu(false);
