@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
+import ImageUpload from '../../../components/ImageUpload';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { Category } from '../../../types';
 
@@ -189,15 +190,12 @@ export const CategoryManagement: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
-                />
-              </div>
+              <ImageUpload
+                categoryId={editingId || 'new'}
+                onImageUrlChange={(url) => setFormData({ ...formData, image_url: url })}
+                currentImageUrl={formData.image_url}
+                onError={(error) => setError(error)}
+              />
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"

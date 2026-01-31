@@ -27,7 +27,7 @@ const amplifyConfig = {
   Storage: {
     S3: {
       region: 'us-east-1',
-      bucket: import.meta.env.VITE_S3_BUCKET || '',
+      bucket: 'beauzead-ecommerce-images-2026',
     },
   },
 };

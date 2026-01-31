@@ -1,0 +1,6 @@
+{
+  "service": "S3",
+  "providerPlugin": "awscloudformation",
+  "dependsOn": [],
+  "lastPushTimeStamp": "2026-01-31T00:30:00Z"
+}
