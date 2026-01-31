@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle } from 'lucide-react';
+import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { getPendingUsers, approveUser, rejectUser, getDashboardMetrics } from '../../services/admin/adminApiService';
+import { KYCRequirementManagement } from './modules/KYCRequirementManagement';
 import type { User, DashboardData } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
@@ -12,6 +13,7 @@ export const AdminDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<'overview' | 'kyc'>('overview');
 
   useEffect(() => {
     fetchData();
@@ -115,7 +117,36 @@ export const AdminDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h2 className="text-3xl font-bold text-gold mb-8">Admin Dashboard</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Tab Navigation */}
+        <div className="flex space-x-4 mb-8 border-b border-gray-700">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-6 py-3 font-semibold flex items-center space-x-2 ${
+              activeTab === 'overview'
+                ? 'text-gold border-b-2 border-gold'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Users size={20} />
+            <span>Overview</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('kyc')}
+            className={`px-6 py-3 font-semibold flex items-center space-x-2 ${
+              activeTab === 'kyc'
+                ? 'text-gold border-b-2 border-gold'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <FileText size={20} />
+            <span>KYC Requirements</span>
+          </button>
+        </div>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold text-white">Total Users</h3>
@@ -219,6 +250,13 @@ export const AdminDashboard: React.FC = () => {
             </div>
           )}
         </div>
+          </>
+        )}
+
+        {/* KYC Requirements Tab */}
+        {activeTab === 'kyc' && (
+          <KYCRequirementManagement />
+        )}
       </div>
     </div>
   );

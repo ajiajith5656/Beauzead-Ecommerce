@@ -1,12 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   ArrowLeft, CheckCircle2, X, Loader2, Image, 
   FileStack, CreditCard, Landmark, Upload
 } from 'lucide-react';
+import { getKYCRequirementsByCountry } from '../../services/kycService';
 
 interface SellerVerifyUploadsProps {
   onBack: () => void;
   onComplete: () => void;
+  sellerCountry?: string;
+  sellerRegistrationType?: string;
 }
 
 interface UploadItem {
@@ -26,7 +29,11 @@ const ALLOWED_TYPES = [
 ];
 const MAX_SIZE_MB = 10;
 
-const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({ onBack, onComplete }) => {
+const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({ 
+  onBack, 
+  onComplete,
+  sellerCountry = 'India'
+}) => {
   const [uploads, setUploads] = useState<UploadItem[]>([
     { id: 'seller-img', label: 'Seller Image', icon: <Image size={24} />, progress: 0, status: 'idle', fileName: null },
     { id: 'addr-f', label: 'Seller Address Proof – Front Side', icon: <FileStack size={24} />, progress: 0, status: 'idle', fileName: null },
@@ -42,6 +49,20 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({ onBack, onCom
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeUploadId = useRef<string | null>(null);
+
+  // Fetch KYC requirements for seller's country
+  useEffect(() => {
+    const fetchKYCRequirements = async () => {
+      try {
+        await getKYCRequirementsByCountry(sellerCountry);
+        // In the future, dynamically generate upload fields based on requirements
+      } catch (error) {
+        console.error('Failed to fetch KYC requirements:', error);
+      }
+    };
+    
+    fetchKYCRequirements();
+  }, [sellerCountry]);
 
   const handleTriggerUpload = (id: string) => {
     activeUploadId.current = id;

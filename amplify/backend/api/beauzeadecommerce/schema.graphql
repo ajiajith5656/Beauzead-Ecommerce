@@ -87,6 +87,33 @@ type Complaint @model {
   resolution: String
 }
 
+# KYC Requirements by Country & Registration Type
+type KYCRequirement @model {
+  id: ID!
+  country: String! # India, USA, UK, Germany, France, Italy, Spain, Canada, Australia, Singapore, UAE, Saudi Arabia, Japan, China, Brazil, South Africa
+  registrationType: String! # Individual, Sole Proprietorship, Partnership, LLC, Corporation, etc.
+  requiredDocuments: String! # Comma-separated: PAN, GST, EIN, UTR, etc.
+  description: String
+  isActive: Boolean! @default(value: "true")
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Seller KYC Submission & Status
+type SellerKYCSubmission @model {
+  id: ID!
+  sellerId: String!
+  country: String!
+  registrationType: String!
+  submittedDocuments: [String] # URLs to uploaded documents
+  status: String! @default(value: "pending") # pending, approved, rejected
+  submissionDate: AWSDateTime!
+  reviewedBy: String # Admin ID who reviewed
+  reviewDate: AWSDateTime
+  rejectionReason: String
+  updatedAt: AWSDateTime!
+}
+
 # Dashboard Metrics
 type DashboardMetrics @model {
   id: ID!
