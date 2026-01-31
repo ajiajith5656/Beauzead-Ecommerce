@@ -1,15 +1,15 @@
-const AWS = require('aws-sdk');
+const { CognitoIdentityServiceProvider } = require('@aws-sdk/client-cognito-identity-provider');
 
-const cognito = new AWS.CognitoIdentityServiceProvider({
-  region: process.env.AWS_REGION,
+const cognito = new CognitoIdentityServiceProvider({
+  region: process.env.AWS_REGION || 'us-east-1',
 });
 
-const USER_POOL_ID = process.env.USER_POOL_ID || process.env.IDENTITY_POOL_ID?.split(':')[4]?.split('/')[1];
+const USER_POOL_ID = process.env.USER_POOL_ID;
 
 exports.handler = async (event) => {
   console.log('Post-confirmation event:', JSON.stringify(event, null, 2));
 
-  const userPoolId = event.userPoolId;
+  const userPoolId = event.userPoolId || USER_POOL_ID;
   const userName = event.userName;
   const userAttributes = event.request.userAttributes;
   
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
         UserPoolId: userPoolId,
         Username: userName,
         GroupName: role,
-      }).promise();
+      });
 
       console.log(`Successfully added user ${userName} to group ${role}`);
     }
