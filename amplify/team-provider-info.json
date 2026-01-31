@@ -18,6 +18,9 @@
       "auth": {
         "beauzeadecommerce374a392f": {},
         "userPoolGroups": {}
+      },
+      "function": {
+        "BeauzeadPostConfirmation": {}
       }
     }
   }

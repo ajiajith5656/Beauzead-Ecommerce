@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Loader2, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 type ResetStep = 'email' | 'otp' | 'password' | 'success';
 
 const SellerForgotPassword: React.FC = () => {
   const navigate = useNavigate();
+  const { resetPassword, confirmPasswordReset } = useAuth();
   const [step, setStep] = useState<ResetStep>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -33,15 +35,29 @@ const SellerForgotPassword: React.FC = () => {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate sending OTP to email
-    await new Promise((r) => setTimeout(r, 1500));
-
-    setIsLoading(false);
-    setStep('otp');
-    setResendTimer(30);
-    setCanResend(false);
+    try {
+      const result = await resetPassword(email);
+      if (result.success) {
+        setIsLoading(false);
+        setStep('otp');
+        setResendTimer(30);
+        setCanResend(false);
+      } else {
+        setError(result.error?.message || 'Failed to send reset code');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+      setIsLoading(false);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -71,11 +87,14 @@ const SellerForgotPassword: React.FC = () => {
     setError('');
     setIsLoading(true);
 
-    // Simulate OTP verification
-    await new Promise((r) => setTimeout(r, 1500));
-
-    setIsLoading(false);
-    setStep('password');
+    try {
+      // Just move to password step - actual verification happens on password reset
+      setIsLoading(false);
+      setStep('password');
+    } catch (err: any) {
+      setError(err.message || 'Failed to verify code');
+      setIsLoading(false);
+    }
   };
 
   const handleResendOtp = async () => {
@@ -83,22 +102,30 @@ const SellerForgotPassword: React.FC = () => {
     setError('');
     setIsLoading(true);
 
-    // Simulate resending OTP
-    await new Promise((r) => setTimeout(r, 1000));
-
-    setIsLoading(false);
-    setResendTimer(30);
-    setCanResend(false);
-    setOtp(['', '', '', '', '', '']);
-    otpRefs.current[0]?.focus();
+    try {
+      const result = await resetPassword(email);
+      if (result.success) {
+        setIsLoading(false);
+        setResendTimer(30);
+        setCanResend(false);
+        setOtp(['', '', '', '', '', '']);
+        otpRefs.current[0]?.focus();
+      } else {
+        setError(result.error?.message || 'Failed to resend code');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+      setIsLoading(false);
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters.');
       return;
     }
 
@@ -107,13 +134,39 @@ const SellerForgotPassword: React.FC = () => {
       return;
     }
 
+    // Validate password strength (uppercase, lowercase, numeric, special)
+    const hasUppercase = /[A-Z]/.test(newPassword);
+    const hasLowercase = /[a-z]/.test(newPassword);
+    const hasNumeric = /[0-9]/.test(newPassword);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};:'\",.<>?/]/.test(newPassword);
+
+    if (!hasUppercase || !hasLowercase || !hasNumeric || !hasSpecialChar) {
+      setError('Password must contain uppercase, lowercase, numeric, and special characters.');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate password reset
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const otpValue = otp.join('');
+      if (otpValue.length < 6) {
+        setError('Please verify the code first');
+        setIsLoading(false);
+        return;
+      }
 
-    setIsLoading(false);
-    setStep('success');
+      const result = await confirmPasswordReset(email, otpValue, newPassword);
+      if (result.success) {
+        setIsLoading(false);
+        setStep('success');
+      } else {
+        setError(result.error?.message || 'Failed to reset password');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
+      setIsLoading(false);
+    }
   };
 
   const handleBackToLogin = () => {

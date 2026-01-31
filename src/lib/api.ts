@@ -29,6 +29,10 @@ class APIClient {
     options: RequestOptions = {}
   ): Promise<{ data?: T; error?: any }> {
     try {
+      if (!this.baseURL) {
+        return { error: new Error('API endpoint not configured') };
+      }
+
       const authToken = await this.getAuthToken();
       const url = `${this.baseURL}${endpoint}`;
 

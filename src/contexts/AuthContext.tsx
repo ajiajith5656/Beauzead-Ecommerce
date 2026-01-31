@@ -51,8 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         'custom:role': payload?.['custom:role'],
         'role': payload?.role,
         'cognito:groups': payload?.['cognito:groups'],
+        'phone_number': payload?.phone_number,
       });
       
+      // PRIMARY: Check for explicit role in JWT
       const roleFromToken =
         (payload?.['custom:role'] as User['role'] | undefined) ||
         (payload?.role as User['role'] | undefined) ||
@@ -61,16 +63,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : undefined) ||
         null;
 
-      console.log('Resolved role from session:', roleFromToken);
+      console.log('Resolved role from JWT:', roleFromToken);
 
       if (roleFromToken) {
         setAuthRole(roleFromToken);
+        return roleFromToken;
       }
 
-      return roleFromToken;
+      // FALLBACK: If no role in JWT, check phone_number attribute to determine role
+      console.log('No role found in JWT, attempting fallback role detection...');
+      
+      const phoneNumber = payload?.phone_number as string | undefined;
+      
+      if (phoneNumber) {
+        console.log('phone_number exists in JWT → assigning seller role (fallback)');
+        setAuthRole('seller');
+        return 'seller';
+      } else {
+        console.log('No phone_number in JWT → assigning user role (fallback)');
+        setAuthRole('user');
+        return 'user';
+      }
     } catch (error) {
       console.error('Failed to resolve role from session:', error);
-      return null;
+      // Final fallback: assume user role
+      console.warn('Failed to resolve role, defaulting to user role');
+      setAuthRole('user');
+      return 'user';
     }
   };
 
@@ -97,6 +116,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
+      if (!import.meta.env.VITE_API_ENDPOINT) {
+        return null;
+      }
+
       const { data, error } = await apiClient.get<User>(`/users/${userId}`);
       if (error) {
         console.error('Error fetching user profile:', error);
