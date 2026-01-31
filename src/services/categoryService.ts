@@ -163,6 +163,152 @@ class CategoryService {
   async toggleCategoryStatus(categoryId: string, isActive: boolean): Promise<Category | null> {
     return this.updateExistingCategory(categoryId, { isActive });
   }
+
+  /**
+   * Get subcategories by category ID
+   */
+  async getSubCategoriesByCategory(categoryId: string): Promise<any[]> {
+    try {
+      const query = `
+        query ListSubCategories {
+          listSubCategories(filter: {categoryId: {eq: "${categoryId}"}, isActive: {eq: true}}) {
+            items {
+              id
+              categoryId
+              name
+              description
+              imageUrl
+              isActive
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      `;
+
+      const result: any = await client.graphql({ query });
+      return result.data?.listSubCategories?.items || [];
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get all subcategories
+   */
+  async getAllSubCategories(): Promise<any[]> {
+    try {
+      const query = `
+        query ListSubCategories {
+          listSubCategories(filter: {isActive: {eq: true}}) {
+            items {
+              id
+              categoryId
+              name
+              description
+              imageUrl
+              isActive
+              createdAt
+              updatedAt
+            }
+          }
+        }
+      `;
+
+      const result: any = await client.graphql({ query });
+      return result.data?.listSubCategories?.items || [];
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Create subcategory
+   */
+  async createSubCategory(
+    categoryId: string,
+    name: string,
+    description?: string,
+    imageUrl?: string
+  ): Promise<boolean> {
+    try {
+      const mutation = `
+        mutation CreateSubCategory {
+          createSubCategory(input: {
+            categoryId: "${categoryId}"
+            name: "${name}"
+            description: "${description || ''}"
+            imageUrl: "${imageUrl || ''}"
+            isActive: true
+          }) {
+            id
+          }
+        }
+      `;
+
+      const result: any = await client.graphql({ query: mutation });
+      return !!result.data?.createSubCategory?.id;
+    } catch (error) {
+      console.error('Error creating subcategory:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Update subcategory
+   */
+  async updateSubCategory(
+    id: string,
+    categoryId: string,
+    name: string,
+    description?: string,
+    imageUrl?: string
+  ): Promise<boolean> {
+    try {
+      const mutation = `
+        mutation UpdateSubCategory {
+          updateSubCategory(input: {
+            id: "${id}"
+            categoryId: "${categoryId}"
+            name: "${name}"
+            description: "${description || ''}"
+            imageUrl: "${imageUrl || ''}"
+          }) {
+            id
+          }
+        }
+      `;
+
+      const result: any = await client.graphql({ query: mutation });
+      return !!result.data?.updateSubCategory?.id;
+    } catch (error) {
+      console.error('Error updating subcategory:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete subcategory
+   */
+  async deleteSubCategory(id: string): Promise<boolean> {
+    try {
+      const mutation = `
+        mutation DeleteSubCategory {
+          deleteSubCategory(input: {id: "${id}"}) {
+            id
+          }
+        }
+      `;
+
+      const result: any = await client.graphql({ query: mutation });
+      return !!result.data?.deleteSubCategory?.id;
+    } catch (error) {
+      console.error('Error deleting subcategory:', error);
+      return false;
+    }
+  }
 }
 
 export default new CategoryService();

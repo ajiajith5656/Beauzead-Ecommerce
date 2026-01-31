@@ -30,6 +30,44 @@ type Category @model {
   updatedAt: AWSDateTime!
 }
 
+# SubCategory Management
+type SubCategory @model {
+  id: ID!
+  categoryId: String! # Reference to Category
+  name: String!
+  description: String
+  imageUrl: String
+  isActive: Boolean! @default(value: "true")
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# SubCategory Management
+type SubCategory @model {
+  id: ID!
+  categoryId: String! # Reference to parent category
+  name: String!
+  description: String
+  imageUrl: String
+  isActive: Boolean! @default(value: "true")
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Product Images
+type ProductImage @model {
+  id: ID!
+  productId: String! # Reference to Product
+  imageUrl: String! # S3 URL
+  thumbnailUrl: String # For faster loading
+  displayOrder: Int! # 1, 2, 3, etc
+  isMainImage: Boolean! @default(value: "false")
+  uploadedBy: String! # sellerId or adminId
+  description: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
 # Product Management
 type Product @model {
   id: ID!
@@ -38,6 +76,7 @@ type Product @model {
   price: Float!
   currency: String!
   imageUrl: String
+  mainImageUrl: String # Direct reference for quick access
   sellerId: String!
   categoryId: String!
   stock: Int!

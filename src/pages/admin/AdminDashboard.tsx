@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle, FileText, Database } from 'lucide-react';
+import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle, FileText, Database, Tags } from 'lucide-react';
 import { getPendingUsers, approveUser, rejectUser, getDashboardMetrics } from '../../services/admin/adminApiService';
 import { KYCRequirementManagement } from './modules/KYCRequirementManagement';
 import { CountryListManagement } from './modules/CountryListManagement';
@@ -12,6 +12,7 @@ import { ReviewManagement } from './modules/ReviewManagement';
 import { ComplaintManagement } from './modules/ComplaintManagement';
 import { SellerKYCSubmissionManagement } from './modules/SellerKYCSubmissionManagement';
 import { DashboardMetricsManagement } from './modules/DashboardMetricsManagement';
+import { SubCategoryManagement } from './modules/SubCategoryManagement';
 import type { User, DashboardData } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
@@ -21,7 +22,7 @@ export const AdminDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'kyc' | 'backend'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'kyc' | 'backend' | 'categories'>('overview');
   const [selectedTable, setSelectedTable] = useState<string>('countries');
 
   useEffect(() => {
@@ -160,6 +161,17 @@ export const AdminDashboard: React.FC = () => {
           >
             <Database size={20} />
             <span>Backend Tables</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('categories')}
+            className={`px-6 py-3 font-semibold flex items-center space-x-2 ${
+              activeTab === 'categories'
+                ? 'text-gold border-b-2 border-gold'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Tags size={20} />
+            <span>Categories & Sub-Categories</span>
           </button>
         </div>
 
@@ -310,6 +322,11 @@ export const AdminDashboard: React.FC = () => {
             {selectedTable === 'kycSubmissions' && <SellerKYCSubmissionManagement />}
             {selectedTable === 'metrics' && <DashboardMetricsManagement />}
           </div>
+        )}
+
+        {/* Categories Tab */}
+        {activeTab === 'categories' && (
+          <SubCategoryManagement />
         )}
       </div>
     </div>
