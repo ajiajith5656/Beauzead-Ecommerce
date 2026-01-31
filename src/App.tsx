@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -30,21 +31,58 @@ import { ProfilePage } from './pages/admin/modules/ProfilePage';
 import { SettingsPage } from './pages/admin/modules/SettingsPage';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import { waitForRoleAny } from './lib/roleDetection';
 
 // Protected Route Component for Sellers
 const ProtectedSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, authRole, loading } = useAuth();
+  const [verifyingRole, setVerifyingRole] = useState(false);
+  const [verifiedRole, setVerifiedRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const verifyRole = async () => {
+      if (!user) {
+        if (isMounted) {
+          setVerifiedRole(null);
+          setVerifyingRole(false);
+        }
+        return;
+      }
+
+      if (isMounted) {
+        setVerifyingRole(true);
+      }
+
+      const role = await waitForRoleAny(['seller', 'admin']);
+
+      if (isMounted) {
+        setVerifiedRole(role);
+        setVerifyingRole(false);
+      }
+    };
+
+    verifyRole();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
   
-  if (loading) {
+  if (loading || verifyingRole) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-gold text-xl">Loading...</div>
+        <div className="text-gold text-xl">
+          {verifyingRole ? 'Verifying seller access...' : 'Loading...'}
+        </div>
       </div>
     );
   }
   
   // Check if user is logged in and has seller or admin role
-  if (!user || (authRole !== 'seller' && authRole !== 'admin')) {
+  const roleToCheck = verifiedRole || authRole;
+  if (!user || (roleToCheck !== 'seller' && roleToCheck !== 'admin')) {
     return <Navigate to="/seller/login" replace />;
   }
   
