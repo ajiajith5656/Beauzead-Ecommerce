@@ -46,13 +46,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const session = await amplifyAuthService.getAuthSession();
       const idToken = session?.tokens?.idToken?.toString();
       const payload = decodeJwtPayload(idToken);
+      
+      console.log('JWT Payload for role detection:', {
+        'custom:role': payload?.['custom:role'],
+        'role': payload?.role,
+        'cognito:groups': payload?.['cognito:groups'],
+      });
+      
       const roleFromToken =
         (payload?.['custom:role'] as User['role'] | undefined) ||
         (payload?.role as User['role'] | undefined) ||
-        (Array.isArray(payload?.['cognito:groups'])
+        (Array.isArray(payload?.['cognito:groups']) && payload?.['cognito:groups'].length > 0
           ? (payload?.['cognito:groups']?.[0] as User['role'] | undefined)
           : undefined) ||
         null;
+
+      console.log('Resolved role from session:', roleFromToken);
 
       if (roleFromToken) {
         setAuthRole(roleFromToken);
