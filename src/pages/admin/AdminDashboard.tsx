@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Users, Package, ShoppingCart, LogOut, CheckCircle, XCircle, FileText, Database } from 'lucide-react';
 import { getPendingUsers, approveUser, rejectUser, getDashboardMetrics } from '../../services/admin/adminApiService';
 import { KYCRequirementManagement } from './modules/KYCRequirementManagement';
+import { CountryListManagement } from './modules/CountryListManagement';
+import { BusinessTypeManagement } from './modules/BusinessTypeManagement';
+import { ProductManagement } from './modules/ProductManagement';
+import { OrderManagement } from './modules/OrderManagement';
+import { ReviewManagement } from './modules/ReviewManagement';
+import { ComplaintManagement } from './modules/ComplaintManagement';
+import { SellerKYCSubmissionManagement } from './modules/SellerKYCSubmissionManagement';
+import { DashboardMetricsManagement } from './modules/DashboardMetricsManagement';
 import type { User, DashboardData } from '../../types';
 
 export const AdminDashboard: React.FC = () => {
@@ -13,7 +21,8 @@ export const AdminDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'kyc'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'kyc' | 'backend'>('overview');
+  const [selectedTable, setSelectedTable] = useState<string>('countries');
 
   useEffect(() => {
     fetchData();
@@ -141,6 +150,17 @@ export const AdminDashboard: React.FC = () => {
             <FileText size={20} />
             <span>KYC Requirements</span>
           </button>
+          <button
+            onClick={() => setActiveTab('backend')}
+            className={`px-6 py-3 font-semibold flex items-center space-x-2 ${
+              activeTab === 'backend'
+                ? 'text-gold border-b-2 border-gold'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            <Database size={20} />
+            <span>Backend Tables</span>
+          </button>
         </div>
 
         {/* Overview Tab */}
@@ -256,6 +276,40 @@ export const AdminDashboard: React.FC = () => {
         {/* KYC Requirements Tab */}
         {activeTab === 'kyc' && (
           <KYCRequirementManagement />
+        )}
+
+        {/* Backend Tables Tab */}
+        {activeTab === 'backend' && (
+          <div>
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Select Table to Manage
+              </label>
+              <select
+                value={selectedTable}
+                onChange={(e) => setSelectedTable(e.target.value)}
+                className="w-full md:w-80 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 bg-white"
+              >
+                <option value="countries">Countries</option>
+                <option value="businessTypes">Business Types</option>
+                <option value="products">Products</option>
+                <option value="orders">Orders</option>
+                <option value="reviews">Reviews</option>
+                <option value="complaints">Complaints</option>
+                <option value="kycSubmissions">Seller KYC Submissions</option>
+                <option value="metrics">Dashboard Metrics</option>
+              </select>
+            </div>
+
+            {selectedTable === 'countries' && <CountryListManagement />}
+            {selectedTable === 'businessTypes' && <BusinessTypeManagement />}
+            {selectedTable === 'products' && <ProductManagement />}
+            {selectedTable === 'orders' && <OrderManagement />}
+            {selectedTable === 'reviews' && <ReviewManagement />}
+            {selectedTable === 'complaints' && <ComplaintManagement />}
+            {selectedTable === 'kycSubmissions' && <SellerKYCSubmissionManagement />}
+            {selectedTable === 'metrics' && <DashboardMetricsManagement />}
+          </div>
         )}
       </div>
     </div>
