@@ -218,10 +218,6 @@ const SellerSignup: React.FC = () => {
     }
   };
 
-  const finalizeSignup = () => {
-    navigate('/seller/dashboard');
-  };
-
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10 relative">

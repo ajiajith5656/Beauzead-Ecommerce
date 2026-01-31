@@ -208,13 +208,6 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
     return '/login';
   };
 
-  const getApprovalMessage = () => {
-    if (role === 'seller') {
-      return 'Your seller account is pending approval. You will receive an email once approved.';
-    }
-    return 'Please check your email to verify your account.';
-  };
-
   if (success) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
