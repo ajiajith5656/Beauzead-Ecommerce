@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/images/logo/logo.png" 
+              src="/images/logo/logo.svg" 
               alt="Beauzead" 
               className="h-10 w-auto"
               onError={(e) => {
