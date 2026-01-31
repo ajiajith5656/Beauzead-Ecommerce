@@ -97,7 +97,6 @@ export const deleteBusinessTypeBzdcore = /* GraphQL */ `
     }
   }
 `;
-// Category Mutations
 export const createCategory = /* GraphQL */ `
   mutation CreateCategory(
     $input: CreateCategoryInput!
@@ -115,7 +114,6 @@ export const createCategory = /* GraphQL */ `
     }
   }
 `;
-
 export const updateCategory = /* GraphQL */ `
   mutation UpdateCategory(
     $input: UpdateCategoryInput!
@@ -133,7 +131,6 @@ export const updateCategory = /* GraphQL */ `
     }
   }
 `;
-
 export const deleteCategory = /* GraphQL */ `
   mutation DeleteCategory(
     $input: DeleteCategoryInput!
@@ -145,6 +142,324 @@ export const deleteCategory = /* GraphQL */ `
       description
       imageUrl
       isActive
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createProduct = /* GraphQL */ `
+  mutation CreateProduct(
+    $input: CreateProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    createProduct(input: $input, condition: $condition) {
+      id
+      name
+      description
+      price
+      currency
+      imageUrl
+      sellerId
+      categoryId
+      stock
+      approved
+      createdAt
+      approvalStatus
+      isActive
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateProduct = /* GraphQL */ `
+  mutation UpdateProduct(
+    $input: UpdateProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    updateProduct(input: $input, condition: $condition) {
+      id
+      name
+      description
+      price
+      currency
+      imageUrl
+      sellerId
+      categoryId
+      stock
+      approved
+      createdAt
+      approvalStatus
+      isActive
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteProduct = /* GraphQL */ `
+  mutation DeleteProduct(
+    $input: DeleteProductInput!
+    $condition: ModelProductConditionInput
+  ) {
+    deleteProduct(input: $input, condition: $condition) {
+      id
+      name
+      description
+      price
+      currency
+      imageUrl
+      sellerId
+      categoryId
+      stock
+      approved
+      createdAt
+      approvalStatus
+      isActive
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createOrder = /* GraphQL */ `
+  mutation CreateOrder(
+    $input: CreateOrderInput!
+    $condition: ModelOrderConditionInput
+  ) {
+    createOrder(input: $input, condition: $condition) {
+      id
+      userId
+      total
+      currency
+      status
+      createdAt
+      address
+      phone
+      paymentStatus
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateOrder = /* GraphQL */ `
+  mutation UpdateOrder(
+    $input: UpdateOrderInput!
+    $condition: ModelOrderConditionInput
+  ) {
+    updateOrder(input: $input, condition: $condition) {
+      id
+      userId
+      total
+      currency
+      status
+      createdAt
+      address
+      phone
+      paymentStatus
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteOrder = /* GraphQL */ `
+  mutation DeleteOrder(
+    $input: DeleteOrderInput!
+    $condition: ModelOrderConditionInput
+  ) {
+    deleteOrder(input: $input, condition: $condition) {
+      id
+      userId
+      total
+      currency
+      status
+      createdAt
+      address
+      phone
+      paymentStatus
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createReview = /* GraphQL */ `
+  mutation CreateReview(
+    $input: CreateReviewInput!
+    $condition: ModelReviewConditionInput
+  ) {
+    createReview(input: $input, condition: $condition) {
+      id
+      productId
+      userId
+      rating
+      comment
+      createdAt
+      isVerified
+      isFlagged
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateReview = /* GraphQL */ `
+  mutation UpdateReview(
+    $input: UpdateReviewInput!
+    $condition: ModelReviewConditionInput
+  ) {
+    updateReview(input: $input, condition: $condition) {
+      id
+      productId
+      userId
+      rating
+      comment
+      createdAt
+      isVerified
+      isFlagged
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteReview = /* GraphQL */ `
+  mutation DeleteReview(
+    $input: DeleteReviewInput!
+    $condition: ModelReviewConditionInput
+  ) {
+    deleteReview(input: $input, condition: $condition) {
+      id
+      productId
+      userId
+      rating
+      comment
+      createdAt
+      isVerified
+      isFlagged
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const createComplaint = /* GraphQL */ `
+  mutation CreateComplaint(
+    $input: CreateComplaintInput!
+    $condition: ModelComplaintConditionInput
+  ) {
+    createComplaint(input: $input, condition: $condition) {
+      id
+      userId
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      assignedTo
+      resolution
+      __typename
+    }
+  }
+`;
+export const updateComplaint = /* GraphQL */ `
+  mutation UpdateComplaint(
+    $input: UpdateComplaintInput!
+    $condition: ModelComplaintConditionInput
+  ) {
+    updateComplaint(input: $input, condition: $condition) {
+      id
+      userId
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      assignedTo
+      resolution
+      __typename
+    }
+  }
+`;
+export const deleteComplaint = /* GraphQL */ `
+  mutation DeleteComplaint(
+    $input: DeleteComplaintInput!
+    $condition: ModelComplaintConditionInput
+  ) {
+    deleteComplaint(input: $input, condition: $condition) {
+      id
+      userId
+      subject
+      description
+      status
+      createdAt
+      updatedAt
+      assignedTo
+      resolution
+      __typename
+    }
+  }
+`;
+export const createDashboardMetrics = /* GraphQL */ `
+  mutation CreateDashboardMetrics(
+    $input: CreateDashboardMetricsInput!
+    $condition: ModelDashboardMetricsConditionInput
+  ) {
+    createDashboardMetrics(input: $input, condition: $condition) {
+      id
+      totalSales
+      totalExpenses
+      totalProducts
+      totalUsers
+      totalSellers
+      totalBookings
+      ongoingOrders
+      returnsCancellations
+      userRegistrations
+      primeMembers
+      sellerRegistrations
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateDashboardMetrics = /* GraphQL */ `
+  mutation UpdateDashboardMetrics(
+    $input: UpdateDashboardMetricsInput!
+    $condition: ModelDashboardMetricsConditionInput
+  ) {
+    updateDashboardMetrics(input: $input, condition: $condition) {
+      id
+      totalSales
+      totalExpenses
+      totalProducts
+      totalUsers
+      totalSellers
+      totalBookings
+      ongoingOrders
+      returnsCancellations
+      userRegistrations
+      primeMembers
+      sellerRegistrations
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteDashboardMetrics = /* GraphQL */ `
+  mutation DeleteDashboardMetrics(
+    $input: DeleteDashboardMetricsInput!
+    $condition: ModelDashboardMetricsConditionInput
+  ) {
+    deleteDashboardMetrics(input: $input, condition: $condition) {
+      id
+      totalSales
+      totalExpenses
+      totalProducts
+      totalUsers
+      totalSellers
+      totalBookings
+      ongoingOrders
+      returnsCancellations
+      userRegistrations
+      primeMembers
+      sellerRegistrations
       createdAt
       updatedAt
       __typename
