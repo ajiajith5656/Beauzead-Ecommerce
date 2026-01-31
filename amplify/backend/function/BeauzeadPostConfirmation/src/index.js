@@ -1,40 +1,19 @@
-const AWS = require('aws-sdk');
-
-// Lambda includes AWS SDK v2 by default
-const cognito = new AWS.CognitoIdentityServiceProvider({
-  region: 'us-east-1',
-});
-
-const USER_POOL_ID = 'us-east-1_PPPmNH7HL';
-
 exports.handler = async (event) => {
   console.log('Post-confirmation event:', JSON.stringify(event, null, 2));
 
-  const userPoolId = event.userPoolId || USER_POOL_ID;
   const userName = event.userName;
   const userAttributes = event.request.userAttributes;
+  const phoneNumber = userAttributes.phone_number;
   
   // Determine role: if user has phone_number, they're a seller, otherwise user
-  const role = userAttributes.phone_number ? 'seller' : 'user';
+  const role = phoneNumber ? 'seller' : 'user';
 
-  try {
-    // Only add non-admin users to groups
-    if (role && role !== 'admin') {
-      console.log(`Adding user ${userName} to group: ${role}`);
-      
-      const params = {
-        UserPoolId: userPoolId,
-        Username: userName,
-        GroupName: role,
-      };
-      
-      await cognito.adminAddUserToGroup(params).promise();
-      console.log(`Successfully added user ${userName} to group ${role}`);
-    }
-  } catch (error) {
-    console.warn(`Warning: Could not add user to group: ${error.message}`);
-    // Don't fail the signup - just log the warning
-  }
+  console.log(`Post-confirmation: User ${userName} verified with phone ${phoneNumber}, role should be: ${role}`);
+  
+  // NOTE: Group assignment must be done outside post-confirmation trigger
+  // because Lambda doesn't have built-in SDK and external packages can't be added
+  // without package.json and dependencies layer.
+  // Use a scheduled task or login flow to assign groups instead.
 
   // Return event to continue authentication flow
   return event;
