@@ -15,6 +15,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { formatCurrency } from '../utils/currency';
+import { requireLogin } from '../utils/authGuard';
 
 const allProducts = [...mockProducts, ...hotDeals, ...trendingDeals];
 
@@ -255,13 +256,25 @@ const ProductDetailsPage: React.FC = () => {
             {/* CTA Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-5 mb-10 md:mb-12">
               <button
-                onClick={() => addToCart(product)}
+                onClick={() => {
+                  if (!user) {
+                    requireLogin(false);
+                    return;
+                  }
+                  addToCart(product);
+                }}
                 className="w-full bg-white text-black font-semibold py-4 md:py-5 rounded-2xl transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs hover:bg-gray-100 active:scale-[0.98]"
               >
                 <ShoppingCart size={18} /> Add To Cart
               </button>
               <button
                 disabled={!inStock}
+                onClick={() => {
+                  if (!user) {
+                    requireLogin(false);
+                    return;
+                  }
+                }}
                 className="w-full bg-yellow-500 disabled:opacity-30 text-black font-semibold py-4 md:py-5 rounded-2xl transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs hover:bg-yellow-400 active:scale-[0.98] shadow-lg shadow-yellow-500/20"
               >
                 <CreditCard size={18} /> Buy Now

@@ -1,6 +1,9 @@
-# This "input" configures a global authorization rule to enable public access to
-# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+# This project uses Cognito User Pools (default) + IAM (additional auth).
+# Public access should use IAM provider, not API key.
+
+# GraphQL Schema for Beauzead Ecommerce
+# Public read access is enabled for browsing products and categories
+# Admin operations require authentication via Cognito User Pools
 
 type CountryListBzdcore @model {
   id: ID!
@@ -17,7 +20,7 @@ type BusinessTypeBzdcore @model {
 }
 
 # Category Management
-type Category @model @auth(rules: [{ allow: public }]) {
+type Category @model {
   id: ID!
   name: String!
   description: String
@@ -28,7 +31,7 @@ type Category @model @auth(rules: [{ allow: public }]) {
 }
 
 # Product Management
-type Product @model @auth(rules: [{ allow: public }]) {
+type Product @model {
   id: ID!
   name: String!
   description: String!
@@ -46,7 +49,7 @@ type Product @model @auth(rules: [{ allow: public }]) {
 }
 
 # Order Management
-type Order @model @auth(rules: [{ allow: public }]) {
+type Order @model {
   id: ID!
   userId: String!
   total: Float!
@@ -60,7 +63,7 @@ type Order @model @auth(rules: [{ allow: public }]) {
 }
 
 # Review Management
-type Review @model @auth(rules: [{ allow: public }]) {
+type Review @model {
   id: ID!
   productId: String!
   userId: String!
@@ -72,7 +75,7 @@ type Review @model @auth(rules: [{ allow: public }]) {
 }
 
 # Complaint Management
-type Complaint @model @auth(rules: [{ allow: public }]) {
+type Complaint @model {
   id: ID!
   userId: String!
   subject: String!
@@ -85,7 +88,7 @@ type Complaint @model @auth(rules: [{ allow: public }]) {
 }
 
 # Dashboard Metrics
-type DashboardMetrics @model @auth(rules: [{ allow: public }]) {
+type DashboardMetrics @model {
   id: ID!
   totalSales: Float!
   totalExpenses: Float!

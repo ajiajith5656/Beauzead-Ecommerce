@@ -1,7 +1,0 @@
-{
-  "name": "beauzead-post-confirmation",
-  "version": "1.0.0",
-  "description": "Post-confirmation Lambda trigger to add users to Cognito groups",
-  "main": "index.js",
-  "dependencies": {}
-}

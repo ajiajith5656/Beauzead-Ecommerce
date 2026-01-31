@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const SellerLogin: React.FC = () => {
-  const navigate = useNavigate();
   const { signIn, signOut, authRole } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +24,7 @@ const SellerLogin: React.FC = () => {
       console.log('No existing session to sign out');
     }
 
-    const { error: signInError, role } = await signIn(email, password);
+    const { error: signInError } = await signIn(email, password);
 
     setIsLoading(false);
     if (signInError) {
@@ -41,38 +40,23 @@ const SellerLogin: React.FC = () => {
       return;
     }
 
-    // Wait longer for role to be properly set and JWT to be decoded
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Wait for authRole to be set in context
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    console.log('Seller login - Returned role from signIn:', role);
-    console.log('Seller login - Current authRole from context:', authRole);
-
-    // Use the role returned from signIn (which includes resolveRoleFromSession)
-    const finalRole = role || authRole;
+    const finalRole = authRole;
     
-    console.log('Final role to use for navigation:', finalRole);
-
     if (finalRole === 'admin') {
-      console.log('Redirecting admin to /admin');
-      navigate('/admin');
+      window.location.href = '/admin';
       return;
     }
 
     if (finalRole === 'seller') {
-      console.log('Redirecting seller to /seller/dashboard');
-      navigate('/seller/dashboard');
+      window.location.href = '/seller/dashboard';
       return;
     }
 
-    if (finalRole === 'user') {
-      console.log('User role detected, redirecting to homepage');
-      navigate('/');
-      return;
-    }
-
-    // Final fallback - if still no role detected
-    console.warn('No role detected after login, redirecting to homepage');
-    navigate('/');
+    // Role is 'user' or something else
+    window.location.href = '/';
   };
 
   return (

@@ -1,9 +1,0 @@
-{
-  "name": "beauzead-post-confirmation",
-  "version": "1.0.0",
-  "private": true,
-  "type": "commonjs",
-  "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.470.0"
-  }
-}

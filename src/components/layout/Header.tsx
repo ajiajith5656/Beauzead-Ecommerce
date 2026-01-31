@@ -6,6 +6,7 @@ import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { SUPPORTED_CURRENCIES } from '../../utils/currency';
+import { requireLogin } from '../../utils/authGuard';
 
 export const Header: React.FC = () => {
   const { user, currentAuthUser, signOut } = useAuth();
@@ -106,24 +107,42 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Wishlist */}
-            <Link to="/wishlist" className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300">
+            <button
+              onClick={() => {
+                if (!isLoggedIn) {
+                  requireLogin(false);
+                } else {
+                  window.location.href = '/wishlist';
+                }
+              }}
+              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300"
+            >
               <Heart className="h-6 w-6 text-gold" />
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300">
+            <button
+              onClick={() => {
+                if (!isLoggedIn) {
+                  requireLogin(false);
+                } else {
+                  window.location.href = '/cart';
+                }
+              }}
+              className="relative p-2 hover:bg-gray-900 rounded-lg transition-all duration-300"
+            >
               <ShoppingCart className="h-6 w-6 text-gold" />
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* User Profile / Login */}
             {isLoggedIn ? (
@@ -223,24 +242,42 @@ export const Header: React.FC = () => {
           {/* Mobile Right Side - Only Cart, Wishlist, and Hamburger */}
           <div className="flex md:hidden items-center space-x-2">
             {/* Wishlist Icon */}
-            <Link to="/wishlist" className="relative p-2">
+            <button
+              onClick={() => {
+                if (!isLoggedIn) {
+                  requireLogin(false);
+                } else {
+                  window.location.href = '/wishlist';
+                }
+              }}
+              className="relative p-2"
+            >
               <Heart className="h-6 w-6 text-gold" />
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* Cart Icon */}
-            <Link to="/cart" className="relative p-2">
+            <button
+              onClick={() => {
+                if (!isLoggedIn) {
+                  requireLogin(false);
+                } else {
+                  window.location.href = '/cart';
+                }
+              }}
+              className="relative p-2"
+            >
               <ShoppingCart className="h-6 w-6 text-gold" />
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {totalItems}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* Hamburger Menu */}
             <button
