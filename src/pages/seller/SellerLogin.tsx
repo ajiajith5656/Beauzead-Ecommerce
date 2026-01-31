@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const SellerLogin: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, signOut } = useAuth();
+  const { signIn, signOut, authRole } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,26 +41,37 @@ const SellerLogin: React.FC = () => {
       return;
     }
 
-    // Wait a moment for role to be properly set
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait longer for role to be properly set and JWT to be decoded
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    console.log('Seller login - User role:', role); // Debug log
-    console.log('Seller login - Expected seller, got:', role); // Additional debug
+    console.log('Seller login - Returned role from signIn:', role);
+    console.log('Seller login - Current authRole from context:', authRole);
 
-    if (role === 'admin') {
+    // Use the role returned from signIn (which includes resolveRoleFromSession)
+    const finalRole = role || authRole;
+    
+    console.log('Final role to use for navigation:', finalRole);
+
+    if (finalRole === 'admin') {
       console.log('Redirecting admin to /admin');
       navigate('/admin');
       return;
     }
 
-    if (role === 'seller') {
+    if (finalRole === 'seller') {
       console.log('Redirecting seller to /seller/dashboard');
       navigate('/seller/dashboard');
       return;
     }
 
-    // Fallback - if no role detected, navigate to homepage
-    console.log('No role detected, redirecting to homepage');
+    if (finalRole === 'user') {
+      console.log('User role detected, redirecting to homepage');
+      navigate('/');
+      return;
+    }
+
+    // Final fallback - if still no role detected
+    console.warn('No role detected after login, redirecting to homepage');
     navigate('/');
   };
 

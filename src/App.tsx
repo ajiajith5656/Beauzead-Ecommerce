@@ -7,7 +7,7 @@ import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 import { UserDashboard } from './pages/user/UserDashboard';
 import ForgotPassword from './pages/user/ForgotPassword';
-import SellerDashboard from './pages/seller/SellerDashboard';
+import EnhancedSellerDashboard from './pages/seller/EnhancedSellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerLogin from './pages/seller/SellerLogin';
@@ -77,7 +77,7 @@ function App() {
                   path="/seller/dashboard" 
                   element={
                     <ProtectedSellerRoute>
-                      <SellerDashboard 
+                      <EnhancedSellerDashboard 
                         onLogout={() => window.location.href = '/seller/login'}
                         sellerEmail="seller@example.com"
                         onNavigate={(view: string) => {
