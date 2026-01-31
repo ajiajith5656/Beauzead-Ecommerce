@@ -9,7 +9,7 @@ interface AuthContextType {
   currentAuthUser: AuthUser | null;
   authRole: User['role'] | null;
   loading: boolean;
-  signUp: (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string, currency?: string) => Promise<any>;
+  signUp: (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string, currency?: string, phoneNumber?: string) => Promise<any>;
   signIn: (
     email: string,
     password: string
@@ -107,12 +107,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   };
 
-  const signUp = async (email: string, password: string, _role: 'user' | 'seller' | 'admin', fullName: string, currency?: string) => {
+  const signUp = async (email: string, password: string, _role: 'user' | 'seller' | 'admin', fullName: string, currency?: string, phoneNumber?: string) => {
     try {
       const result = await amplifyAuthService.signup({
         email,
         password,
         name: fullName,
+        phone_number: phoneNumber, // Only passed for sellers
       });
 
       // Store currency preference

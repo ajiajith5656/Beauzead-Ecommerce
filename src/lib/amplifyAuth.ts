@@ -36,15 +36,24 @@ export interface SignInInput {
 class AmplifyAuthService {
   async signup(input: SignUpInput) {
     try {
+      // Build user attributes, only include phone_number if provided
+      const userAttributes: Record<string, string> = {
+        email: input.email,
+      };
+      
+      if (input.name) {
+        userAttributes.name = input.name;
+      }
+      
+      if (input.phone_number) {
+        userAttributes.phone_number = input.phone_number;
+      }
+
       const { isSignUpComplete, userId, nextStep } = await signUp({
         username: input.email,
         password: input.password,
         options: {
-          userAttributes: {
-            email: input.email,
-            name: input.name,
-            phone_number: input.phone_number,
-          },
+          userAttributes,
           autoSignIn: true,
         },
       });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, User, LogOut, Package, ChevronDown, Loader2, Menu } from 'lucide-react';
+import { ShoppingCart, Heart, User, LogOut, Package, ChevronDown, Loader2, Menu, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useWishlist } from '../../contexts/WishlistContext';
@@ -125,7 +125,7 @@ export const Header: React.FC = () => {
                 >
                   <User className="h-5 w-5 text-gold" />
                   <span className="text-white font-medium text-sm">
-                    {getDisplayName()}
+                    Account
                   </span>
                   <ChevronDown className="h-4 w-4 text-gold" />
                 </button>
@@ -136,28 +136,36 @@ export const Header: React.FC = () => {
                     onMouseLeave={() => setShowProfileDropdown(false)}
                   >
                     <Link
-                      to="/user/dashboard"
-                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
-                      onClick={() => setShowProfileDropdown(false)}
-                    >
-                      <User className="inline h-4 w-4 mr-3 text-gold" />
-                      My Profile
-                    </Link>
-                    <Link
                       to="/orders"
                       className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
                       onClick={() => setShowProfileDropdown(false)}
                     >
                       <Package className="inline h-4 w-4 mr-3 text-gold" />
-                      Orders
+                      My Orders
                     </Link>
                     <Link
-                      to="/wishlist"
+                      to="/user/dashboard"
                       className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
                       onClick={() => setShowProfileDropdown(false)}
                     >
-                      <Heart className="inline h-4 w-4 mr-3 text-gold" />
-                      My Wishlist
+                      <User className="inline h-4 w-4 mr-3 text-gold" />
+                      My Account
+                    </Link>
+                    <Link
+                      to="/notifications"
+                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <Bell className="inline h-4 w-4 mr-3 text-gold" />
+                      Notifications
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <Settings className="inline h-4 w-4 mr-3 text-gold" />
+                      Settings
                     </Link>
                     <div className="border-t border-gray-700 my-1"></div>
                     <button
@@ -165,7 +173,7 @@ export const Header: React.FC = () => {
                       className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-gray-800 hover:text-red-300 transition-all duration-300"
                     >
                       <LogOut className="inline h-4 w-4 mr-3" />
-                      Log Out
+                      Logout
                     </button>
                   </div>
                 )}

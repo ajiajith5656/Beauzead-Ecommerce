@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
+import { useAuth } from '../../contexts/AuthContext';
 // @ts-ignore
 import { listCountryListBzdcores, listBusinessTypeBzdcores } from '../../graphql/queries';
 
@@ -40,6 +41,7 @@ const SellerSignup: React.FC = () => {
   const [businessTypes, setBusinessTypes] = useState<BusinessType[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -52,6 +54,7 @@ const SellerSignup: React.FC = () => {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
   const client = generateClient();
+  const { signUp, confirmSignUp } = useAuth();
 
   // Fetch countries and business types on mount
   useEffect(() => {
@@ -124,6 +127,7 @@ const SellerSignup: React.FC = () => {
 
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     
     // Validate password
     const errors = validatePassword(formData.password);
@@ -133,9 +137,35 @@ const SellerSignup: React.FC = () => {
     }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
-    setStep('otp');
+
+    try {
+      const selectedCountry = countries.find((c) => c.id === formData.countryId);
+      const phoneNumber = selectedCountry?.dialCode 
+        ? `${selectedCountry.dialCode}${formData.mobile}` 
+        : formData.mobile;
+
+      const result = await signUp(
+        formData.email, 
+        formData.password, 
+        'seller', 
+        formData.fullName, 
+        selectedCountry?.currency,
+        phoneNumber // Pass phone number for sellers
+      );
+
+      if (result.success) {
+        // Store email for OTP verification
+        sessionStorage.setItem('sellerSignupEmail', formData.email);
+        setIsLoading(false);
+        setStep('otp');
+      } else {
+        setError(result.error?.message || 'Failed to sign up');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during signup');
+      setIsLoading(false);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -157,12 +187,35 @@ const SellerSignup: React.FC = () => {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpValue = otp.join('');
-    if (otpValue.length < 6) return;
+    if (otpValue.length < 6) {
+      setError('Please enter the complete 6-digit code');
+      return;
+    }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
-    setStep('success');
+
+    try {
+      const signupEmail = sessionStorage.getItem('sellerSignupEmail') || formData.email;
+      const result = await confirmSignUp(signupEmail, otpValue);
+
+      if (result.success) {
+        setIsLoading(false);
+        // Clear signup data
+        sessionStorage.removeItem('sellerSignupEmail');
+        setStep('success');
+        
+        // Auto-redirect after 2 seconds since user is now logged in
+        setTimeout(() => {
+          navigate('/seller/dashboard');
+        }, 2000);
+      } else {
+        setError(result.error?.message || 'Failed to verify OTP');
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to verify OTP');
+      setIsLoading(false);
+    }
   };
 
   const finalizeSignup = () => {
@@ -192,6 +245,15 @@ const SellerSignup: React.FC = () => {
 
             <div className="bg-transparent p-0">
               <form onSubmit={handleDetailsSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                    <div className="flex items-center gap-2 text-red-600 text-sm">
+                      <AlertCircle size={16} />
+                      <span>{error}</span>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-500 ml-1">Business Country</label>
                   <div className="relative group">
@@ -393,6 +455,15 @@ const SellerSignup: React.FC = () => {
 
             <div className="bg-transparent p-0">
               <form onSubmit={handleVerifyOtp} className="space-y-8">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                    <div className="flex items-center gap-2 text-red-600 text-sm">
+                      <AlertCircle size={16} />
+                      <span>{error}</span>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
                   {otp.map((digit, i) => (
                     <input
@@ -456,14 +527,11 @@ const SellerSignup: React.FC = () => {
               Verification Successful
             </h1>
             <p className="text-gray-500 text-sm font-medium mb-12 leading-relaxed">
-              Your seller account has been verified successfully. You are now ready to launch your store.
+              Your seller account has been verified. Redirecting to seller dashboard...
             </p>
-            <button
-              onClick={finalizeSignup}
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
-            >
-              Enter Seller Dashboard
-            </button>
+            <div className="flex items-center justify-center">
+              <Loader2 className="animate-spin h-8 w-8 text-yellow-500" />
+            </div>
           </div>
         )}
       </div>

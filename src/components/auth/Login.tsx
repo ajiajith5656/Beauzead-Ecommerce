@@ -36,7 +36,7 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
       } else if (role === 'seller') {
         navigate('/seller/dashboard');
       } else {
-        navigate('/user/dashboard');
+        navigate('/'); // Users go to homepage
       }
       setLoading(false);
     }, 500);

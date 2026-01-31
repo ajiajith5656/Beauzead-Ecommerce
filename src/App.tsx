@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -31,6 +31,26 @@ import { SettingsPage } from './pages/admin/modules/SettingsPage';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 
+// Protected Route Component for Sellers
+const ProtectedSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, authRole, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-gold text-xl">Loading...</div>
+      </div>
+    );
+  }
+  
+  // Check if user is logged in and has seller or admin role
+  if (!user || (authRole !== 'seller' && authRole !== 'admin')) {
+    return <Navigate to="/seller/login" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -56,16 +76,18 @@ function App() {
                 <Route 
                   path="/seller/dashboard" 
                   element={
-                    <SellerDashboard 
-                      onLogout={() => window.location.href = '/seller/login'}
-                      sellerEmail="seller@example.com"
-                      onNavigate={(view: string) => {
-                        if (view === 'seller-dashboard') window.location.href = '/seller/dashboard';
-                        if (view === 'seller-verify') window.location.href = '/seller/verify';
-                        if (view === 'seller-product-listing') window.location.href = '/seller/products';
-                      }}
-                      verificationStatus="unverified"
-                    />
+                    <ProtectedSellerRoute>
+                      <SellerDashboard 
+                        onLogout={() => window.location.href = '/seller/login'}
+                        sellerEmail="seller@example.com"
+                        onNavigate={(view: string) => {
+                          if (view === 'seller-dashboard') window.location.href = '/seller/dashboard';
+                          if (view === 'seller-verify') window.location.href = '/seller/verify';
+                          if (view === 'seller-product-listing') window.location.href = '/seller/products';
+                        }}
+                        verificationStatus="unverified"
+                      />
+                    </ProtectedSellerRoute>
                   } 
                 />
                 

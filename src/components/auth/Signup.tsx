@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, User, AlertCircle, CheckCircle, Eye, EyeOff, Globe, Loader2, ChevronDown } from 'lucide-react';
 import { generateClient } from 'aws-amplify/api';
@@ -34,8 +34,9 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const { signUp } = useAuth();
+  const { signUp, confirmSignUp } = useAuth();
   const client = generateClient();
+  const navigate = useNavigate();
 
   // Fetch countries on mount
   useEffect(() => {
@@ -176,13 +177,22 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
 
     try {
       const signupEmail = sessionStorage.getItem('signupEmail') || email;
-      const result = await useAuth().confirmSignUp(signupEmail, otpValue);
+      const result = await confirmSignUp(signupEmail, otpValue);
 
       if (result.success) {
         setSuccess(true);
         setLoading(false);
         // Clear signup data
         sessionStorage.removeItem('signupEmail');
+        
+        // Auto-redirect after 2 seconds since user is now logged in
+        setTimeout(() => {
+          if (role === 'seller') {
+            navigate('/seller/dashboard');
+          } else {
+            navigate('/'); // Users go to homepage
+          }
+        }, 2000);
       } else {
         setError(result.error?.message || 'Failed to verify OTP');
         setLoading(false);
@@ -217,19 +227,20 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
           </Link>
           <CheckCircle className="mx-auto h-12 w-12 text-black mb-4" />
           <h2 className="text-2xl font-bold text-black mb-4">Registration Successful!</h2>
-          <p className="text-gray-600 mb-6">{getApprovalMessage()}</p>
+          <p className="text-gray-600 mb-6">
+            {role === 'seller' 
+              ? 'Your seller account has been created. Redirecting to dashboard...'
+              : 'Your account has been created successfully! Redirecting to homepage...'}
+          </p>
           <p className="text-gray-500 mb-4 text-sm">
             Selected Country: <span className="text-black font-semibold">{selectedCountry?.countryName}</span>
           </p>
           <p className="text-gray-500 mb-6 text-sm">
             Currency: <span className="text-black font-semibold">{selectedCountry?.currency}</span>
           </p>
-          <Link
-            to={getLoginLink()}
-            className="inline-block w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors"
-          >
-            Go to Login
-          </Link>
+          <div className="flex items-center justify-center">
+            <Loader2 className="animate-spin h-6 w-6 text-black" />
+          </div>
         </div>
       </div>
     );
@@ -391,6 +402,15 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
               <h3 className="text-xl font-bold text-black mb-2">Verify Your Email</h3>
               <p className="text-sm text-gray-500">We've sent a 6-digit code to {email}</p>
             </div>
+
+            {error && (
+              <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               <div className="grid grid-cols-6 gap-2">
