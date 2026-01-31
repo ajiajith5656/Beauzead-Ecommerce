@@ -12,7 +12,7 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,10 +20,26 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    try {
+      // First, sign out any existing session to prevent "already signed in" error
+      await signOut();
+    } catch (err) {
+      // Ignore signout errors, continue with login
+      console.log('No existing session to sign out');
+    }
 
-    if (error) {
-      setError(error.message || 'Failed to sign in');
+    const result = await signIn(email, password);
+
+    if (result.error) {
+      // Better error messages
+      const errorMessage = result.error.message || '';
+      if (errorMessage.includes('Incorrect username or password')) {
+        setError('Invalid email or password. Please try again.');
+      } else if (errorMessage.includes('User does not exist')) {
+        setError('No account found with this email. Please sign up first.');
+      } else {
+        setError(errorMessage || 'Failed to sign in');
+      }
       setLoading(false);
       return;
     }

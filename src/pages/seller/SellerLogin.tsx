@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const SellerLogin: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, signOut } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,11 +17,27 @@ const SellerLogin: React.FC = () => {
     setError('');
     setIsLoading(true);
 
+    try {
+      // First, sign out any existing session to prevent "already signed in" error
+      await signOut();
+    } catch (err) {
+      // Ignore signout errors, continue with login
+      console.log('No existing session to sign out');
+    }
+
     const { error: signInError, role } = await signIn(email, password);
 
     setIsLoading(false);
     if (signInError) {
-      setError(signInError.message || 'Failed to sign in.');
+      // Better error messages
+      const errorMessage = signInError.message || '';
+      if (errorMessage.includes('Incorrect username or password')) {
+        setError('Invalid email or password. Please try again.');
+      } else if (errorMessage.includes('User does not exist')) {
+        setError('No account found with this email. Please sign up first.');
+      } else {
+        setError(errorMessage || 'Failed to sign in');
+      }
       return;
     }
 

@@ -8,7 +8,7 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { SUPPORTED_CURRENCIES } from '../../utils/currency';
 
 export const Header: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, currentAuthUser, signOut } = useAuth();
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { currency, setCurrency, loading: currencyLoading } = useCurrency();
@@ -17,6 +17,9 @@ export const Header: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Check if user is logged in (either user profile or auth user exists)
+  const isLoggedIn = user || currentAuthUser;
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -116,7 +119,7 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* User Profile / Login */}
-            {user ? (
+            {isLoggedIn ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onMouseEnter={() => setShowProfileDropdown(true)}
