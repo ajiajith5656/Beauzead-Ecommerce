@@ -36,55 +36,69 @@ import { waitForRoleAny } from './lib/roleDetection';
 // Protected Route Component for Sellers
 const ProtectedSellerRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, authRole, loading } = useAuth();
-  const [verifyingRole, setVerifyingRole] = useState(false);
   const [verifiedRole, setVerifiedRole] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const verifyRole = async () => {
       if (!user) {
+        console.log('ProtectedSellerRoute: No user, skipping verification');
         if (isMounted) {
           setVerifiedRole(null);
-          setVerifyingRole(false);
         }
         return;
       }
 
-      if (isMounted) {
-        setVerifyingRole(true);
-      }
+      console.log('ProtectedSellerRoute: Starting role verification');
 
       const role = await waitForRoleAny(['seller', 'admin']);
+      
+      console.log('ProtectedSellerRoute: Verified role:', role);
 
       if (isMounted) {
         setVerifiedRole(role);
-        setVerifyingRole(false);
       }
     };
 
     verifyRole();
 
+    // Safeguard: Force completion after 5 seconds
+    timeoutId = setTimeout(() => {
+      console.warn('ProtectedSellerRoute: Timeout reached');
+      if (isMounted) {
+        // Force set whatever role we have
+        setVerifiedRole(authRole);
+      }
+    }, 5000);
+
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
     };
   }, [user]);
   
-  if (loading || verifyingRole) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-gold text-xl">
-          {verifyingRole ? 'Verifying seller access...' : 'Loading...'}
-        </div>
+        <div className="text-gold text-xl">Loading...</div>
       </div>
     );
   }
-  
+
   // Check if user is logged in and has seller or admin role
-  const roleToCheck = verifiedRole || authRole;
+  // Use authRole first (from context), then verification result
+  const roleToCheck = authRole || verifiedRole;
+  
+  console.log('ProtectedSellerRoute: Checking access - role:', roleToCheck);
+  
   if (!user || (roleToCheck !== 'seller' && roleToCheck !== 'admin')) {
+    console.log('ProtectedSellerRoute: Access denied, redirecting to login');
     return <Navigate to="/seller/login" replace />;
   }
+
+  console.log('ProtectedSellerRoute: Access granted for role:', roleToCheck);
   
   return <>{children}</>;
 };
