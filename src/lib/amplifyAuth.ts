@@ -97,11 +97,6 @@ class AmplifyAuthService {
         password: input.password,
       });
 
-      // If sign in is complete, establish the session with autoSignIn
-      if (isSignedIn) {
-        await autoSignIn();
-      }
-
       return { isSignedIn, nextStep };
     } catch (error: any) {
       console.error('Signin error:', error);

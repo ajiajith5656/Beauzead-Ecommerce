@@ -173,6 +173,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
 
+      // Wait for session to be established after signin
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const authUser = await amplifyAuthService.getCurrentAuthUser();
       setCurrentAuthUser(authUser);
 
