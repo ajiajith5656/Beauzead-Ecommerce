@@ -34,6 +34,7 @@ import { ReportsManagement } from './pages/admin/modules/ReportsManagement';
 import { AdminManagement } from './pages/admin/modules/AdminManagement';
 import { ProfilePage } from './pages/admin/modules/ProfilePage';
 import { SettingsPage } from './pages/admin/modules/SettingsPage';
+import { ProductVariantManagement } from './pages/admin/modules/ProductVariantManagement';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import { CategoryProducts } from './pages/CategoryProducts';
@@ -136,6 +137,7 @@ function App() {
                     <Route path="/admin/users" element={<UserManagement />} />
                     <Route path="/admin/sellers" element={<SellerManagement />} />
                     <Route path="/admin/products" element={<ProductManagement />} />
+                    <Route path="/admin/variants" element={<ProductVariantManagement />} />
                     <Route path="/admin/orders" element={<OrderManagement />} />
                     <Route path="/admin/categories" element={<CategoryManagement />} />
                     <Route path="/admin/banners" element={<BannerManagement />} />
