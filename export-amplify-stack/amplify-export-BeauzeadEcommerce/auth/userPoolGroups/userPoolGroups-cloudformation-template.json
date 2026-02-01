@@ -1,0 +1,237 @@
+{
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"14.2.5\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{\"whyContinueWithGen1\":\"\"}}",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "AuthRoleArn": {
+      "Type": "String"
+    },
+    "UnauthRoleArn": {
+      "Type": "String"
+    },
+    "authbeauzeadecommercebbc17bd3UserPoolId": {
+      "Type": "String",
+      "Default": "authbeauzeadecommercebbc17bd3UserPoolId"
+    },
+    "authbeauzeadecommercebbc17bd3IdentityPoolId": {
+      "Type": "String",
+      "Default": "authbeauzeadecommercebbc17bd3IdentityPoolId"
+    },
+    "authbeauzeadecommercebbc17bd3AppClientID": {
+      "Type": "String",
+      "Default": "authbeauzeadecommercebbc17bd3AppClientID"
+    },
+    "authbeauzeadecommercebbc17bd3AppClientIDWeb": {
+      "Type": "String",
+      "Default": "authbeauzeadecommercebbc17bd3AppClientIDWeb"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "adminGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "Description": "override success",
+        "GroupName": "admin",
+        "Precedence": 1,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "adminGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+        }
+      }
+    },
+    "adminGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authbeauzeadecommercebbc17bd3IdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+              },
+              "-adminGroupRole"
+            ]
+          ]
+        }
+      }
+    },
+    "sellerGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "Description": "override success",
+        "GroupName": "seller",
+        "Precedence": 2,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "sellerGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+        }
+      }
+    },
+    "sellerGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authbeauzeadecommercebbc17bd3IdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+              },
+              "-sellerGroupRole"
+            ]
+          ]
+        }
+      }
+    },
+    "userGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "Description": "override success",
+        "GroupName": "user",
+        "Precedence": 3,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "userGroupRole",
+            "Arn"
+          ]
+        },
+        "UserPoolId": {
+          "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+        }
+      }
+    },
+    "userGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authbeauzeadecommercebbc17bd3IdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authbeauzeadecommercebbc17bd3UserPoolId"
+              },
+              "-userGroupRole"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "adminGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "adminGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "sellerGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "sellerGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "userGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "userGroupRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

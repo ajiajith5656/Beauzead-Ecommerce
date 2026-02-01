@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Mail, Lock, User, AlertCircle, CheckCircle, Eye, EyeOff, Globe, Loader2, ChevronDown } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Eye, EyeOff, Globe, ChevronDown } from 'lucide-react';
 import { generateClient } from 'aws-amplify/api';
 // @ts-ignore
 import { listCountryListBzdcores } from '../../graphql/queries';
@@ -18,23 +18,17 @@ interface Country {
   dialCode?: string;
 }
 
-type SignupStep = 'details' | 'otp' | 'success';
-
 export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
-  const [step, setStep] = useState<SignupStep>('details');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [countryId, setCountryId] = useState('');
   const [countries, setCountries] = useState<Country[]>([]);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const { signUp, confirmSignUp } = useAuth();
+  const { signUp } = useAuth();
   const client = generateClient();
   const navigate = useNavigate();
 
@@ -44,8 +38,8 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
       try {
         const response = await client.graphql({ query: listCountryListBzdcores });
         const countriesData = (response.data as any).listCountryListBzdcores?.items || [];
-        setCountries(countriesData);
         if (countriesData.length > 0) {
+          setCountries(countriesData);
           setCountryId(countriesData[0].id);
         }
       } catch (err) {
@@ -138,7 +132,18 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
         // Store email for OTP verification
         sessionStorage.setItem('signupEmail', email);
         setLoading(false);
-        setStep('otp');
+        
+        // Navigate to OTP page
+        const otpPath = role === 'seller' ? '/seller/otp-verification' : '/otp-verification';
+        navigate(otpPath, {
+          state: {
+            email,
+            purpose: role === 'seller' ? 'seller-signup' : 'signup',
+            onConfirm: async (_email: string, _otp: string) => {
+              return { success: true };
+            }
+          }
+        });
       } else {
         setError(result.error?.message || 'Failed to sign up');
         setLoading(false);
@@ -149,95 +154,10 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
     }
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-    if (value && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const otpValue = otp.join('');
-    if (otpValue.length < 6) {
-      setError('Please enter the complete 6-digit code');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const signupEmail = sessionStorage.getItem('signupEmail') || email;
-      const result = await confirmSignUp(signupEmail, otpValue);
-
-      if (result.success) {
-        setSuccess(true);
-        setLoading(false);
-        // Clear signup data
-        sessionStorage.removeItem('signupEmail');
-        
-        // Auto-redirect after 2 seconds since user is now logged in
-        setTimeout(() => {
-          if (role === 'seller') {
-            navigate('/seller/dashboard');
-          } else {
-            navigate('/'); // Users go to homepage
-          }
-        }, 2000);
-      } else {
-        setError(result.error?.message || 'Failed to verify OTP');
-        setLoading(false);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to verify OTP');
-      setLoading(false);
-    }
-  };
-
   const getLoginLink = () => {
     if (role === 'seller') return '/seller/login';
     return '/login';
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-8 md:p-10 text-center relative">
-          <Link
-            to="/"
-            className="absolute top-4 left-4 text-xs font-semibold text-gray-500 hover:text-black"
-          >
-            Back to Home
-          </Link>
-          <CheckCircle className="mx-auto h-12 w-12 text-black mb-4" />
-          <h2 className="text-2xl font-bold text-black mb-4">Registration Successful!</h2>
-          <p className="text-gray-600 mb-6">
-            {role === 'seller' 
-              ? 'Your seller account has been created. Redirecting to dashboard...'
-              : 'Your account has been created successfully! Redirecting to homepage...'}
-          </p>
-          <p className="text-gray-500 mb-4 text-sm">
-            Selected Country: <span className="text-black font-semibold">{selectedCountry?.countryName}</span>
-          </p>
-          <p className="text-gray-500 mb-6 text-sm">
-            Currency: <span className="text-black font-semibold">{selectedCountry?.currency}</span>
-          </p>
-          <div className="flex items-center justify-center">
-            <Loader2 className="animate-spin h-6 w-6 text-black" />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-10">
@@ -253,8 +173,7 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
           <p className="text-gray-500 text-sm mt-2">Complete your details to continue.</p>
         </div>
 
-        {step === 'details' && (
-          <form className="space-y-5" onSubmit={handleDetailsSubmit}>
+        <form className="space-y-5" onSubmit={handleDetailsSubmit}>
             {error && (
               <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
                 <div className="flex items-center gap-2">
@@ -387,66 +306,6 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
               </Link>
             </div>
           </form>
-        )}
-
-        {step === 'otp' && (
-          <form className="space-y-6" onSubmit={handleVerifyOtp}>
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-black mb-2">Verify Your Email</h3>
-              <p className="text-sm text-gray-500">We've sent a 6-digit code to {email}</p>
-            </div>
-
-            {error && (
-              <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>{error}</span>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-6 gap-2">
-                {otp.map((digit, i) => (
-                  <input
-                    key={i}
-                    ref={(el) => {
-                      if (el) otpRefs.current[i] = el;
-                    }}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleOtpChange(i, e.target.value)}
-                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                    className="w-full py-3 rounded-lg border border-gray-200 focus:border-black focus:ring-2 focus:ring-black/10 outline-none text-center text-2xl font-bold"
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading || otp.join('').length < 6}
-                className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors disabled:opacity-50"
-              >
-                {loading ? <Loader2 className="inline animate-spin mr-2" size={20} /> : ''}
-                Verify OTP
-              </button>
-            </div>
-
-            <div className="text-center text-sm">
-              <button
-                type="button"
-                onClick={() => setStep('details')}
-                className="font-semibold text-gray-600 hover:text-black"
-              >
-                Back to Details
-              </button>
-            </div>
-          </form>
-        )}
       </div>
     </div>
   );

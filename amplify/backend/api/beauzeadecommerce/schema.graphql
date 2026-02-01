@@ -1,228 +1,33 @@
-# This project uses Cognito User Pools (default) + IAM (additional auth).
-# Public access should use IAM provider, not API key.
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
 
-# GraphQL Schema for Beauzead Ecommerce
-# Public read access is enabled for browsing products and categories
-# Admin operations require authentication via Cognito User Pools
-
-type CountryListBzdcore @model {
+"""
+Country model - stores list of countries
+Used for seller registration and user profile
+"""
+type Country @model {
   id: ID!
-  countryName: String!
-  shortCode: String!
-  currency: String!
+  code: String! @index(name: "codeIndex", queryField: "countryByCode")
+  name: String!
   dialCode: String
-}
-
-type BusinessTypeBzdcore @model {
-  id: ID!
-  typeName: String!
-  description: String
-}
-
-# Category Management
-type Category @model {
-  id: ID!
-  name: String!
-  description: String
-  imageUrl: String
+  flag: String
   isActive: Boolean! @default(value: "true")
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
 
-# SubCategory Management
-type SubCategory @model {
+"""
+BusinessType model - stores seller business types
+Used during seller signup for categorization
+"""
+type BusinessType @model {
   id: ID!
-  categoryId: String! # Reference to Category
-  name: String!
+  name: String! @index(name: "nameIndex", queryField: "businessTypeByName")
   description: String
-  imageUrl: String
+  icon: String
   isActive: Boolean! @default(value: "true")
+  displayOrder: Int @default(value: "0")
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
-}
-
-# Product Images
-type ProductImage @model {
-  id: ID!
-  productId: String! # Reference to Product
-  imageUrl: String! # S3 URL
-  thumbnailUrl: String # For faster loading
-  displayOrder: Int! # 1, 2, 3, etc
-  isMainImage: Boolean! @default(value: "false")
-  uploadedBy: String! # sellerId or adminId
-  description: String
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Product Management
-type Product @model {
-  id: ID!
-  name: String!
-  description: String!
-  price: Float!
-  currency: String!
-  imageUrl: String
-  mainImageUrl: String # Direct reference for quick access
-  sellerId: String!
-  categoryId: String!
-  stock: Int!
-  approved: Boolean! @default(value: "false")
-  createdAt: AWSDateTime!
-  approvalStatus: String @default(value: "pending") # pending, approved, rejected
-  isActive: Boolean! @default(value: "true")
-  status: String @default(value: "ACTIVE") # DRAFT, PENDING, ACTIVE, REJECTED
-  measurementType: String # COUNT, WEIGHT, VOLUME, DIMENSION, AREA, APPAREL, DIGITAL, POWER, FREE_SIZE
-  variants: [ProductVariant] @hasMany(indexName: "byProduct", fields: ["id"])
-  updatedAt: AWSDateTime!
-}
-
-# Product Variants (Color, Size, Price, Stock combinations)
-type ProductVariant @model {
-  id: ID!
-  productId: ID! @index(name: "byProduct")
-  sku: String! # auto-generated or custom
-  sellerCode: String # optional seller-specific code
-  colorId: String # Reference to Color
-  color: String # Color name for quick access
-  sizeSystem: String # INTL_ALPHA, EU_NUMERIC, US_NUMERIC, UK_NUMERIC, WAIST, SHOE_US, SHOE_UK, SHOE_EU, KIDS_AGE, FREE_SIZE
-  sizeValue: String # S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE, etc.
-  price: Float!
-  stock: Int!
-  images: [VariantImage] @hasMany(indexName: "byVariant", fields: ["id"])
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Variant Images
-type VariantImage @model {
-  id: ID!
-  variantId: ID! @index(name: "byVariant")
-  url: String! # S3 URL
-  position: Int! # Display order (1, 2, 3, etc.)
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Color Management
-type Color @model {
-  id: ID!
-  name: String!
-  hex: String # Color hex code (#FF0000)
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Order Management
-type Order @model {
-  id: ID!
-  userId: String!
-  total: Float!
-  currency: String!
-  status: String! @default(value: "new") # new, processing, shipped, delivered, cancelled, return_requested, returned
-  createdAt: AWSDateTime!
-  address: String
-  phone: String
-  paymentStatus: String @default(value: "pending") # pending, completed, failed
-  updatedAt: AWSDateTime!
-}
-
-# Review Management
-type Review @model {
-  id: ID!
-  productId: String!
-  userId: String!
-  rating: Int!
-  comment: String!
-  createdAt: AWSDateTime!
-  isVerified: Boolean
-  isFlagged: Boolean @default(value: "false")
-}
-
-# Complaint Management
-type Complaint @model {
-  id: ID!
-  userId: String!
-  subject: String!
-  description: String!
-  status: String! @default(value: "open") # open, in_progress, resolved, closed
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-  assignedTo: String
-  resolution: String
-}
-
-# KYC Requirements by Country & Registration Type
-type KYCRequirement @model {
-  id: ID!
-  country: String! # India, USA, UK, Germany, France, Italy, Spain, Canada, Australia, Singapore, UAE, Saudi Arabia, Japan, China, Brazil, South Africa
-  registrationType: String! # Individual, Sole Proprietorship, Partnership, LLC, Corporation, etc.
-  requiredDocuments: String! # Comma-separated: PAN, GST, EIN, UTR, etc.
-  description: String
-  isActive: Boolean! @default(value: "true")
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Seller KYC Submission & Status
-type SellerKYCSubmission @model {
-  id: ID!
-  sellerId: String!
-  country: String!
-  registrationType: String!
-  submittedDocuments: [String] # URLs to uploaded documents
-  status: String! @default(value: "pending") # pending, approved, rejected
-  submissionDate: AWSDateTime!
-  reviewedBy: String # Admin ID who reviewed
-  reviewDate: AWSDateTime
-  rejectionReason: String
-  updatedAt: AWSDateTime!
-}
-
-# Dashboard Metrics
-type DashboardMetrics @model {
-  id: ID!
-  totalSales: Float!
-  totalExpenses: Float!
-  totalProducts: Int!
-  totalUsers: Int!
-  totalSellers: Int!
-  totalBookings: Int!
-  ongoingOrders: Int!
-  returnsCancellations: Int!
-  userRegistrations: Int!
-  primeMembers: Int!
-  sellerRegistrations: Int!
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
-# Measurement Types (COUNT, WEIGHT, VOLUME, DIMENSION, AREA, APPAREL, DIGITAL, POWER, FREE_SIZE)
-type MeasurementType @model {
-  type_id: String! @primaryKey
-  description: String
-}
-
-# Measurement Units (g, kg, ml, L, cm, inch, GB, TB, W, mAh, piece, pack, set, box, etc.)
-type MeasurementUnit @model {
-  id: ID! @primaryKey
-  type_id: String! # Reference to MeasurementType
-  unit_id: String! # g, kg, ml, L, cm, inch, GB, TB, W, mAh, piece, pack, set, box
-  displayName: String
-  conversionFactor: Float
-}
-
-# Apparel Size Systems (INTL_ALPHA, EU_NUMERIC, US_NUMERIC, SHOE_US, SHOE_EU, FREE_SIZE)
-type ApparelSizeSystem @model {
-  system_id: String! @primaryKey
-  description: String
-}
-
-# Apparel Size Values (S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE, etc.)
-type ApparelSizeValue @model {
-  id: ID! @primaryKey
-  system_id: String! # Reference to ApparelSizeSystem
-  size_value: String! # S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE
-  displayOrder: Int
 }

@@ -9,18 +9,25 @@
       "UnauthRoleName": "amplify-beauzeadecommerce-dev-33f4b-unauthRole",
       "StackName": "amplify-beauzeadecommerce-dev-33f4b",
       "StackId": "arn:aws:cloudformation:us-east-1:422287834049:stack/amplify-beauzeadecommerce-dev-33f4b/79895fa0-fe20-11f0-a628-0e6492ae4d33",
-      "AmplifyAppId": "d9zynv3b1wp98"
+      "AmplifyAppId": "d9zynv3b1wp98",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-beauzeadecommerce-dev-33f4b-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
-      "api": {
-        "beauzeadecommerce": {}
-      },
       "auth": {
         "beauzeadecommerce374a392f": {},
-        "userPoolGroups": {}
+        "userPoolGroups": {},
+        "beauzeadecommerce255e5edc": {},
+        "beauzeadecommercebbc17bd3": {}
       },
       "function": {
-        "BeauzeadPostConfirmation": {}
+        "BeauzeadPostConfirmation": {},
+        "beauzeadecommerce255e5edcPostConfirmation": {
+          "GROUP": "Admin"
+        },
+        "beauzeadPostConfirmation": {}
+      },
+      "api": {
+        "beauzeadecommerce": {}
       }
     }
   }

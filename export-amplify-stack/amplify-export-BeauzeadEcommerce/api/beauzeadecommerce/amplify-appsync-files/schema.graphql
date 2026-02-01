@@ -1,0 +1,348 @@
+"""
+Country model - stores list of countries
+Used for seller registration and user profile
+"""
+type Country {
+  id: ID!
+  code: String!
+  name: String!
+  dialCode: String
+  flag: String
+  isActive: Boolean!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+"""
+BusinessType model - stores seller business types
+Used during seller signup for categorization
+"""
+type BusinessType {
+  id: ID!
+  name: String!
+  description: String
+  icon: String
+  isActive: Boolean!
+  displayOrder: Int
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelCountryConnection {
+  items: [Country]!
+  nextToken: String
+}
+
+input ModelCountryFilterInput {
+  id: ModelIDInput
+  code: ModelStringInput
+  name: ModelStringInput
+  dialCode: ModelStringInput
+  flag: ModelStringInput
+  isActive: ModelBooleanInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelCountryFilterInput]
+  or: [ModelCountryFilterInput]
+  not: ModelCountryFilterInput
+}
+
+type Query {
+  getCountry(id: ID!): Country
+  listCountries(filter: ModelCountryFilterInput, limit: Int, nextToken: String): ModelCountryConnection
+  getBusinessType(id: ID!): BusinessType
+  listBusinessTypes(filter: ModelBusinessTypeFilterInput, limit: Int, nextToken: String): ModelBusinessTypeConnection
+  countryByCode(code: String!, sortDirection: ModelSortDirection, filter: ModelCountryFilterInput, limit: Int, nextToken: String): ModelCountryConnection
+  businessTypeByName(name: String!, sortDirection: ModelSortDirection, filter: ModelBusinessTypeFilterInput, limit: Int, nextToken: String): ModelBusinessTypeConnection
+}
+
+input ModelCountryConditionInput {
+  code: ModelStringInput
+  name: ModelStringInput
+  dialCode: ModelStringInput
+  flag: ModelStringInput
+  isActive: ModelBooleanInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelCountryConditionInput]
+  or: [ModelCountryConditionInput]
+  not: ModelCountryConditionInput
+}
+
+input CreateCountryInput {
+  id: ID
+  code: String!
+  name: String!
+  dialCode: String
+  flag: String
+  isActive: Boolean!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input UpdateCountryInput {
+  id: ID!
+  code: String
+  name: String
+  dialCode: String
+  flag: String
+  isActive: Boolean
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input DeleteCountryInput {
+  id: ID!
+}
+
+type Mutation {
+  createCountry(input: CreateCountryInput!, condition: ModelCountryConditionInput): Country
+  updateCountry(input: UpdateCountryInput!, condition: ModelCountryConditionInput): Country
+  deleteCountry(input: DeleteCountryInput!, condition: ModelCountryConditionInput): Country
+  createBusinessType(input: CreateBusinessTypeInput!, condition: ModelBusinessTypeConditionInput): BusinessType
+  updateBusinessType(input: UpdateBusinessTypeInput!, condition: ModelBusinessTypeConditionInput): BusinessType
+  deleteBusinessType(input: DeleteBusinessTypeInput!, condition: ModelBusinessTypeConditionInput): BusinessType
+}
+
+input ModelSubscriptionCountryFilterInput {
+  id: ModelSubscriptionIDInput
+  code: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  dialCode: ModelSubscriptionStringInput
+  flag: ModelSubscriptionStringInput
+  isActive: ModelSubscriptionBooleanInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionCountryFilterInput]
+  or: [ModelSubscriptionCountryFilterInput]
+}
+
+type Subscription {
+  onCreateCountry(filter: ModelSubscriptionCountryFilterInput): Country @aws_subscribe(mutations: ["createCountry"])
+  onUpdateCountry(filter: ModelSubscriptionCountryFilterInput): Country @aws_subscribe(mutations: ["updateCountry"])
+  onDeleteCountry(filter: ModelSubscriptionCountryFilterInput): Country @aws_subscribe(mutations: ["deleteCountry"])
+  onCreateBusinessType(filter: ModelSubscriptionBusinessTypeFilterInput): BusinessType @aws_subscribe(mutations: ["createBusinessType"])
+  onUpdateBusinessType(filter: ModelSubscriptionBusinessTypeFilterInput): BusinessType @aws_subscribe(mutations: ["updateBusinessType"])
+  onDeleteBusinessType(filter: ModelSubscriptionBusinessTypeFilterInput): BusinessType @aws_subscribe(mutations: ["deleteBusinessType"])
+}
+
+type ModelBusinessTypeConnection {
+  items: [BusinessType]!
+  nextToken: String
+}
+
+input ModelBusinessTypeFilterInput {
+  id: ModelIDInput
+  name: ModelStringInput
+  description: ModelStringInput
+  icon: ModelStringInput
+  isActive: ModelBooleanInput
+  displayOrder: ModelIntInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBusinessTypeFilterInput]
+  or: [ModelBusinessTypeFilterInput]
+  not: ModelBusinessTypeFilterInput
+}
+
+input ModelBusinessTypeConditionInput {
+  name: ModelStringInput
+  description: ModelStringInput
+  icon: ModelStringInput
+  isActive: ModelBooleanInput
+  displayOrder: ModelIntInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelBusinessTypeConditionInput]
+  or: [ModelBusinessTypeConditionInput]
+  not: ModelBusinessTypeConditionInput
+}
+
+input CreateBusinessTypeInput {
+  id: ID
+  name: String!
+  description: String
+  icon: String
+  isActive: Boolean!
+  displayOrder: Int
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input UpdateBusinessTypeInput {
+  id: ID!
+  name: String
+  description: String
+  icon: String
+  isActive: Boolean
+  displayOrder: Int
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+input DeleteBusinessTypeInput {
+  id: ID!
+}
+
+input ModelSubscriptionBusinessTypeFilterInput {
+  id: ModelSubscriptionIDInput
+  name: ModelSubscriptionStringInput
+  description: ModelSubscriptionStringInput
+  icon: ModelSubscriptionStringInput
+  isActive: ModelSubscriptionBooleanInput
+  displayOrder: ModelSubscriptionIntInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionBusinessTypeFilterInput]
+  or: [ModelSubscriptionBusinessTypeFilterInput]
+}

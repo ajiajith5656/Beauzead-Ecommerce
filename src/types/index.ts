@@ -101,6 +101,25 @@ export interface OrderItem {
   product?: Product;
 }
 
+export interface UserAddress {
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone_number: string;
+  email: string;
+  country: string;
+  street_address_1: string;
+  street_address_2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  address_type: 'home' | 'work' | 'other';
+  delivery_notes?: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -281,4 +300,137 @@ export interface PlatformCost {
   currency: string;
   billing_cycle: 'monthly' | 'quarterly' | 'yearly' | 'one_time';
   is_active: boolean;
+}
+export interface SellerKYC {
+  id: string;
+  seller_id: string;
+
+  // Pre-filled from signup (auto-populated)
+  email: string;
+  phone: string;
+  full_name: string;
+  country: string;
+
+  // Tier 2 - Tax & Business Information
+  pan: string;
+  gstin?: string;
+
+  // Identity Verification
+  id_type: 'aadhar' | 'passport' | 'voter' | 'driver_license';
+  id_number: string;
+  id_document_url: string;
+  id_document_file?: File;
+
+  // Address Information
+  business_address: UserAddress;
+  address_proof_url: string;
+  address_proof_file?: File;
+
+  // Bank Details
+  bank_holder_name: string;
+  account_number: string;
+  account_type: 'checking' | 'savings' | 'current';
+  ifsc_code: string;
+  bank_statement_url: string;
+  bank_statement_file?: File;
+
+  // Compliance & Legal
+  pep_declaration: boolean;
+  sanctions_check: boolean;
+  aml_compliance: boolean;
+  tax_compliance: boolean;
+  terms_accepted: boolean;
+
+  // KYC Status & Metadata
+  kyc_status: 'draft' | 'pending' | 'approved' | 'rejected';
+  kyc_tier: 1 | 2 | 3;
+  rejection_reason?: string;
+  verified_by_admin?: string;
+  verified_at?: string;
+
+  // Timestamps
+  created_at: string;
+  updated_at: string;
+  submitted_at?: string;
+}
+
+// =====================================================
+// PAYMENT & ORDER TYPES
+// =====================================================
+
+export interface StripePaymentIntent {
+  id: string;
+  clientSecret: string;
+  status: 'requires_payment_method' | 'requires_confirmation' | 'requires_action' | 'processing' | 'requires_capture' | 'canceled' | 'succeeded';
+  amount: number;
+  currency: string;
+  customerId: string;
+  customerEmail: string;
+  metadata?: Record<string, string>;
+  created_at: string;
+}
+
+export interface OrderData {
+  id: string;
+  customerId: string;
+  customerEmail: string;
+  totalAmount: number;
+  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
+  paymentIntentId?: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+  }>;
+  shippingAddress: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  billingAddress?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  notes?: string;
+  trackingNumber?: string;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+
+export interface CheckoutSession {
+  id: string;
+  sessionId: string;
+  customerId: string;
+  customerEmail: string;
+  status: 'open' | 'complete' | 'expired';
+  url?: string;
+  successUrl: string;
+  cancelUrl: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    price: number;
+  }>;
+  totalAmount: number;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export interface PaymentRefund {
+  id: string;
+  refundId: string;
+  paymentIntentId: string;
+  amount: number;
+  status: 'succeeded' | 'failed' | 'canceled';
+  reason: 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'abandoned';
+  createdAt: string;
 }

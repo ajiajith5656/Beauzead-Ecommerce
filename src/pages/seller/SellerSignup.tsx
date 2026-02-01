@@ -65,24 +65,39 @@ const SellerSignup: React.FC = () => {
           client.graphql({ query: listBusinessTypeBzdcores }),
         ]);
         
-        setCountries((countriesResponse.data as any).listCountryListBzdcores?.items || []);
-        setBusinessTypes((businessTypesResponse.data as any).listBusinessTypeBzdcores?.items || []);
+        const countriesData = (countriesResponse.data as any).listCountryListBzdcores?.items || [];
+        const businessTypesData = (businessTypesResponse.data as any).listBusinessTypeBzdcores?.items || [];
         
-        // Set default country if available
-        if ((countriesResponse.data as any).listCountryListBzdcores?.items?.length > 0) {
-          setFormData(prev => ({
-            ...prev,
-            countryId: (countriesResponse.data as any).listCountryListBzdcores.items[0].id
-          }));
+        if (countriesData.length > 0) {
+          setCountries(countriesData);
+          setFormData(prev => ({ ...prev, countryId: countriesData[0].id }));
         }
-        if ((businessTypesResponse.data as any).listBusinessTypeBzdcores?.items?.length > 0) {
-          setFormData(prev => ({
-            ...prev,
-            businessTypeId: (businessTypesResponse.data as any).listBusinessTypeBzdcores.items[0].id
-          }));
+
+        if (businessTypesData.length > 0) {
+          setBusinessTypes(businessTypesData);
+          setFormData(prev => ({ ...prev, businessTypeId: businessTypesData[0].id }));
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('❌ Error fetching data:', error);
+        setError('Failed to load countries and business types');
+        // Fallback
+        const mockCountries = [
+          { id: '1', countryName: 'United States', shortCode: 'US', currency: 'USD', dialCode: '+1' },
+          { id: '2', countryName: 'Canada', shortCode: 'CA', currency: 'CAD', dialCode: '+1' },
+          { id: '3', countryName: 'India', shortCode: 'IN', currency: 'INR', dialCode: '+91' },
+        ];
+        const mockTypes = [
+          { id: '1', typeName: 'Retail Store', description: 'Physical storefront' },
+          { id: '2', typeName: 'Online Store', description: 'E-commerce' },
+          { id: '3', typeName: 'Wholesale', description: 'Distributor' },
+        ];
+        setCountries(mockCountries);
+        setBusinessTypes(mockTypes);
+        setFormData(prev => ({ 
+          ...prev, 
+          countryId: mockCountries[0].id,
+          businessTypeId: mockTypes[0].id 
+        }));
       }
     };
     
@@ -157,7 +172,15 @@ const SellerSignup: React.FC = () => {
         // Store email for OTP verification
         sessionStorage.setItem('sellerSignupEmail', formData.email);
         setIsLoading(false);
-        setStep('otp');
+        
+        // Navigate to OTP verification page
+        navigate('/seller/otp-verification', {
+          state: {
+            email: formData.email,
+            purpose: 'seller-signup',
+            onConfirm: confirmSignUp
+          }
+        });
       } else {
         setError(result.error?.message || 'Failed to sign up');
         setIsLoading(false);

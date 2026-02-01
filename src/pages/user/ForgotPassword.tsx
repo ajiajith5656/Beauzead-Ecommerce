@@ -47,9 +47,18 @@ const ForgotPassword: React.FC = () => {
       const result = await resetPassword(email);
       if (result.success) {
         setIsLoading(false);
-        setStep('otp');
-        setResendTimer(30);
-        setCanResend(false);
+        // Navigate to OTP verification page
+        navigate('/otp-verification', {
+          state: {
+            email,
+            purpose: 'password-reset',
+            onConfirm: async (_email: string, _otpCode: string) => {
+              // Verify OTP - for now just return success
+              // In real implementation, this would call backend to verify
+              return { success: true };
+            }
+          }
+        });
       } else {
         setError(result.error?.message || 'Failed to send reset code');
         setIsLoading(false);

@@ -3,21 +3,35 @@ import {
   LayoutDashboard, ShoppingBag, DollarSign, BarChart2, 
   Package, Settings, LogOut, Bell, TrendingUp, 
   MoreVertical, Clock, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  ShieldCheck, X, Info, Menu
+  ShieldCheck, X, Info, Menu, Shield, CheckCircle2
 } from 'lucide-react';
+import SellerKYCVerification from './SellerKYCVerification';
+import type { SellerKYC } from '../../types';
 
 interface SellerDashboardProps {
   onLogout: () => void;
   sellerEmail: string;
+  sellerPhone?: string;
+  sellerFullName?: string;
+  sellerCountry?: string;
   onNavigate: (view: any) => void;
   verificationStatus: 'unverified' | 'pending' | 'verified';
 }
 
-type DashboardSection = 'overview' | 'products' | 'orders' | 'sales' | 'payouts' | 'settings';
+type DashboardSection = 'overview' | 'products' | 'orders' | 'sales' | 'payouts' | 'settings' | 'verification';
 
-const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, onNavigate, verificationStatus }) => {
+const SellerDashboard: React.FC<SellerDashboardProps> = ({ 
+  onLogout, 
+  sellerEmail, 
+  sellerPhone = '', 
+  sellerFullName = 'Seller', 
+  sellerCountry = 'India',
+  onNavigate, 
+  verificationStatus 
+}) => {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [kycSubmitted, setKycSubmitted] = useState(false);
   
   const isPending = verificationStatus === 'pending';
   const isVerified = verificationStatus === 'verified';
@@ -68,6 +82,15 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, onNavigate,
             active={activeSection === 'overview'} 
             onClick={() => { setActiveSection('overview'); setMobileMenuOpen(false); }} 
           />
+          {!isVerified && (
+            <NavItem 
+              icon={<Shield />} 
+              label="Verification" 
+              active={activeSection === 'verification'} 
+              onClick={() => { setActiveSection('verification'); setMobileMenuOpen(false); }} 
+              badge={isPending ? 'pending' : 'required'}
+            />
+          )}
           <NavItem 
             icon={<Package />} 
             label="My Products" 
@@ -168,7 +191,40 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, onNavigate,
           </div>
         </header>
 
-        {activeSection === 'overview' && renderOverview(verificationStatus, onNavigate)}
+        {activeSection === 'overview' && renderOverview(verificationStatus, onNavigate, () => setActiveSection('verification'))}
+        
+        {activeSection === 'verification' && !kycSubmitted && (
+          <SellerKYCVerification 
+            sellerEmail={sellerEmail}
+            sellerPhone={sellerPhone}
+            sellerFullName={sellerFullName}
+            sellerCountry={sellerCountry}
+            onSubmit={(data: SellerKYC) => {
+              console.log('KYC submitted:', data);
+              setKycSubmitted(true);
+            }}
+            onCancel={() => setActiveSection('overview')}
+          />
+        )}
+        
+        {activeSection === 'verification' && kycSubmitted && (
+          <div className="bg-green-500/5 border border-green-500/20 rounded-2xl p-12 text-center animate-in fade-in duration-500">
+            <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 size={40} className="text-white" />
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-2">KYC Submitted Successfully</h3>
+            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">Your KYC verification has been submitted for review. Our compliance team will verify your documents within 48-72 hours. You'll receive an email update once the review is complete.</p>
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-6 py-4 inline-block mb-8">
+              <p className="text-green-400 font-bold text-sm uppercase tracking-wider">Status: Pending Admin Review</p>
+            </div>
+            <button
+              onClick={() => setActiveSection('overview')}
+              className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl font-bold transition-colors"
+            >
+              Back to Overview
+            </button>
+          </div>
+        )}
         
         {activeSection !== 'overview' && activeSection !== 'settings' && !isVerified && (
           <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center animate-in fade-in duration-500">
@@ -200,7 +256,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({ onLogout, onNavigate,
   );
 };
 
-const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigate: (v: any) => void) => (
+const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigate: (v: any) => void, onVerificationClick?: () => void) => (
   <div className="animate-in fade-in duration-500">
     {status === 'unverified' && (
       <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 md:mb-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 transition-all hover:bg-yellow-500/10">
@@ -214,7 +270,7 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
           </div>
         </div>
         <button 
-          onClick={() => onNavigate('seller-verify')}
+          onClick={onVerificationClick}
           className="w-full sm:w-auto bg-white text-black font-bold px-6 sm:px-8 py-3 rounded-lg sm:rounded-xl text-[10px] uppercase tracking-[0.2em] hover:bg-yellow-500 transition-all active:scale-95 shadow-2xl whitespace-nowrap"
         >
           Begin Verification
@@ -282,7 +338,7 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
   </div>
 );
 
-const NavItem = ({ icon, label, active, onClick, disabled = false }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void, disabled?: boolean }) => (
+const NavItem = ({ icon, label, active, onClick, disabled = false, badge }: { icon: React.ReactNode, label: string, active?: boolean, onClick?: () => void, disabled?: boolean, badge?: 'required' | 'pending' }) => (
   <button 
     disabled={disabled}
     onClick={onClick}
@@ -291,7 +347,16 @@ const NavItem = ({ icon, label, active, onClick, disabled = false }: { icon: Rea
     active ? 'bg-yellow-500 text-black shadow-xl shadow-yellow-500/20 scale-[1.02]' : 'text-gray-500 hover:text-white hover:bg-gray-900'
   }`}>
     {React.cloneElement(icon as React.ReactElement<any>, { size: 18 })}
-    {label}
+    <span className="flex-1">{label}</span>
+    {badge && (
+      <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+        badge === 'required' 
+          ? 'bg-red-500/20 text-red-400'
+          : 'bg-blue-500/20 text-blue-400'
+      }`}>
+        {badge === 'required' ? 'Required' : 'Pending'}
+      </span>
+    )}
   </button>
 );
 

@@ -17,48 +17,14 @@
       "service": "AppSync"
     }
   },
-  "auth": {
-    "beauzeadecommerce374a392f": {
-      "customAuth": false,
-      "dependsOn": [],
-      "frontendAuthConfig": {
-        "mfaConfiguration": "OFF",
-        "mfaTypes": [
-          "SMS"
-        ],
-        "passwordProtectionSettings": {
-          "passwordPolicyCharacters": [],
-          "passwordPolicyMinLength": 8
-        },
-        "signupAttributes": [
-          "EMAIL"
-        ],
-        "socialProviders": [],
-        "usernameAttributes": [
-          "EMAIL"
-        ],
-        "verificationMechanisms": [
-          "EMAIL"
-        ]
-      },
-      "providerPlugin": "awscloudformation",
-      "service": "Cognito"
-    },
-    "userPoolGroups": {
-      "dependsOn": [
+  "parameters": {
+    "AMPLIFY_function_beauzeadecommerce255e5edcPostConfirmation_GROUP": {
+      "usedBy": [
         {
-          "attributes": [
-            "UserPoolId",
-            "AppClientIDWeb",
-            "AppClientID",
-            "IdentityPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "beauzeadecommerce374a392f"
+          "category": "function",
+          "resourceName": "beauzeadecommerce255e5edcPostConfirmation"
         }
-      ],
-      "providerPlugin": "awscloudformation",
-      "service": "Cognito-UserPool-Groups"
+      ]
     }
   }
 }

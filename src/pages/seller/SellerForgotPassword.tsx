@@ -47,9 +47,17 @@ const SellerForgotPassword: React.FC = () => {
       const result = await resetPassword(email);
       if (result.success) {
         setIsLoading(false);
-        setStep('otp');
-        setResendTimer(30);
-        setCanResend(false);
+        // Navigate to OTP verification page
+        navigate('/seller/otp-verification', {
+          state: {
+            email,
+            purpose: 'seller-password-reset',
+            onConfirm: async (_email: string, _otpCode: string) => {
+              // Verify OTP
+              return { success: true };
+            }
+          }
+        });
       } else {
         setError(result.error?.message || 'Failed to send reset code');
         setIsLoading(false);

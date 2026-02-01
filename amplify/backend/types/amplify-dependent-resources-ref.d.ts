@@ -2,18 +2,15 @@ export type AmplifyDependentResourcesAttributes = {
   "api": {
     "beauzeadecommerce": {
       "GraphQLAPIEndpointOutput": "string",
-      "GraphQLAPIIdOutput": "string"
+      "GraphQLAPIIdOutput": "string",
+      "GraphQLAPIKeyOutput": "string"
     }
   },
-  "auth": {
-    "beauzeadecommerce374a392f": {
-      "AppClientID": "string",
-      "AppClientIDWeb": "string",
-      "IdentityPoolId": "string",
-      "IdentityPoolName": "string",
-      "UserPoolArn": "string",
-      "UserPoolId": "string",
-      "UserPoolName": "string"
+  "function": {
+    "beauzeadPostConfirmation": {
+      "LambdaExecutionRoleArn": "string",
+      "LambdaFunctionArn": "string",
+      "LambdaFunctionName": "string"
     }
   }
 }

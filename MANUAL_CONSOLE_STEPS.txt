@@ -1,0 +1,99 @@
+╔════════════════════════════════════════════════════════════════╗
+║     MANUAL AURORA CREATION - AWS CONSOLE (100% Works)           ║
+╚════════════════════════════════════════════════════════════════╝
+
+STEP 1: Go to RDS Console
+───────────────────────────────────────────────────────────────
+  https://console.aws.amazon.com/rds/
+
+STEP 2: Click "Create database" button (ORANGE)
+───────────────────────────────────────────────────────────────
+
+STEP 3: Choose Engine
+───────────────────────────────────────────────────────────────
+  ✅ Select "Amazon Aurora"
+  ✅ Select "PostgreSQL compatible"
+  ✅ Edition: Aurora PostgreSQL
+  ✅ Version: 17.7-R1 (or latest available)
+
+STEP 4: Templates
+───────────────────────────────────────────────────────────────
+  ✅ Click "Free tier"
+
+STEP 5: Settings - DB Cluster Identifier
+───────────────────────────────────────────────────────────────
+  Field: "DB cluster identifier"
+  Value: beauzead-aurora-free
+
+STEP 6: Credentials - Master Username & Password
+───────────────────────────────────────────────────────────────
+  Master username: beauzeadadmin
+  
+  Master password: Beauzead@2026Secure
+  Confirm password: Beauzead@2026Secure
+
+STEP 7: Instance Configuration
+───────────────────────────────────────────────────────────────
+  ✅ DB instance class: db.t3.micro (burstable)
+  ✅ Multi-AZ deployment: OFF (free tier)
+
+STEP 8: Storage
+───────────────────────────────────────────────────────────────
+  Storage type: General Purpose (gp3)
+  Allocated storage: 20 GB
+  Storage autoscaling: UNCHECK (keep it at 20 GB)
+
+STEP 9: Connectivity
+───────────────────────────────────────────────────────────────
+  ✅ Public access: YES
+  ✅ VPC Security group: Create new
+
+STEP 10: Database Authentication
+───────────────────────────────────────────────────────────────
+  Password authentication: Enabled
+
+STEP 11: Initial Database Name
+───────────────────────────────────────────────────────────────
+  Initial database name: beauzeaddb
+
+STEP 12: Backup
+───────────────────────────────────────────────────────────────
+  Backup retention period: 7 days
+  Backup window: 03:00-04:00 UTC
+  Copy backups to another region: OFF
+
+STEP 13: Encryption
+───────────────────────────────────────────────────────────────
+  ✅ Encryption: Enable encryption
+  ✅ KMS key: (default)
+
+STEP 14: Deletion Protection
+───────────────────────────────────────────────────────────────
+  ✅ Enable deletion protection
+
+STEP 15: Monitoring & Logs
+───────────────────────────────────────────────────────────────
+  Enhanced monitoring: OFF (optional)
+  Export logs: postgresql (checked)
+
+STEP 16: CLICK "Create database" Button
+───────────────────────────────────────────────────────────────
+  Wait 10-15 minutes for cluster to be created
+
+═══════════════════════════════════════════════════════════════
+
+STEP 17: After cluster is READY, Get Endpoint
+───────────────────────────────────────────────────────────────
+  1. Go back to RDS > Databases
+  2. Click on "beauzead-aurora-free"
+  3. Copy the "Endpoint" value under "Connectivity & security"
+     (looks like: beauzead-aurora-free.xxxxxx.us-east-1.rds.amazonaws.com)
+
+STEP 18: Come back here and give me the ENDPOINT
+───────────────────────────────────────────────────────────────
+  Then I'll automatically:
+  - Update config file
+  - Import schema (16 tables + 60 countries)
+  - Test connection
+
+═══════════════════════════════════════════════════════════════

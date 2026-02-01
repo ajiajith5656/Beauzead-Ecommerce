@@ -1,0 +1,132 @@
+{
+  "stackName": "amplify-beauzeadecommerce-dev-33f4b",
+  "props": {
+    "templateFile": "root-stack-template.json",
+    "parameters": {
+      "AuthRoleName": "amplify-beauzeadecommerce-dev-33f4b-authRole",
+      "UnauthRoleName": "amplify-beauzeadecommerce-dev-33f4b-unauthRole",
+      "DeploymentBucketName": "amplify-beauzeadecommerce-dev-33f4b-deployment"
+    },
+    "preserveLogicalIds": true,
+    "loadNestedStacks": {
+      "apibeauzeadecommerce": {
+        "templateFile": "api/beauzeadecommerce/cloudformation-template.json",
+        "parameters": {
+          "AppSyncApiName": "beauzeadecommerce",
+          "DynamoDBBillingMode": "PAY_PER_REQUEST",
+          "DynamoDBEnableServerSideEncryption": false,
+          "S3DeploymentBucket": "amplify-beauzeadecommerce-dev-33f4b-deployment",
+          "S3DeploymentRootKey": "amplify-appsync-files/0bdd7eb7e8c6687c5f0e33590b5d50834d5526ae",
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {
+          "BusinessType": {
+            "templateFile": "api/beauzeadecommerce/amplify-appsync-files/stacks/BusinessType.json",
+            "preserveLogicalIds": true,
+            "loadNestedStacks": {}
+          },
+          "Country": {
+            "templateFile": "api/beauzeadecommerce/amplify-appsync-files/stacks/Country.json",
+            "preserveLogicalIds": true,
+            "loadNestedStacks": {}
+          },
+          "CustomResourcesjson": {
+            "templateFile": "api/beauzeadecommerce/amplify-appsync-files/stacks/CustomResources.json",
+            "preserveLogicalIds": true,
+            "loadNestedStacks": {}
+          }
+        }
+      },
+      "authbeauzeadecommercebbc17bd3": {
+        "templateFile": "auth/beauzeadecommercebbc17bd3/beauzeadecommercebbc17bd3-cloudformation-template.json",
+        "parameters": {
+          "identityPoolName": "beauzeadecommercebbc17bd3_identitypool_bbc17bd3",
+          "allowUnauthenticatedIdentities": false,
+          "resourceNameTruncated": "beauzebbc17bd3",
+          "userPoolName": "beauzeadecommercebbc17bd3_userpool_bbc17bd3",
+          "autoVerifiedAttributes": [
+            "email"
+          ],
+          "mfaConfiguration": "OFF",
+          "mfaTypes": [
+            "SMS Text Message"
+          ],
+          "smsAuthenticationMessage": "Your authentication code is {####}",
+          "smsVerificationMessage": "Your verification code is {####}",
+          "emailVerificationSubject": "Your verification code",
+          "emailVerificationMessage": "Your verification code is {####}",
+          "defaultPasswordPolicy": false,
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": [],
+          "requiredAttributes": [
+            "email",
+            "name"
+          ],
+          "aliasAttributes": [],
+          "userpoolClientGenerateSecret": false,
+          "userpoolClientRefreshTokenValidity": 30,
+          "userpoolClientWriteAttributes": [
+            "email"
+          ],
+          "userpoolClientReadAttributes": [
+            "email"
+          ],
+          "userpoolClientLambdaRole": "beauzebbc17bd3_userpoolclient_lambda_role",
+          "userpoolClientSetAttributes": false,
+          "sharedId": "bbc17bd3",
+          "resourceName": "beauzeadecommercebbc17bd3",
+          "authSelections": "identityPoolAndUserPool",
+          "useDefault": "default",
+          "usernameAttributes": [
+            "email"
+          ],
+          "triggers": "{\"PostConfirmation\":[\"beauzeadPostConfirmation\"]}",
+          "userPoolGroupList": [
+            "admin",
+            "seller",
+            "user"
+          ],
+          "serviceName": "Cognito",
+          "usernameCaseSensitive": false,
+          "useEnabledMfas": true,
+          "breakCircularDependency": true,
+          "dependsOn": [
+            {
+              "category": "function",
+              "resourceName": "beauzeadecommercebbc17bd3PostConfirmation",
+              "triggerProvider": "Cognito",
+              "attributes": [
+                "Arn",
+                "Name"
+              ]
+            }
+          ],
+          "permissions": [],
+          "authTriggerConnections": [
+            "{\"triggerType\":\"PostConfirmation\",\"lambdaFunctionName\":\"beauzeadecommercebbc17bd3PostConfirmation\"}"
+          ],
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "authuserPoolGroups": {
+        "templateFile": "auth/userPoolGroups/userPoolGroups-cloudformation-template.json",
+        "parameters": {
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      },
+      "functionbeauzeadPostConfirmation": {
+        "templateFile": "function/beauzeadPostConfirmation/beauzeadPostConfirmation-cloudformation-template.json",
+        "parameters": {
+          "env": "dev"
+        },
+        "preserveLogicalIds": true,
+        "loadNestedStacks": {}
+      }
+    }
+  }
+}

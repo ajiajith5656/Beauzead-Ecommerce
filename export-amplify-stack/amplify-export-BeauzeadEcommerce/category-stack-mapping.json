@@ -1,0 +1,22 @@
+[
+  {
+    "category": "api",
+    "resourceName": "beauzeadecommerce",
+    "service": "AppSync"
+  },
+  {
+    "category": "auth",
+    "resourceName": "beauzeadecommercebbc17bd3",
+    "service": "Cognito"
+  },
+  {
+    "category": "auth",
+    "resourceName": "userPoolGroups",
+    "service": "Cognito-UserPool-Groups"
+  },
+  {
+    "category": "function",
+    "resourceName": "beauzeadPostConfirmation",
+    "service": "Lambda"
+  }
+]

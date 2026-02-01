@@ -6,18 +6,22 @@ import { WishlistProvider } from './contexts/WishlistContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
-import { UserDashboard } from './pages/user/UserDashboard';
 import { MyOrders } from './pages/user/MyOrders';
 import { NotificationsPage } from './pages/user/Notifications';
 import { WishlistPage } from './pages/user/Wishlist';
 import { CartPage } from './pages/user/Cart';
 import { UserSettings } from './pages/user/Settings';
 import ForgotPassword from './pages/user/ForgotPassword';
+import Profile from './pages/user/Profile';
+import OrderDetails from './pages/user/OrderDetails';
+import WriteReview from './pages/user/WriteReview';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerLogin from './pages/seller/SellerLogin';
 import SellerForgotPassword from './pages/seller/SellerForgotPassword';
+import AnalyticsDashboard from './pages/seller/AnalyticsDashboard';
+import SellerProfile from './pages/seller/SellerProfile';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminOverview } from './pages/admin/modules/AdminOverview';
 import { UserManagement } from './pages/admin/modules/UserManagement';
@@ -35,9 +39,20 @@ import { AdminManagement } from './pages/admin/modules/AdminManagement';
 import { ProfilePage } from './pages/admin/modules/ProfilePage';
 import { SettingsPage } from './pages/admin/modules/SettingsPage';
 import { ProductVariantManagement } from './pages/admin/modules/ProductVariantManagement';
+import SearchManagement from './pages/admin/modules/SearchManagement';
+import AuditLogs from './pages/admin/modules/AuditLogs';
+import SystemHealth from './pages/admin/modules/SystemHealth';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import { CategoryProducts } from './pages/CategoryProducts';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsService from './pages/TermsService';
+import ShippingPolicy from './pages/ShippingPolicy';
+import RefundPolicy from './pages/RefundPolicy';
+import UserAddressManagement from './pages/user/AddressManagement';
+import AdminAddressManagement from './pages/admin/components/AdminAddressManagement';
+import OTPVerification from './pages/OTPVerification';
+import NewPassword from './pages/NewPassword';
 
 // Simple path-based route guard
 const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -95,22 +110,37 @@ function App() {
                   <Route path="/products/:productId" element={<ProductDetailsPage />} />
                   <Route path="/category/:categoryId" element={<CategoryProducts />} />
                   
+                  {/* Legal Pages */}
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsService />} />
+                  <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  
                   {/* User Routes */}
                   <Route path="/login" element={<Login role="user" />} />
                   <Route path="/signup" element={<Signup role="user" />} />
+                  <Route path="/otp-verification" element={<OTPVerification />} />
+                  <Route path="/new-password" element={<NewPassword />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/user/dashboard" element={<UserDashboard />} />
                   <Route path="/orders" element={<MyOrders />} />
+                  <Route path="/orders/:orderId" element={<OrderDetails />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/settings" element={<UserSettings />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/products/:productId/review" element={<WriteReview />} />
+                  <Route path="/user/addresses" element={<UserAddressManagement />} />
                   
                   {/* Seller Routes */}
                   <Route path="/seller" element={<SellerLanding />} />
                   <Route path="/seller/login" element={<SellerLogin />} />
                   <Route path="/seller/signup" element={<SellerSignup />} />
+                  <Route path="/seller/otp-verification" element={<OTPVerification />} />
+                  <Route path="/seller/new-password" element={<NewPassword />} />
                   <Route path="/seller/forgot-password" element={<SellerForgotPassword />} />
+                  <Route path="/seller/analytics" element={<AnalyticsDashboard />} />
+                  <Route path="/seller/profile" element={<SellerProfile />} />
                   <Route 
                     path="/seller/dashboard" 
                     element={
@@ -149,6 +179,10 @@ function App() {
                     <Route path="/admin/admins" element={<AdminManagement />} />
                     <Route path="/admin/profile" element={<ProfilePage />} />
                     <Route path="/admin/settings" element={<SettingsPage />} />
+                    <Route path="/admin/search" element={<SearchManagement />} />
+                    <Route path="/admin/audit-logs" element={<AuditLogs />} />
+                    <Route path="/admin/health" element={<SystemHealth />} />
+                    <Route path="/admin/addresses" element={<AdminAddressManagement />} />
                   </Route>
                   
                   {/* Fallback */}
