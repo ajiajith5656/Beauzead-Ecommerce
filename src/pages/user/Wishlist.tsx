@@ -3,26 +3,15 @@ import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
+import { useCart } from '../../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
 
-interface WishlistItem {
-  id: string;
-  productId: string;
-  productName: string;
-  brand: string;
-  price: number;
-  discount: number;
-  image: string;
-  inStock: boolean;
-  addedDate: string;
-}
-
 export const WishlistPage: React.FC = () => {
   const { user, currentAuthUser } = useAuth();
-  const { removeFromWishlist } = useWishlist();
+  const { items: wishlistItems, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
@@ -32,85 +21,30 @@ export const WishlistPage: React.FC = () => {
       navigate('/login');
       return;
     }
-
-    // Simulate fetching wishlist
-    const loadWishlist = async () => {
-      try {
-        setLoading(true);
-        // TODO: Replace with actual GraphQL query
-        const mockWishlist: WishlistItem[] = [
-          {
-            id: '1',
-            productId: 'prod1',
-            productName: 'Premium Wireless Headphones',
-            brand: 'AudioTech',
-            price: 4999,
-            discount: 25,
-            image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
-            inStock: true,
-            addedDate: '2026-01-27',
-          },
-          {
-            id: '2',
-            productId: 'prod2',
-            productName: 'Smartphone Stand',
-            brand: 'TechGear',
-            price: 1299,
-            discount: 15,
-            image: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg',
-            inStock: true,
-            addedDate: '2026-01-25',
-          },
-          {
-            id: '3',
-            productId: 'prod3',
-            productName: 'Wireless Charging Pad',
-            brand: 'ChargePro',
-            price: 2499,
-            discount: 30,
-            image: 'https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg',
-            inStock: false,
-            addedDate: '2026-01-20',
-          },
-        ];
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1200));
-        setWishlistItems(mockWishlist);
-      } catch (error) {
-        console.error('Failed to load wishlist:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadWishlist();
+    setLoading(false);
   }, [user, currentAuthUser, navigate]);
 
   const handleRemoveItem = async (id: string) => {
     try {
       setRemovingId(id);
       // Simulate removal delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setWishlistItems((prev) => prev.filter((item) => item.id !== id));
+      await new Promise((resolve) => setTimeout(resolve, 300));
       removeFromWishlist(id);
     } finally {
       setRemovingId(null);
     }
   };
 
-  const handleAddToCart = (productId: string) => {
-    // TODO: Implement add to cart functionality
-    navigate(`/products/${productId}`);
-  };
-
-  const calculateDiscountedPrice = (price: number, discount: number) => {
-    return Math.round(price * (1 - discount / 100));
+  const handleAddToCart = (product: any) => {
+    // Add the product to cart
+    addToCart(product, 1);
+    // Show feedback
+    alert('Added to cart!');
   };
 
   const totalValue = wishlistItems.reduce((sum, item) => sum + item.price, 0);
   const totalSavings = wishlistItems.reduce(
-    (sum, item) => sum + (item.price * item.discount) / 100,
+    (sum, item) => sum + (item.price * (item.discount || 0)) / 100,
     0
   );
 
@@ -165,61 +99,63 @@ export const WishlistPage: React.FC = () => {
 
             {/* Wishlist Items */}
             <div className="space-y-4">
-              {wishlistItems.map((item) => (
+              {wishlistItems.map((product) => (
                 <div
-                  key={item.id}
+                  key={product.id}
                   className={`bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gold transition-all duration-300 flex flex-col sm:flex-row gap-4 p-4 group ${
-                    removingId === item.id ? 'opacity-50' : ''
+                    removingId === product.id ? 'opacity-50' : ''
                   }`}
                 >
                   {/* Image */}
                   <div className="flex-shrink-0 w-full sm:w-40 h-40 bg-gray-800 rounded-lg overflow-hidden">
                     <img
-                      src={item.image}
-                      alt={item.productName}
+                      src={product.image_url}
+                      alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
 
                   {/* Details */}
                   <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-white mb-1">{item.productName}</h3>
-                    <p className="text-sm text-gray-400 mb-3">{item.brand}</p>
+                    <h3 className="text-xl font-bold text-white mb-1">{product.name}</h3>
+                    <p className="text-sm text-gray-400 mb-3">{product.brand || 'Brand'}</p>
 
                     {/* Price */}
                     <div className="mb-3 flex items-center gap-3">
                       <span className="text-2xl font-bold text-gold">
-                        ₹{calculateDiscountedPrice(item.price, item.discount)}
+                        ₹{product.price}
                       </span>
-                      <span className="text-sm text-gray-500 line-through">₹{item.price}</span>
-                      <span className="bg-red-900 text-red-200 px-2 py-1 rounded text-xs font-bold">
-                        -{item.discount}%
-                      </span>
+                      {product.discount && (
+                        <>
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{Math.round(product.price / (1 - product.discount / 100))}
+                          </span>
+                          <span className="bg-red-900 text-red-200 px-2 py-1 rounded text-xs font-bold">
+                            -{product.discount}%
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     {/* Stock Status */}
-                    <p
-                      className={`text-sm font-medium mb-4 ${
-                        item.inStock ? 'text-green-400' : 'text-red-400'
-                      }`}
-                    >
-                      {item.inStock ? '✓ In Stock' : '✗ Out of Stock'}
+                    <p className="text-sm font-medium mb-4 text-green-400">
+                      ✓ In Stock
                     </p>
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-col gap-3 justify-end sm:w-40">
                     <button
-                      onClick={() => handleAddToCart(item.productId)}
-                      disabled={removingId === item.id}
+                      onClick={() => handleAddToCart(product)}
+                      disabled={removingId === product.id}
                       className="bg-gold text-black px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       <ShoppingCart className="h-4 w-4" />
                       Add to Cart
                     </button>
                     <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      disabled={removingId === item.id}
+                      onClick={() => handleRemoveItem(product.id)}
+                      disabled={removingId === product.id}
                       className="bg-gray-800 hover:bg-red-900 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       <Trash2 className="h-4 w-4" />

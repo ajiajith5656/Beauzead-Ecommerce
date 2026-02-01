@@ -2,26 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, ShoppingCart, Loader2 } from 'lucide-react';
 
-interface CartItemData {
-  id: string;
-  productId: string;
-  productName: string;
-  brand: string;
-  price: number;
-  quantity: number;
-  image: string;
-  selectedSize?: string;
-  totalPrice: number;
-}
-
 export const CartPage: React.FC = () => {
   const { user, currentAuthUser } = useAuth();
+  const { items: cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<CartItemData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -32,82 +21,31 @@ export const CartPage: React.FC = () => {
       navigate('/login');
       return;
     }
-
-    // Simulate fetching cart
-    const loadCart = async () => {
-      try {
-        setLoading(true);
-        // TODO: Replace with actual GraphQL query
-        const mockCart: CartItemData[] = [
-          {
-            id: 'cart1',
-            productId: 'prod1',
-            productName: 'Premium Wireless Headphones',
-            brand: 'AudioTech',
-            price: 4999,
-            quantity: 1,
-            image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg',
-            selectedSize: 'One Size',
-            totalPrice: 4999,
-          },
-          {
-            id: 'cart2',
-            productId: 'prod2',
-            productName: 'Smartphone Stand',
-            brand: 'TechGear',
-            price: 1299,
-            quantity: 2,
-            image: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg',
-            selectedSize: 'M',
-            totalPrice: 2598,
-          },
-        ];
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setCartItems(mockCart);
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCart();
+    setLoading(false);
   }, [user, currentAuthUser, navigate]);
 
-  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
+  const handleUpdateQuantity = async (productId: string, newQuantity: number) => {
     if (newQuantity < 1) {
-      handleRemoveItem(id);
+      handleRemoveItem(productId);
       return;
     }
 
     try {
-      setUpdatingId(id);
+      setUpdatingId(productId);
       // Simulate update delay
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                quantity: newQuantity,
-                totalPrice: item.price * newQuantity,
-              }
-            : item
-        )
-      );
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      updateQuantity(productId, newQuantity);
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const handleRemoveItem = async (id: string) => {
+  const handleRemoveItem = async (productId: string) => {
     try {
-      setUpdatingId(id);
+      setUpdatingId(productId);
       // Simulate removal delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      removeFromCart(productId);
     } finally {
       setUpdatingId(null);
     }
@@ -124,7 +62,7 @@ export const CartPage: React.FC = () => {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const discountAmount = Math.round(subtotal * discount);
   const tax = Math.round((subtotal - discountAmount) * 0.18); // 18% GST
   const total = subtotal - discountAmount + tax;
@@ -169,37 +107,34 @@ export const CartPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
+              {cartItems.map((cartItem) => (
                 <div
-                  key={item.id}
+                  key={cartItem.product.id}
                   className={`bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gold transition-all duration-300 flex gap-4 p-4 group ${
-                    updatingId === item.id ? 'opacity-50' : ''
+                    updatingId === cartItem.product.id ? 'opacity-50' : ''
                   }`}
                 >
                   {/* Image */}
                   <div className="flex-shrink-0 w-24 h-24 bg-gray-800 rounded-lg overflow-hidden">
                     <img
-                      src={item.image}
-                      alt={item.productName}
+                      src={cartItem.product.image_url}
+                      alt={cartItem.product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
 
                   {/* Details */}
                   <div className="flex-grow">
-                    <h3 className="text-lg font-bold text-white mb-1">{item.productName}</h3>
-                    <p className="text-sm text-gray-400 mb-2">{item.brand}</p>
-                    {item.selectedSize && (
-                      <p className="text-xs text-gray-500 mb-2">Size: {item.selectedSize}</p>
-                    )}
-                    <p className="text-lg font-bold text-gold">₹{item.totalPrice}</p>
+                    <h3 className="text-lg font-bold text-white mb-1">{cartItem.product.name}</h3>
+                    <p className="text-sm text-gray-400 mb-2">{cartItem.product.brand || 'Brand'}</p>
+                    <p className="text-lg font-bold text-gold">₹{cartItem.product.price}</p>
                   </div>
 
                   {/* Quantity Controls */}
                   <div className="flex flex-col items-end justify-between">
                     <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      disabled={updatingId === item.id}
+                      onClick={() => handleRemoveItem(cartItem.product.id)}
+                      disabled={updatingId === cartItem.product.id}
                       className="text-gray-400 hover:text-red-400 transition-all duration-300 disabled:opacity-50"
                     >
                       <Trash2 className="h-5 w-5" />
@@ -207,18 +142,18 @@ export const CartPage: React.FC = () => {
 
                     <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
                       <button
-                        onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                        disabled={updatingId === item.id}
+                        onClick={() => handleUpdateQuantity(cartItem.product.id, cartItem.quantity - 1)}
+                        disabled={updatingId === cartItem.product.id}
                         className="p-1 hover:bg-gray-700 rounded transition-all duration-300 disabled:opacity-50 text-gold"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
                       <span className="w-8 text-center text-white font-semibold">
-                        {item.quantity}
+                        {cartItem.quantity}
                       </span>
                       <button
-                        onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                        disabled={updatingId === item.id}
+                        onClick={() => handleUpdateQuantity(cartItem.product.id, cartItem.quantity + 1)}
+                        disabled={updatingId === cartItem.product.id}
                         className="p-1 hover:bg-gray-700 rounded transition-all duration-300 disabled:opacity-50 text-gold"
                       >
                         <Plus className="h-4 w-4" />
