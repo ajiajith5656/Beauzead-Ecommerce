@@ -72,6 +72,45 @@ type Product @model {
   createdAt: AWSDateTime!
   approvalStatus: String @default(value: "pending") # pending, approved, rejected
   isActive: Boolean! @default(value: "true")
+  status: String @default(value: "ACTIVE") # DRAFT, PENDING, ACTIVE, REJECTED
+  measurementType: String # COUNT, WEIGHT, VOLUME, DIMENSION, AREA, APPAREL, DIGITAL, POWER, FREE_SIZE
+  variants: [ProductVariant] @hasMany(indexName: "byProduct", fields: ["id"])
+  updatedAt: AWSDateTime!
+}
+
+# Product Variants (Color, Size, Price, Stock combinations)
+type ProductVariant @model {
+  id: ID!
+  productId: ID! @index(name: "byProduct")
+  sku: String! # auto-generated or custom
+  sellerCode: String # optional seller-specific code
+  colorId: String # Reference to Color
+  color: String # Color name for quick access
+  sizeSystem: String # INTL_ALPHA, EU_NUMERIC, US_NUMERIC, UK_NUMERIC, WAIST, SHOE_US, SHOE_UK, SHOE_EU, KIDS_AGE, FREE_SIZE
+  sizeValue: String # S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE, etc.
+  price: Float!
+  stock: Int!
+  images: [VariantImage] @hasMany(indexName: "byVariant", fields: ["id"])
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Variant Images
+type VariantImage @model {
+  id: ID!
+  variantId: ID! @index(name: "byVariant")
+  url: String! # S3 URL
+  position: Int! # Display order (1, 2, 3, etc.)
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Color Management
+type Color @model {
+  id: ID!
+  name: String!
+  hex: String # Color hex code (#FF0000)
+  createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
 }
 
