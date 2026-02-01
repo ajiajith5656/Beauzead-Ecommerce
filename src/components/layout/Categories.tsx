@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { categories } from '../../data/mockData';
 
@@ -42,8 +43,9 @@ export const Categories: React.FC = () => {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {categories.map((category) => (
-            <div
+            <Link
               key={category.id}
+              to={`/category/${category.id}`}
               className="flex-shrink-0 w-24 cursor-pointer group"
             >
               <div className="bg-gray-900 border-2 border-gray-800 rounded-lg p-4 hover:border-gold transition-all duration-200 group-hover:scale-105">
@@ -55,7 +57,7 @@ export const Categories: React.FC = () => {
                   {category.count}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

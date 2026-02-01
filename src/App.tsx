@@ -36,6 +36,7 @@ import { ProfilePage } from './pages/admin/modules/ProfilePage';
 import { SettingsPage } from './pages/admin/modules/SettingsPage';
 import { NewHome } from './pages/NewHome';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import { CategoryProducts } from './pages/CategoryProducts';
 
 // Simple path-based route guard
 const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -91,6 +92,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<NewHome />} />
                   <Route path="/products/:productId" element={<ProductDetailsPage />} />
+                  <Route path="/category/:categoryId" element={<CategoryProducts />} />
                   
                   {/* User Routes */}
                   <Route path="/login" element={<Login role="user" />} />
