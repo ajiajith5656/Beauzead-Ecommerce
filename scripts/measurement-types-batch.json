@@ -1,0 +1,103 @@
+{
+  "MeasurementType": [
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "COUNT" },
+          "id": { "S": "COUNT#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "WEIGHT" },
+          "id": { "S": "WEIGHT#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "VOLUME" },
+          "id": { "S": "VOLUME#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "DIMENSION" },
+          "id": { "S": "DIMENSION#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "AREA" },
+          "id": { "S": "AREA#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "APPAREL" },
+          "id": { "S": "APPAREL#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "DIGITAL" },
+          "id": { "S": "DIGITAL#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "POWER" },
+          "id": { "S": "POWER#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "type_id": { "S": "FREE_SIZE" },
+          "id": { "S": "FREE_SIZE#1" },
+          "__typename": { "S": "MeasurementType" },
+          "createdAt": { "S": "2026-02-01T04:00:00Z" },
+          "updatedAt": { "S": "2026-02-01T04:00:00Z" }
+        }
+      }
+    }
+  ]
+}

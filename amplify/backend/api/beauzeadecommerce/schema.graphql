@@ -42,18 +42,6 @@ type SubCategory @model {
   updatedAt: AWSDateTime!
 }
 
-# SubCategory Management
-type SubCategory @model {
-  id: ID!
-  categoryId: String! # Reference to parent category
-  name: String!
-  description: String
-  imageUrl: String
-  isActive: Boolean! @default(value: "true")
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
-}
-
 # Product Images
 type ProductImage @model {
   id: ID!
@@ -169,4 +157,33 @@ type DashboardMetrics @model {
   sellerRegistrations: Int!
   createdAt: AWSDateTime!
   updatedAt: AWSDateTime!
+}
+
+# Measurement Types (COUNT, WEIGHT, VOLUME, DIMENSION, AREA, APPAREL, DIGITAL, POWER, FREE_SIZE)
+type MeasurementType @model {
+  type_id: String! @primaryKey
+  description: String
+}
+
+# Measurement Units (g, kg, ml, L, cm, inch, GB, TB, W, mAh, piece, pack, set, box, etc.)
+type MeasurementUnit @model {
+  id: ID! @primaryKey
+  type_id: String! # Reference to MeasurementType
+  unit_id: String! # g, kg, ml, L, cm, inch, GB, TB, W, mAh, piece, pack, set, box
+  displayName: String
+  conversionFactor: Float
+}
+
+# Apparel Size Systems (INTL_ALPHA, EU_NUMERIC, US_NUMERIC, SHOE_US, SHOE_EU, FREE_SIZE)
+type ApparelSizeSystem @model {
+  system_id: String! @primaryKey
+  description: String
+}
+
+# Apparel Size Values (S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE, etc.)
+type ApparelSizeValue @model {
+  id: ID! @primaryKey
+  system_id: String! # Reference to ApparelSizeSystem
+  size_value: String! # S, M, L, XL, 38, 40, 42, 8, 9, 10, FREE
+  displayOrder: Int
 }
