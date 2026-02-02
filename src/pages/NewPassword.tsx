@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Loader2, ChevronLeft, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,7 +8,7 @@ const NewPassword: React.FC = () => {
   const navigate = useNavigate();
   const { confirmPasswordReset } = useAuth();
 
-  const { email, purpose } = location.state || {};
+  const { email, otpCode, role } = location.state || {};
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,6 +18,16 @@ const NewPassword: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
+  // Redirect if no email or OTP code
+  useEffect(() => {
+    if (!email || !otpCode) {
+      const redirectPath = role === 'seller' ? '/seller/forgot-password' : '/forgot-password';
+      navigate(redirectPath, { 
+        state: { error: 'Invalid session. Please start the password reset process again.' }
+      });
+    }
+  }, [email, otpCode, navigate, role]);
 
   const validatePassword = (password: string): string[] => {
     const errors: string[] = [];
@@ -77,24 +87,20 @@ const NewPassword: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // This would call the confirmPasswordReset from auth context
-      // For now, we'll navigate to success
-      const result = await confirmPasswordReset(email, newPassword, 'temp-token');
+      // Call confirmPasswordReset with email, OTP code, and new password
+      const result = await confirmPasswordReset(email, otpCode, newPassword);
 
       if (result.success) {
         setSuccess(true);
         setTimeout(() => {
-          if (purpose === 'reset') {
-            // Redirect to appropriate login page based on email or role
-            navigate('/login', {
-              state: { message: 'Password reset successfully! Please login.' }
-            });
-          } else {
-            navigate('/');
-          }
+          // Redirect to appropriate login page based on role
+          const loginPath = role === 'seller' ? '/seller/login' : '/login';
+          navigate(loginPath, {
+            state: { message: 'Password reset successfully! Please login with your new password.' }
+          });
         }, 2000);
       } else {
-        setError(result.error || 'Failed to reset password');
+        setError(result.error?.message || 'Failed to reset password. Please try again.');
       }
     } catch (err: any) {
       setError(err.message || 'Error resetting password');

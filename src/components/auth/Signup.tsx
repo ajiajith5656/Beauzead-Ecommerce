@@ -148,9 +148,7 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
           state: {
             email,
             purpose: role === 'seller' ? 'seller-signup' : 'signup',
-            onConfirm: async (_email: string, _otp: string) => {
-              return { success: true };
-            }
+            role: role
           }
         });
       } else {

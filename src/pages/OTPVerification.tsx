@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Loader2, ChevronLeft, RotateCcw } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import amplifyAuthService from '../lib/amplifyAuth';
 
 const OTPVerification: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { confirmSignUp } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -14,7 +17,7 @@ const OTPVerification: React.FC = () => {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Get data from location state
-  const { email, purpose, onConfirm, confirmData } = location.state || {};
+  const { email, purpose, role } = location.state || {};
 
   // Timer for resend OTP
   useEffect(() => {
@@ -63,37 +66,51 @@ const OTPVerification: React.FC = () => {
     setIsLoading(true);
 
     try {
-      if (onConfirm) {
-        const result = await onConfirm(email, otpCode);
+      // Handle different purposes
+      if (purpose === 'signup' || purpose === 'seller-signup') {
+        // Confirm signup with the OTP code
+        const result = await confirmSignUp(email, otpCode);
+        
         if (result.success) {
           setShowSuccess(true);
           
           setTimeout(() => {
-            if (purpose === 'signup') {
-              // User signup - redirect to home logged in
-              navigate('/', { state: { loginSuccess: true } });
-            } else if (purpose === 'seller-signup') {
+            if (purpose === 'seller-signup' || role === 'seller') {
               // Seller signup - redirect to seller dashboard
               navigate('/seller/dashboard', { state: { loginSuccess: true } });
-            } else if (purpose === 'password-reset') {
-              // Password reset - go to new password page
-              navigate('/new-password', { 
-                state: { email, purpose: 'reset' }
-              });
-            } else if (purpose === 'seller-password-reset') {
-              // Seller password reset
-              navigate('/seller/new-password', { 
-                state: { email, purpose: 'reset' }
-              });
+            } else {
+              // User signup - redirect to home
+              navigate('/', { state: { loginSuccess: true } });
             }
           }, 2000);
         } else {
-          setError(result.error || 'Failed to verify OTP. Please try again.');
+          setError(result.error?.message || 'Failed to verify OTP. Please try again.');
+          setIsLoading(false);
         }
+      } else if (purpose === 'password-reset' || purpose === 'seller-password-reset') {
+        // Store OTP for password reset - navigate to new password page
+        setShowSuccess(true);
+        
+        setTimeout(() => {
+          const newPasswordPath = purpose === 'seller-password-reset' 
+            ? '/seller/new-password' 
+            : '/new-password';
+            
+          navigate(newPasswordPath, { 
+            state: { 
+              email, 
+              otpCode,
+              purpose: 'reset',
+              role: purpose === 'seller-password-reset' ? 'seller' : 'user'
+            }
+          });
+        }, 1500);
+      } else {
+        setError('Invalid verification purpose');
+        setIsLoading(false);
       }
     } catch (err: any) {
       setError(err.message || 'Error verifying OTP');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -106,12 +123,17 @@ const OTPVerification: React.FC = () => {
     setOtp(['', '', '', '', '', '']);
 
     try {
-      // Call resend function if provided
-      if (confirmData?.onResend) {
-        await confirmData.onResend(email);
+      // Resend confirmation code for signup
+      if (purpose === 'signup' || purpose === 'seller-signup') {
+        await amplifyAuthService.resendConfirmationCode(email);
+      } else if (purpose === 'password-reset' || purpose === 'seller-password-reset') {
+        // Resend password reset code
+        await amplifyAuthService.initiatePasswordReset(email);
       }
+      // Focus first input
+      otpRefs.current[0]?.focus();
     } catch (err: any) {
-      setError('Failed to resend OTP');
+      setError(err.message || 'Failed to resend OTP');
     }
   };
 

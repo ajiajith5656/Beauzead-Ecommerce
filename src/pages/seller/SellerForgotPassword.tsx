@@ -52,10 +52,7 @@ const SellerForgotPassword: React.FC = () => {
           state: {
             email,
             purpose: 'seller-password-reset',
-            onConfirm: async (_email: string, _otpCode: string) => {
-              // Verify OTP
-              return { success: true };
-            }
+            role: 'seller'
           }
         });
       } else {

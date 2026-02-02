@@ -179,7 +179,7 @@ const SellerSignup: React.FC = () => {
           state: {
             email: formData.email,
             purpose: 'seller-signup',
-            onConfirm: confirmSignUp
+            role: 'seller'
           }
         });
       } else {

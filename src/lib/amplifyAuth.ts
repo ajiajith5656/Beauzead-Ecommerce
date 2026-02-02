@@ -6,6 +6,7 @@ import {
   resetPassword, 
   confirmResetPassword, 
   confirmSignUp,
+  resendSignUpCode,
   autoSignIn,
   fetchAuthSession 
 } from 'aws-amplify/auth';
@@ -157,6 +158,18 @@ class AmplifyAuthService {
     } catch (error: any) {
       console.error('Confirm password reset error:', error);
       throw new Error(error.message || 'Failed to confirm password reset');
+    }
+  }
+
+  async resendConfirmationCode(email: string) {
+    try {
+      const { destination, deliveryMedium } = await resendSignUpCode({
+        username: email,
+      });
+      return { destination, deliveryMedium };
+    } catch (error: any) {
+      console.error('Resend confirmation code error:', error);
+      throw new Error(error.message || 'Failed to resend confirmation code');
     }
   }
 }

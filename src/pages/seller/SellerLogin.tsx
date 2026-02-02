@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const SellerLogin: React.FC = () => {
   const { signIn, signOut, authRole } = useAuth();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Check for success message from password reset
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the state so message doesn't persist on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +85,16 @@ const SellerLogin: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {successMessage && (
+            <div className="text-green-600 bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              <span>{successMessage}</span>
+            </div>
+          )}
           {error && (
-            <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
-              {error}
+            <div className="text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
             </div>
           )}
 

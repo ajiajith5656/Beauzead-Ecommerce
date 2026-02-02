@@ -52,11 +52,7 @@ const ForgotPassword: React.FC = () => {
           state: {
             email,
             purpose: 'password-reset',
-            onConfirm: async (_email: string, _otpCode: string) => {
-              // Verify OTP - for now just return success
-              // In real implementation, this would call backend to verify
-              return { success: true };
-            }
+            role: 'user'
           }
         });
       } else {
