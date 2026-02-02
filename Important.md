@@ -1,5 +1,8 @@
 # CRITICAL BACKEND ARCHITECTURE RULES
 
+Deplyoed Frontend and backend via Aws Amplify , Us-East-1
+Domain : beauzead.store
+Url = http://www.beauzead.store
 ## Authentication System
 
 ### User Roles & Creation

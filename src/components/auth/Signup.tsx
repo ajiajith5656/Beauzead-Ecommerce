@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Lock, User, AlertCircle, Eye, EyeOff, Globe, ChevronDown } from 'lucide-react';
-import { generateClient } from 'aws-amplify/api';
-// @ts-ignore
-import { listCountryListBzdcores } from '../../graphql/queries';
+import { fetchCountries } from '../../services/databaseService';
+import type { Country as DBCountry } from '../../services/databaseService';
 
 interface SignupProps {
   role?: 'user' | 'seller' | 'admin';
@@ -29,24 +28,34 @@ export const Signup: React.FC<SignupProps> = ({ role = 'user' }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const { signUp } = useAuth();
-  const client = generateClient();
   const navigate = useNavigate();
 
-  // Fetch countries on mount
+  // Fetch countries from Aurora PostgreSQL
   useEffect(() => {
-    const fetchCountries = async () => {
+    const loadCountries = async () => {
       try {
-        const response = await client.graphql({ query: listCountryListBzdcores });
-        const countriesData = (response.data as any).listCountryListBzdcores?.items || [];
-        if (countriesData.length > 0) {
-          setCountries(countriesData);
-          setCountryId(countriesData[0].id);
+        const countriesData = await fetchCountries();
+        
+        // Map Aurora PostgreSQL format to component format
+        const mappedCountries: Country[] = countriesData.map((c: DBCountry) => ({
+          id: c.id,
+          countryName: c.country_name,
+          shortCode: c.country_code,
+          currency: c.currency_code,
+          dialCode: c.dialing_code
+        }));
+        
+        if (mappedCountries.length > 0) {
+          setCountries(mappedCountries);
+          // Default to India if available, otherwise first country
+          const india = mappedCountries.find(c => c.shortCode === 'IND');
+          setCountryId(india?.id || mappedCountries[0].id);
         }
       } catch (err) {
         console.error('Error fetching countries:', err);
       }
     };
-    fetchCountries();
+    loadCountries();
   }, []);
 
   const selectedCountry = countries.find((c) => c.id === countryId);

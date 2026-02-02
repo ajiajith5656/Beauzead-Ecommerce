@@ -5,8 +5,8 @@ const amplifyConfig = {
   Auth: {
     Cognito: {
       region: 'us-east-1',
-      userPoolId: 'us-east-1_zRNdR5G5o',
-      userPoolClientId: '5e4r4of7mpu2e1ma3o6ps6jqds',
+      userPoolId: 'us-east-1_PPPmNH7HL',
+      userPoolClientId: '3hk6tg9hduv7fkotlo2h99jpin',
       identityPoolId: 'us-east-1:f2d8fd71-baf1-4b52-85d4-5f22fbb3098f',
       signUpVerificationMethod: 'code' as const, // 'code' or 'link'
       loginWith: {

@@ -13,13 +13,19 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { generateClient } from 'aws-amplify/api';
 import { useAuth } from '../../contexts/AuthContext';
-// @ts-ignore
-import { listCountryListBzdcores, listBusinessTypeBzdcores } from '../../graphql/queries';
+import { 
+  fetchCountries, 
+  fetchBusinessTypes, 
+} from '../../services/databaseService';
+import type { 
+  Country as DBCountry, 
+  BusinessType as DBBusinessType 
+} from '../../services/databaseService';
 
 type SignupStep = 'details' | 'otp' | 'success';
 
+// Map database types to component types
 interface Country {
   id: string;
   countryName: string;
@@ -53,51 +59,46 @@ const SellerSignup: React.FC = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
-  const client = generateClient();
   const { signUp, confirmSignUp } = useAuth();
 
-  // Fetch countries and business types on mount
+  // Fetch countries and business types from Aurora PostgreSQL
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [countriesResponse, businessTypesResponse] = await Promise.all([
-          client.graphql({ query: listCountryListBzdcores }),
-          client.graphql({ query: listBusinessTypeBzdcores }),
+        const [countriesData, businessTypesData] = await Promise.all([
+          fetchCountries(),
+          fetchBusinessTypes(),
         ]);
         
-        const countriesData = (countriesResponse.data as any).listCountryListBzdcores?.items || [];
-        const businessTypesData = (businessTypesResponse.data as any).listBusinessTypeBzdcores?.items || [];
+        // Map Aurora PostgreSQL format to component format
+        const mappedCountries: Country[] = countriesData.map((c: DBCountry) => ({
+          id: c.id,
+          countryName: c.country_name,
+          shortCode: c.country_code,
+          currency: c.currency_code,
+          dialCode: c.dialing_code
+        }));
         
-        if (countriesData.length > 0) {
-          setCountries(countriesData);
-          setFormData(prev => ({ ...prev, countryId: countriesData[0].id }));
+        const mappedBusinessTypes: BusinessType[] = businessTypesData.map((b: DBBusinessType) => ({
+          id: b.id,
+          typeName: b.business_type_name,
+          description: b.description
+        }));
+        
+        if (mappedCountries.length > 0) {
+          setCountries(mappedCountries);
+          // Default to India if available, otherwise first country
+          const india = mappedCountries.find(c => c.shortCode === 'IND');
+          setFormData(prev => ({ ...prev, countryId: india?.id || mappedCountries[0].id }));
         }
 
-        if (businessTypesData.length > 0) {
-          setBusinessTypes(businessTypesData);
-          setFormData(prev => ({ ...prev, businessTypeId: businessTypesData[0].id }));
+        if (mappedBusinessTypes.length > 0) {
+          setBusinessTypes(mappedBusinessTypes);
+          setFormData(prev => ({ ...prev, businessTypeId: mappedBusinessTypes[0].id }));
         }
       } catch (error) {
         console.error('❌ Error fetching data:', error);
         setError('Failed to load countries and business types');
-        // Fallback
-        const mockCountries = [
-          { id: '1', countryName: 'United States', shortCode: 'US', currency: 'USD', dialCode: '+1' },
-          { id: '2', countryName: 'Canada', shortCode: 'CA', currency: 'CAD', dialCode: '+1' },
-          { id: '3', countryName: 'India', shortCode: 'IN', currency: 'INR', dialCode: '+91' },
-        ];
-        const mockTypes = [
-          { id: '1', typeName: 'Retail Store', description: 'Physical storefront' },
-          { id: '2', typeName: 'Online Store', description: 'E-commerce' },
-          { id: '3', typeName: 'Wholesale', description: 'Distributor' },
-        ];
-        setCountries(mockCountries);
-        setBusinessTypes(mockTypes);
-        setFormData(prev => ({ 
-          ...prev, 
-          countryId: mockCountries[0].id,
-          businessTypeId: mockTypes[0].id 
-        }));
       }
     };
     
