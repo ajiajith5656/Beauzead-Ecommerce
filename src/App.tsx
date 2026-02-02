@@ -53,6 +53,13 @@ import UserAddressManagement from './pages/user/AddressManagement';
 import AdminAddressManagement from './pages/admin/components/AdminAddressManagement';
 import OTPVerification from './pages/OTPVerification';
 import NewPassword from './pages/NewPassword';
+import { ProductListingLayout } from './pages/admin/modules/ProductListingLayout';
+import { AdminListings1 } from './pages/admin/modules/AdminListings1';
+import { AdminListings2 } from './pages/admin/modules/AdminListings2';
+import { AdminListings3 } from './pages/admin/modules/AdminListings3';
+import { AdminListing4 } from './pages/admin/modules/AdminListing4';
+import { AdminListing5 } from './pages/admin/modules/AdminListing5';
+import { AdminListing6 } from './pages/admin/modules/AdminListing6';
 
 // Simple path-based route guard
 const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -183,6 +190,17 @@ function App() {
                     <Route path="/admin/audit-logs" element={<AuditLogs />} />
                     <Route path="/admin/health" element={<SystemHealth />} />
                     <Route path="/admin/addresses" element={<AdminAddressManagement />} />
+                    
+                    {/* Product Listing Wizard Routes */}
+                    <Route path="/admin/products/new" element={<ProductListingLayout />}>
+                      <Route index element={<AdminListings1 />} />
+                      <Route path="step1" element={<AdminListings1 />} />
+                      <Route path="step2" element={<AdminListings2 />} />
+                      <Route path="step3" element={<AdminListings3 />} />
+                      <Route path="step4" element={<AdminListing4 />} />
+                      <Route path="step5" element={<AdminListing5 />} />
+                      <Route path="step6" element={<AdminListing6 />} />
+                    </Route>
                   </Route>
                   
                   {/* Fallback */}

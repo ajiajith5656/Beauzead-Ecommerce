@@ -560,6 +560,122 @@ export const disableProduct = async (productId: string): Promise<Product | null>
   }
 };
 
+// Create a new product with full details
+export const createProduct = async (productData: any): Promise<Product | null> => {
+  try {
+    const productId = crypto.randomUUID();
+    const now = new Date().toISOString();
+    
+    // Build the DynamoDB item
+    const item: Record<string, any> = {
+      productId: { S: productId },
+      createdAt: { S: now },
+      updatedAt: { S: now },
+      approvalStatus: { S: productData.approvalStatus || 'pending' },
+      isActive: { BOOL: productData.isActive ?? false },
+    };
+    
+    // Basic info
+    if (productData.categoryId) item.categoryId = { S: productData.categoryId };
+    if (productData.subCategoryId) item.subCategoryId = { S: productData.subCategoryId };
+    if (productData.productTypeId) item.productTypeId = { S: productData.productTypeId };
+    if (productData.name) item.name = { S: productData.name };
+    if (productData.brandName) item.brandName = { S: productData.brandName };
+    if (productData.modelNumber) item.modelNumber = { S: productData.modelNumber };
+    if (productData.shortDescription) item.shortDescription = { S: productData.shortDescription };
+    if (productData.stock !== undefined) item.stock = { N: productData.stock.toString() };
+    
+    // Variants
+    if (productData.sizeVariants?.length > 0) {
+      item.sizeVariants = { S: JSON.stringify(productData.sizeVariants) };
+    }
+    if (productData.colorVariants?.length > 0) {
+      item.colorVariants = { S: JSON.stringify(productData.colorVariants) };
+    }
+    
+    // Media
+    if (productData.images?.length > 0) {
+      item.images = { L: productData.images.map((img: string) => ({ S: img })) };
+      item.imageUrl = { S: productData.images[0] }; // Primary image
+    }
+    if (productData.videos?.length > 0) {
+      item.videos = { L: productData.videos.map((vid: string) => ({ S: vid })) };
+    }
+    
+    // Details
+    if (productData.highlights?.length > 0) {
+      item.highlights = { L: productData.highlights.map((h: string) => ({ S: h })) };
+    }
+    if (productData.description) item.description = { S: productData.description };
+    if (productData.specifications?.length > 0) {
+      item.specifications = { S: JSON.stringify(productData.specifications) };
+    }
+    if (productData.sellerNotes?.length > 0) {
+      item.sellerNotes = { L: productData.sellerNotes.map((n: string) => ({ S: n })) };
+    }
+    
+    // Pricing
+    if (productData.countryCode) item.countryCode = { S: productData.countryCode };
+    if (productData.mrp !== undefined) item.mrp = { N: productData.mrp.toString() };
+    if (productData.price !== undefined) item.price = { N: productData.price.toString() };
+    if (productData.stockQuantity !== undefined) item.stockQuantity = { N: productData.stockQuantity.toString() };
+    if (productData.gstRate !== undefined) item.gstRate = { N: productData.gstRate.toString() };
+    if (productData.platformFee !== undefined) item.platformFee = { N: productData.platformFee.toString() };
+    if (productData.commission !== undefined) item.commission = { N: productData.commission.toString() };
+    if (productData.deliveryCountries?.length > 0) {
+      item.deliveryCountries = { S: JSON.stringify(productData.deliveryCountries) };
+    }
+    
+    // Shipping
+    if (productData.packageWeight !== undefined) item.packageWeight = { N: productData.packageWeight.toString() };
+    if (productData.packageDimensions) {
+      item.packageDimensions = { S: JSON.stringify(productData.packageDimensions) };
+    }
+    if (productData.shippingType) item.shippingType = { S: productData.shippingType };
+    if (productData.manufacturerName) item.manufacturerName = { S: productData.manufacturerName };
+    if (productData.manufacturerAddress) item.manufacturerAddress = { S: productData.manufacturerAddress };
+    if (productData.packingDetails) item.packingDetails = { S: productData.packingDetails };
+    if (productData.courierPartner) item.courierPartner = { S: productData.courierPartner };
+    if (productData.cancellationPolicyDays !== undefined) {
+      item.cancellationPolicyDays = { N: productData.cancellationPolicyDays.toString() };
+    }
+    if (productData.returnPolicyDays !== undefined) {
+      item.returnPolicyDays = { N: productData.returnPolicyDays.toString() };
+    }
+    
+    // Offers
+    if (productData.offerRules?.length > 0) {
+      item.offerRules = { S: JSON.stringify(productData.offerRules) };
+    }
+    
+    // Set currency based on country
+    item.currency = { S: 'INR' };
+    
+    await dynamoDBRequest('PutItem', {
+      TableName: TABLES.PRODUCTS,
+      Item: item,
+    });
+    
+    return {
+      id: productId,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      currency: 'INR',
+      image_url: productData.images?.[0] || '',
+      seller_id: productData.sellerId || '',
+      category: productData.categoryId,
+      stock: productData.stock || 0,
+      approved: false,
+      created_at: now,
+      approval_status: 'pending',
+    } as Product;
+  } catch (error) {
+    console.error('Failed to create product:', error);
+    return null;
+  }
+};
+
 export const deleteProduct = async (productId: string): Promise<boolean> => {
   try {
     await dynamoDBRequest('DeleteItem', {
@@ -1149,6 +1265,7 @@ export default {
   // Products
   getAllProducts,
   getProductById,
+  createProduct,
   updateProduct,
   approveProduct,
   rejectProduct,

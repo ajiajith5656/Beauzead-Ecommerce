@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
-import { Search, Eye, CheckCircle, XCircle, Power } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Power, Plus } from 'lucide-react';
 import type { Product } from '../../../types';
 
 interface PaginationState {
@@ -11,6 +12,7 @@ interface PaginationState {
 }
 
 export const ProductManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,8 +123,17 @@ export const ProductManagement: React.FC = () => {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
-        <p className="text-gray-600">Total Products: {pagination.total}</p>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
+          <p className="text-gray-600">Total Products: {pagination.total}</p>
+        </div>
+        <button
+          onClick={() => navigate('/admin/products/new')}
+          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+        >
+          <Plus size={20} />
+          Add New Product
+        </button>
       </div>
 
       {/* Filters */}

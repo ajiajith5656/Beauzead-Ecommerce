@@ -51,6 +51,11 @@ const menuItems: MenuItem[] = [
     path: '/admin/products',
   },
   {
+    label: 'Add New Product',
+    icon: <Package size={20} />,
+    path: '/admin/products/new',
+  },
+  {
     label: 'Product Variants',
     icon: <Package size={20} />,
     path: '/admin/variants',

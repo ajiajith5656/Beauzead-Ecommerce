@@ -1,14 +1,16 @@
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut, getCurrentUser, resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 
+// All sensitive values should be set via environment variables in AWS Amplify Console
+// Never hardcode secrets in source code
 const amplifyConfig = {
   Auth: {
     Cognito: {
-      region: 'us-east-1',
-      userPoolId: 'us-east-1_PPPmNH7HL',
-      userPoolClientId: '3hk6tg9hduv7fkotlo2h99jpin',
-      identityPoolId: 'us-east-1:f2d8fd71-baf1-4b52-85d4-5f22fbb3098f',
-      signUpVerificationMethod: 'code' as const, // 'code' or 'link'
+      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+      userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID || '',
+      userPoolClientId: import.meta.env.VITE_COGNITO_CLIENT_ID || '',
+      identityPoolId: import.meta.env.VITE_COGNITO_IDENTITY_POOL_ID || '',
+      signUpVerificationMethod: 'code' as const,
       loginWith: {
         email: true,
         phone: false,
@@ -18,16 +20,16 @@ const amplifyConfig = {
   },
   API: {
     GraphQL: {
-      endpoint: 'https://woqi3tosm5a2jnj4w6zit2mfye.appsync-api.us-east-1.amazonaws.com/graphql',
-      region: 'us-east-1',
+      endpoint: import.meta.env.VITE_APPSYNC_ENDPOINT || '',
+      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
       defaultAuthMode: 'apiKey' as const,
-      apiKey: 'da2-hgvpvqv72jcj3o2sglactpt3gq',
+      apiKey: import.meta.env.VITE_APPSYNC_API_KEY || '',
     },
   },
   Storage: {
     S3: {
-      region: 'us-east-1',
-      bucket: 'beauzead-ecommerce-images-2026',
+      region: import.meta.env.VITE_AWS_REGION || 'us-east-1',
+      bucket: import.meta.env.VITE_S3_BUCKET || '',
     },
   },
 };
