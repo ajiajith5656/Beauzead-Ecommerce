@@ -1,33 +1,169 @@
-# This "input" configures a global authorization rule to enable public access to
-# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+# BeauZead E-Commerce GraphQL Schema
+# Using API Key auth for initial setup
 
-"""
-Country model - stores list of countries
-Used for seller registration and user profile
-"""
-type Country @model {
+type User @model @auth(rules: [{ allow: public }]) {
   id: ID!
-  code: String! @index(name: "codeIndex", queryField: "countryByCode")
-  name: String!
-  dialCode: String
-  flag: String
-  isActive: Boolean! @default(value: "true")
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
+  email: String! @index(name: "byEmail", queryField: "userByEmail")
+  phone: String @index(name: "byPhone", queryField: "userByPhone")
+  first_name: String
+  last_name: String
+  profile_type: String
+  avatar_url: String
+  address: AWSJSON
+  is_verified: Boolean
+  is_banned: Boolean
+  created_at: AWSDateTime
+  updated_at: AWSDateTime
 }
 
-"""
-BusinessType model - stores seller business types
-Used during seller signup for categorization
-"""
-type BusinessType @model {
+type Seller @model @auth(rules: [{ allow: public }]) {
   id: ID!
-  name: String! @index(name: "nameIndex", queryField: "businessTypeByName")
+  user_id: String! @index(name: "byUserId", queryField: "sellerByUserId")
+  email: String! @index(name: "byEmail", queryField: "sellerByEmail")
+  business_name: String!
+  business_type: String
+  gst_number: String
+  pan_number: String
+  phone: String
+  address: AWSJSON
+  bank_details: AWSJSON
+  kyc_status: String
+  kyc_documents: AWSJSON
+  badge: String
+  is_approved: Boolean
+  is_active: Boolean
+  created_at: AWSDateTime
+  updated_at: AWSDateTime
+}
+
+type Product @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  seller_id: String! @index(name: "bySeller", queryField: "productsBySeller")
+  category_id: String! @index(name: "byCategory", queryField: "productsByCategory")
+  sub_category_id: String
+  name: String!
+  brand_name: String
+  model_number: String
+  short_description: String
   description: String
-  icon: String
-  isActive: Boolean! @default(value: "true")
-  displayOrder: Int @default(value: "0")
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
+  highlights: [String]
+  specifications: AWSJSON
+  image_url: String
+  images: [String]
+  videos: [String]
+  price: Float!
+  mrp: Float
+  currency: String
+  stock: Int
+  size_variants: AWSJSON
+  color_variants: AWSJSON
+  gst_rate: Float
+  platform_fee: Float
+  commission: Float
+  delivery_countries: AWSJSON
+  package_weight: Float
+  package_dimensions: AWSJSON
+  shipping_type: String
+  manufacturer_name: String
+  cancellation_policy_days: Int
+  return_policy_days: Int
+  offer_rules: AWSJSON
+  approval_status: String
+  is_active: Boolean
+  rating: Float
+  review_count: Int
+  created_at: AWSDateTime
+  updated_at: AWSDateTime
+}
+
+type Order @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  user_id: String! @index(name: "byUser", queryField: "ordersByUser")
+  seller_id: String @index(name: "bySeller", queryField: "ordersBySeller")
+  order_number: String!
+  status: String!
+  items: AWSJSON!
+  subtotal: Float!
+  shipping_cost: Float
+  tax_amount: Float
+  discount_amount: Float
+  total_amount: Float!
+  currency: String
+  shipping_address: AWSJSON!
+  billing_address: AWSJSON
+  payment_method: String
+  payment_status: String
+  payment_intent_id: String
+  tracking_number: String
+  created_at: AWSDateTime
+  updated_at: AWSDateTime
+}
+
+type Category @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  slug: String
+  description: String
+  image_url: String
+  parent_id: String
+  sub_categories: AWSJSON
+  is_active: Boolean
+  sort_order: Int
+  created_at: AWSDateTime
+}
+
+type Review @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  product_id: String! @index(name: "byProduct", queryField: "reviewsByProduct")
+  user_id: String!
+  rating: Int!
+  title: String
+  comment: String
+  images: [String]
+  is_verified_purchase: Boolean
+  created_at: AWSDateTime
+}
+
+type Banner @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  title: String!
+  subtitle: String
+  image_url: String!
+  link_url: String
+  position: String
+  is_active: Boolean
+  sort_order: Int
+  created_at: AWSDateTime
+}
+
+type Promotion @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  code: String!
+  name: String!
+  discount_type: String!
+  discount_value: Float!
+  min_order_amount: Float
+  max_discount: Float
+  usage_limit: Int
+  used_count: Int
+  is_active: Boolean
+  start_date: AWSDateTime
+  end_date: AWSDateTime
+  created_at: AWSDateTime
+}
+
+type Country @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  code: String!
+  currency: String
+  dial_code: String
+  is_active: Boolean
+}
+
+type BusinessType @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  name: String!
+  description: String
+  is_active: Boolean
 }

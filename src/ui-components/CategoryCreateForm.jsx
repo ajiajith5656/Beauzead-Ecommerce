@@ -11,6 +11,7 @@ import {
   Flex,
   Grid,
   SwitchField,
+  TextAreaField,
   TextField,
 } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
@@ -30,37 +31,51 @@ export default function CategoryCreateForm(props) {
   } = props;
   const initialValues = {
     name: "",
+    slug: "",
     description: "",
-    imageUrl: "",
-    isActive: false,
-    createdAt: "",
-    updatedAt: "",
+    image_url: "",
+    parent_id: "",
+    sub_categories: "",
+    is_active: false,
+    sort_order: "",
+    created_at: "",
   };
   const [name, setName] = React.useState(initialValues.name);
+  const [slug, setSlug] = React.useState(initialValues.slug);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
-  const [imageUrl, setImageUrl] = React.useState(initialValues.imageUrl);
-  const [isActive, setIsActive] = React.useState(initialValues.isActive);
-  const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
-  const [updatedAt, setUpdatedAt] = React.useState(initialValues.updatedAt);
+  const [image_url, setImage_url] = React.useState(initialValues.image_url);
+  const [parent_id, setParent_id] = React.useState(initialValues.parent_id);
+  const [sub_categories, setSub_categories] = React.useState(
+    initialValues.sub_categories
+  );
+  const [is_active, setIs_active] = React.useState(initialValues.is_active);
+  const [sort_order, setSort_order] = React.useState(initialValues.sort_order);
+  const [created_at, setCreated_at] = React.useState(initialValues.created_at);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setName(initialValues.name);
+    setSlug(initialValues.slug);
     setDescription(initialValues.description);
-    setImageUrl(initialValues.imageUrl);
-    setIsActive(initialValues.isActive);
-    setCreatedAt(initialValues.createdAt);
-    setUpdatedAt(initialValues.updatedAt);
+    setImage_url(initialValues.image_url);
+    setParent_id(initialValues.parent_id);
+    setSub_categories(initialValues.sub_categories);
+    setIs_active(initialValues.is_active);
+    setSort_order(initialValues.sort_order);
+    setCreated_at(initialValues.created_at);
     setErrors({});
   };
   const validations = {
     name: [{ type: "Required" }],
+    slug: [],
     description: [],
-    imageUrl: [],
-    isActive: [{ type: "Required" }],
-    createdAt: [{ type: "Required" }],
-    updatedAt: [{ type: "Required" }],
+    image_url: [],
+    parent_id: [],
+    sub_categories: [{ type: "JSON" }],
+    is_active: [],
+    sort_order: [],
+    created_at: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -106,11 +121,14 @@ export default function CategoryCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           name,
+          slug,
           description,
-          imageUrl,
-          isActive,
-          createdAt,
-          updatedAt,
+          image_url,
+          parent_id,
+          sub_categories,
+          is_active,
+          sort_order,
+          created_at,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -174,11 +192,14 @@ export default function CategoryCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name: value,
+              slug,
               description,
-              imageUrl,
-              isActive,
-              createdAt,
-              updatedAt,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -194,6 +215,38 @@ export default function CategoryCreateForm(props) {
         {...getOverrideProps(overrides, "name")}
       ></TextField>
       <TextField
+        label="Slug"
+        isRequired={false}
+        isReadOnly={false}
+        value={slug}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              slug: value,
+              description,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.slug ?? value;
+          }
+          if (errors.slug?.hasError) {
+            runValidationTasks("slug", value);
+          }
+          setSlug(value);
+        }}
+        onBlur={() => runValidationTasks("slug", slug)}
+        errorMessage={errors.slug?.errorMessage}
+        hasError={errors.slug?.hasError}
+        {...getOverrideProps(overrides, "slug")}
+      ></TextField>
+      <TextField
         label="Description"
         isRequired={false}
         isReadOnly={false}
@@ -203,11 +256,14 @@ export default function CategoryCreateForm(props) {
           if (onChange) {
             const modelFields = {
               name,
+              slug,
               description: value,
-              imageUrl,
-              isActive,
-              createdAt,
-              updatedAt,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -226,121 +282,198 @@ export default function CategoryCreateForm(props) {
         label="Image url"
         isRequired={false}
         isReadOnly={false}
-        value={imageUrl}
+        value={image_url}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
               name,
+              slug,
               description,
-              imageUrl: value,
-              isActive,
-              createdAt,
-              updatedAt,
+              image_url: value,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at,
             };
             const result = onChange(modelFields);
-            value = result?.imageUrl ?? value;
+            value = result?.image_url ?? value;
           }
-          if (errors.imageUrl?.hasError) {
-            runValidationTasks("imageUrl", value);
+          if (errors.image_url?.hasError) {
+            runValidationTasks("image_url", value);
           }
-          setImageUrl(value);
+          setImage_url(value);
         }}
-        onBlur={() => runValidationTasks("imageUrl", imageUrl)}
-        errorMessage={errors.imageUrl?.errorMessage}
-        hasError={errors.imageUrl?.hasError}
-        {...getOverrideProps(overrides, "imageUrl")}
+        onBlur={() => runValidationTasks("image_url", image_url)}
+        errorMessage={errors.image_url?.errorMessage}
+        hasError={errors.image_url?.hasError}
+        {...getOverrideProps(overrides, "image_url")}
       ></TextField>
+      <TextField
+        label="Parent id"
+        isRequired={false}
+        isReadOnly={false}
+        value={parent_id}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              slug,
+              description,
+              image_url,
+              parent_id: value,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.parent_id ?? value;
+          }
+          if (errors.parent_id?.hasError) {
+            runValidationTasks("parent_id", value);
+          }
+          setParent_id(value);
+        }}
+        onBlur={() => runValidationTasks("parent_id", parent_id)}
+        errorMessage={errors.parent_id?.errorMessage}
+        hasError={errors.parent_id?.hasError}
+        {...getOverrideProps(overrides, "parent_id")}
+      ></TextField>
+      <TextAreaField
+        label="Sub categories"
+        isRequired={false}
+        isReadOnly={false}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              slug,
+              description,
+              image_url,
+              parent_id,
+              sub_categories: value,
+              is_active,
+              sort_order,
+              created_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.sub_categories ?? value;
+          }
+          if (errors.sub_categories?.hasError) {
+            runValidationTasks("sub_categories", value);
+          }
+          setSub_categories(value);
+        }}
+        onBlur={() => runValidationTasks("sub_categories", sub_categories)}
+        errorMessage={errors.sub_categories?.errorMessage}
+        hasError={errors.sub_categories?.hasError}
+        {...getOverrideProps(overrides, "sub_categories")}
+      ></TextAreaField>
       <SwitchField
         label="Is active"
         defaultChecked={false}
         isDisabled={false}
-        isChecked={isActive}
+        isChecked={is_active}
         onChange={(e) => {
           let value = e.target.checked;
           if (onChange) {
             const modelFields = {
               name,
+              slug,
               description,
-              imageUrl,
-              isActive: value,
-              createdAt,
-              updatedAt,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active: value,
+              sort_order,
+              created_at,
             };
             const result = onChange(modelFields);
-            value = result?.isActive ?? value;
+            value = result?.is_active ?? value;
           }
-          if (errors.isActive?.hasError) {
-            runValidationTasks("isActive", value);
+          if (errors.is_active?.hasError) {
+            runValidationTasks("is_active", value);
           }
-          setIsActive(value);
+          setIs_active(value);
         }}
-        onBlur={() => runValidationTasks("isActive", isActive)}
-        errorMessage={errors.isActive?.errorMessage}
-        hasError={errors.isActive?.hasError}
-        {...getOverrideProps(overrides, "isActive")}
+        onBlur={() => runValidationTasks("is_active", is_active)}
+        errorMessage={errors.is_active?.errorMessage}
+        hasError={errors.is_active?.hasError}
+        {...getOverrideProps(overrides, "is_active")}
       ></SwitchField>
       <TextField
-        label="Created at"
-        isRequired={true}
+        label="Sort order"
+        isRequired={false}
         isReadOnly={false}
-        type="datetime-local"
-        value={createdAt && convertToLocal(new Date(createdAt))}
+        type="number"
+        step="any"
+        value={sort_order}
         onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          let value = isNaN(parseInt(e.target.value))
+            ? e.target.value
+            : parseInt(e.target.value);
           if (onChange) {
             const modelFields = {
               name,
+              slug,
               description,
-              imageUrl,
-              isActive,
-              createdAt: value,
-              updatedAt,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order: value,
+              created_at,
             };
             const result = onChange(modelFields);
-            value = result?.createdAt ?? value;
+            value = result?.sort_order ?? value;
           }
-          if (errors.createdAt?.hasError) {
-            runValidationTasks("createdAt", value);
+          if (errors.sort_order?.hasError) {
+            runValidationTasks("sort_order", value);
           }
-          setCreatedAt(value);
+          setSort_order(value);
         }}
-        onBlur={() => runValidationTasks("createdAt", createdAt)}
-        errorMessage={errors.createdAt?.errorMessage}
-        hasError={errors.createdAt?.hasError}
-        {...getOverrideProps(overrides, "createdAt")}
+        onBlur={() => runValidationTasks("sort_order", sort_order)}
+        errorMessage={errors.sort_order?.errorMessage}
+        hasError={errors.sort_order?.hasError}
+        {...getOverrideProps(overrides, "sort_order")}
       ></TextField>
       <TextField
-        label="Updated at"
-        isRequired={true}
+        label="Created at"
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
-        value={updatedAt && convertToLocal(new Date(updatedAt))}
+        value={created_at && convertToLocal(new Date(created_at))}
         onChange={(e) => {
           let value =
             e.target.value === "" ? "" : new Date(e.target.value).toISOString();
           if (onChange) {
             const modelFields = {
               name,
+              slug,
               description,
-              imageUrl,
-              isActive,
-              createdAt,
-              updatedAt: value,
+              image_url,
+              parent_id,
+              sub_categories,
+              is_active,
+              sort_order,
+              created_at: value,
             };
             const result = onChange(modelFields);
-            value = result?.updatedAt ?? value;
+            value = result?.created_at ?? value;
           }
-          if (errors.updatedAt?.hasError) {
-            runValidationTasks("updatedAt", value);
+          if (errors.created_at?.hasError) {
+            runValidationTasks("created_at", value);
           }
-          setUpdatedAt(value);
+          setCreated_at(value);
         }}
-        onBlur={() => runValidationTasks("updatedAt", updatedAt)}
-        errorMessage={errors.updatedAt?.errorMessage}
-        hasError={errors.updatedAt?.hasError}
-        {...getOverrideProps(overrides, "updatedAt")}
+        onBlur={() => runValidationTasks("created_at", created_at)}
+        errorMessage={errors.created_at?.errorMessage}
+        hasError={errors.created_at?.hasError}
+        {...getOverrideProps(overrides, "created_at")}
       ></TextField>
       <Flex
         justifyContent="space-between"

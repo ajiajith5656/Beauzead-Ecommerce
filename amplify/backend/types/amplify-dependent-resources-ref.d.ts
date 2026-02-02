@@ -5,12 +5,5 @@ export type AmplifyDependentResourcesAttributes = {
       "GraphQLAPIIdOutput": "string",
       "GraphQLAPIKeyOutput": "string"
     }
-  },
-  "function": {
-    "beauzeadPostConfirmation": {
-      "LambdaExecutionRoleArn": "string",
-      "LambdaFunctionArn": "string",
-      "LambdaFunctionName": "string"
-    }
   }
 }

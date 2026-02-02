@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -23,29 +23,38 @@ export declare type ValidationResponse = {
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type CategoryUpdateFormInputValues = {
     name?: string;
+    slug?: string;
     description?: string;
-    imageUrl?: string;
-    isActive?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
+    image_url?: string;
+    parent_id?: string;
+    sub_categories?: string;
+    is_active?: boolean;
+    sort_order?: number;
+    created_at?: string;
 };
 export declare type CategoryUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
+    slug?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
-    imageUrl?: ValidationFunction<string>;
-    isActive?: ValidationFunction<boolean>;
-    createdAt?: ValidationFunction<string>;
-    updatedAt?: ValidationFunction<string>;
+    image_url?: ValidationFunction<string>;
+    parent_id?: ValidationFunction<string>;
+    sub_categories?: ValidationFunction<string>;
+    is_active?: ValidationFunction<boolean>;
+    sort_order?: ValidationFunction<number>;
+    created_at?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type CategoryUpdateFormOverridesProps = {
     CategoryUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
+    slug?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
-    imageUrl?: PrimitiveOverrideProps<TextFieldProps>;
-    isActive?: PrimitiveOverrideProps<SwitchFieldProps>;
-    createdAt?: PrimitiveOverrideProps<TextFieldProps>;
-    updatedAt?: PrimitiveOverrideProps<TextFieldProps>;
+    image_url?: PrimitiveOverrideProps<TextFieldProps>;
+    parent_id?: PrimitiveOverrideProps<TextFieldProps>;
+    sub_categories?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    is_active?: PrimitiveOverrideProps<SwitchFieldProps>;
+    sort_order?: PrimitiveOverrideProps<TextFieldProps>;
+    created_at?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type CategoryUpdateFormProps = React.PropsWithChildren<{
     overrides?: CategoryUpdateFormOverridesProps | undefined | null;

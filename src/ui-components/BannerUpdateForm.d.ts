@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, SwitchFieldProps, TextAreaFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -21,49 +21,47 @@ export declare type ValidationResponse = {
     errorMessage?: string;
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
-export declare type CategoryCreateFormInputValues = {
-    name?: string;
-    slug?: string;
-    description?: string;
+export declare type BannerUpdateFormInputValues = {
+    title?: string;
+    subtitle?: string;
     image_url?: string;
-    parent_id?: string;
-    sub_categories?: string;
+    link_url?: string;
+    position?: string;
     is_active?: boolean;
     sort_order?: number;
     created_at?: string;
 };
-export declare type CategoryCreateFormValidationValues = {
-    name?: ValidationFunction<string>;
-    slug?: ValidationFunction<string>;
-    description?: ValidationFunction<string>;
+export declare type BannerUpdateFormValidationValues = {
+    title?: ValidationFunction<string>;
+    subtitle?: ValidationFunction<string>;
     image_url?: ValidationFunction<string>;
-    parent_id?: ValidationFunction<string>;
-    sub_categories?: ValidationFunction<string>;
+    link_url?: ValidationFunction<string>;
+    position?: ValidationFunction<string>;
     is_active?: ValidationFunction<boolean>;
     sort_order?: ValidationFunction<number>;
     created_at?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
-export declare type CategoryCreateFormOverridesProps = {
-    CategoryCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    name?: PrimitiveOverrideProps<TextFieldProps>;
-    slug?: PrimitiveOverrideProps<TextFieldProps>;
-    description?: PrimitiveOverrideProps<TextFieldProps>;
+export declare type BannerUpdateFormOverridesProps = {
+    BannerUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
+    title?: PrimitiveOverrideProps<TextFieldProps>;
+    subtitle?: PrimitiveOverrideProps<TextFieldProps>;
     image_url?: PrimitiveOverrideProps<TextFieldProps>;
-    parent_id?: PrimitiveOverrideProps<TextFieldProps>;
-    sub_categories?: PrimitiveOverrideProps<TextAreaFieldProps>;
+    link_url?: PrimitiveOverrideProps<TextFieldProps>;
+    position?: PrimitiveOverrideProps<TextFieldProps>;
     is_active?: PrimitiveOverrideProps<SwitchFieldProps>;
     sort_order?: PrimitiveOverrideProps<TextFieldProps>;
     created_at?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
-export declare type CategoryCreateFormProps = React.PropsWithChildren<{
-    overrides?: CategoryCreateFormOverridesProps | undefined | null;
+export declare type BannerUpdateFormProps = React.PropsWithChildren<{
+    overrides?: BannerUpdateFormOverridesProps | undefined | null;
 } & {
-    clearOnSuccess?: boolean;
-    onSubmit?: (fields: CategoryCreateFormInputValues) => CategoryCreateFormInputValues;
-    onSuccess?: (fields: CategoryCreateFormInputValues) => void;
-    onError?: (fields: CategoryCreateFormInputValues, errorMessage: string) => void;
-    onChange?: (fields: CategoryCreateFormInputValues) => CategoryCreateFormInputValues;
-    onValidate?: CategoryCreateFormValidationValues;
+    id?: string;
+    banner?: any;
+    onSubmit?: (fields: BannerUpdateFormInputValues) => BannerUpdateFormInputValues;
+    onSuccess?: (fields: BannerUpdateFormInputValues) => void;
+    onError?: (fields: BannerUpdateFormInputValues, errorMessage: string) => void;
+    onChange?: (fields: BannerUpdateFormInputValues) => BannerUpdateFormInputValues;
+    onValidate?: BannerUpdateFormValidationValues;
 } & React.CSSProperties>;
-export default function CategoryCreateForm(props: CategoryCreateFormProps): React.ReactElement;
+export default function BannerUpdateForm(props: BannerUpdateFormProps): React.ReactElement;

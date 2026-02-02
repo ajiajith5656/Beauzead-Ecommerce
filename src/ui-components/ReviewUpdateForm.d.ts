@@ -22,33 +22,36 @@ export declare type ValidationResponse = {
 };
 export declare type ValidationFunction<T> = (value: T, validationResponse: ValidationResponse) => ValidationResponse | Promise<ValidationResponse>;
 export declare type ReviewUpdateFormInputValues = {
-    productId?: string;
-    userId?: string;
+    product_id?: string;
+    user_id?: string;
     rating?: number;
+    title?: string;
     comment?: string;
-    createdAt?: string;
-    isVerified?: boolean;
-    isFlagged?: boolean;
+    images?: string[];
+    is_verified_purchase?: boolean;
+    created_at?: string;
 };
 export declare type ReviewUpdateFormValidationValues = {
-    productId?: ValidationFunction<string>;
-    userId?: ValidationFunction<string>;
+    product_id?: ValidationFunction<string>;
+    user_id?: ValidationFunction<string>;
     rating?: ValidationFunction<number>;
+    title?: ValidationFunction<string>;
     comment?: ValidationFunction<string>;
-    createdAt?: ValidationFunction<string>;
-    isVerified?: ValidationFunction<boolean>;
-    isFlagged?: ValidationFunction<boolean>;
+    images?: ValidationFunction<string>;
+    is_verified_purchase?: ValidationFunction<boolean>;
+    created_at?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ReviewUpdateFormOverridesProps = {
     ReviewUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
-    productId?: PrimitiveOverrideProps<TextFieldProps>;
-    userId?: PrimitiveOverrideProps<TextFieldProps>;
+    product_id?: PrimitiveOverrideProps<TextFieldProps>;
+    user_id?: PrimitiveOverrideProps<TextFieldProps>;
     rating?: PrimitiveOverrideProps<TextFieldProps>;
+    title?: PrimitiveOverrideProps<TextFieldProps>;
     comment?: PrimitiveOverrideProps<TextFieldProps>;
-    createdAt?: PrimitiveOverrideProps<TextFieldProps>;
-    isVerified?: PrimitiveOverrideProps<SwitchFieldProps>;
-    isFlagged?: PrimitiveOverrideProps<SwitchFieldProps>;
+    images?: PrimitiveOverrideProps<TextFieldProps>;
+    is_verified_purchase?: PrimitiveOverrideProps<SwitchFieldProps>;
+    created_at?: PrimitiveOverrideProps<TextFieldProps>;
 } & EscapeHatchProps;
 export declare type ReviewUpdateFormProps = React.PropsWithChildren<{
     overrides?: ReviewUpdateFormOverridesProps | undefined | null;

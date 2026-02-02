@@ -1,90 +1,366 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
-export const onCreateCountryListBzdcore = /* GraphQL */ `
-  subscription OnCreateCountryListBzdcore(
-    $filter: ModelSubscriptionCountryListBzdcoreFilterInput
-  ) {
-    onCreateCountryListBzdcore(filter: $filter) {
+export const onCreateUser = /* GraphQL */ `
+  subscription OnCreateUser($filter: ModelSubscriptionUserFilterInput) {
+    onCreateUser(filter: $filter) {
       id
-      countryName
-      shortCode
-      currency
-      dialCode
+      email
+      phone
+      first_name
+      last_name
+      profile_type
+      avatar_url
+      address
+      is_verified
+      is_banned
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onUpdateCountryListBzdcore = /* GraphQL */ `
-  subscription OnUpdateCountryListBzdcore(
-    $filter: ModelSubscriptionCountryListBzdcoreFilterInput
-  ) {
-    onUpdateCountryListBzdcore(filter: $filter) {
+export const onUpdateUser = /* GraphQL */ `
+  subscription OnUpdateUser($filter: ModelSubscriptionUserFilterInput) {
+    onUpdateUser(filter: $filter) {
       id
-      countryName
-      shortCode
-      currency
-      dialCode
+      email
+      phone
+      first_name
+      last_name
+      profile_type
+      avatar_url
+      address
+      is_verified
+      is_banned
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onDeleteCountryListBzdcore = /* GraphQL */ `
-  subscription OnDeleteCountryListBzdcore(
-    $filter: ModelSubscriptionCountryListBzdcoreFilterInput
-  ) {
-    onDeleteCountryListBzdcore(filter: $filter) {
+export const onDeleteUser = /* GraphQL */ `
+  subscription OnDeleteUser($filter: ModelSubscriptionUserFilterInput) {
+    onDeleteUser(filter: $filter) {
       id
-      countryName
-      shortCode
-      currency
-      dialCode
+      email
+      phone
+      first_name
+      last_name
+      profile_type
+      avatar_url
+      address
+      is_verified
+      is_banned
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onCreateBusinessTypeBzdcore = /* GraphQL */ `
-  subscription OnCreateBusinessTypeBzdcore(
-    $filter: ModelSubscriptionBusinessTypeBzdcoreFilterInput
-  ) {
-    onCreateBusinessTypeBzdcore(filter: $filter) {
+export const onCreateSeller = /* GraphQL */ `
+  subscription OnCreateSeller($filter: ModelSubscriptionSellerFilterInput) {
+    onCreateSeller(filter: $filter) {
       id
-      typeName
+      user_id
+      email
+      business_name
+      business_type
+      gst_number
+      pan_number
+      phone
+      address
+      bank_details
+      kyc_status
+      kyc_documents
+      badge
+      is_approved
+      is_active
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateSeller = /* GraphQL */ `
+  subscription OnUpdateSeller($filter: ModelSubscriptionSellerFilterInput) {
+    onUpdateSeller(filter: $filter) {
+      id
+      user_id
+      email
+      business_name
+      business_type
+      gst_number
+      pan_number
+      phone
+      address
+      bank_details
+      kyc_status
+      kyc_documents
+      badge
+      is_approved
+      is_active
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteSeller = /* GraphQL */ `
+  subscription OnDeleteSeller($filter: ModelSubscriptionSellerFilterInput) {
+    onDeleteSeller(filter: $filter) {
+      id
+      user_id
+      email
+      business_name
+      business_type
+      gst_number
+      pan_number
+      phone
+      address
+      bank_details
+      kyc_status
+      kyc_documents
+      badge
+      is_approved
+      is_active
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateProduct = /* GraphQL */ `
+  subscription OnCreateProduct($filter: ModelSubscriptionProductFilterInput) {
+    onCreateProduct(filter: $filter) {
+      id
+      seller_id
+      category_id
+      sub_category_id
+      name
+      brand_name
+      model_number
+      short_description
       description
+      highlights
+      specifications
+      image_url
+      images
+      videos
+      price
+      mrp
+      currency
+      stock
+      size_variants
+      color_variants
+      gst_rate
+      platform_fee
+      commission
+      delivery_countries
+      package_weight
+      package_dimensions
+      shipping_type
+      manufacturer_name
+      cancellation_policy_days
+      return_policy_days
+      offer_rules
+      approval_status
+      is_active
+      rating
+      review_count
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onUpdateBusinessTypeBzdcore = /* GraphQL */ `
-  subscription OnUpdateBusinessTypeBzdcore(
-    $filter: ModelSubscriptionBusinessTypeBzdcoreFilterInput
-  ) {
-    onUpdateBusinessTypeBzdcore(filter: $filter) {
+export const onUpdateProduct = /* GraphQL */ `
+  subscription OnUpdateProduct($filter: ModelSubscriptionProductFilterInput) {
+    onUpdateProduct(filter: $filter) {
       id
-      typeName
+      seller_id
+      category_id
+      sub_category_id
+      name
+      brand_name
+      model_number
+      short_description
       description
+      highlights
+      specifications
+      image_url
+      images
+      videos
+      price
+      mrp
+      currency
+      stock
+      size_variants
+      color_variants
+      gst_rate
+      platform_fee
+      commission
+      delivery_countries
+      package_weight
+      package_dimensions
+      shipping_type
+      manufacturer_name
+      cancellation_policy_days
+      return_policy_days
+      offer_rules
+      approval_status
+      is_active
+      rating
+      review_count
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
     }
   }
 `;
-export const onDeleteBusinessTypeBzdcore = /* GraphQL */ `
-  subscription OnDeleteBusinessTypeBzdcore(
-    $filter: ModelSubscriptionBusinessTypeBzdcoreFilterInput
-  ) {
-    onDeleteBusinessTypeBzdcore(filter: $filter) {
+export const onDeleteProduct = /* GraphQL */ `
+  subscription OnDeleteProduct($filter: ModelSubscriptionProductFilterInput) {
+    onDeleteProduct(filter: $filter) {
       id
-      typeName
+      seller_id
+      category_id
+      sub_category_id
+      name
+      brand_name
+      model_number
+      short_description
       description
+      highlights
+      specifications
+      image_url
+      images
+      videos
+      price
+      mrp
+      currency
+      stock
+      size_variants
+      color_variants
+      gst_rate
+      platform_fee
+      commission
+      delivery_countries
+      package_weight
+      package_dimensions
+      shipping_type
+      manufacturer_name
+      cancellation_policy_days
+      return_policy_days
+      offer_rules
+      approval_status
+      is_active
+      rating
+      review_count
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateOrder = /* GraphQL */ `
+  subscription OnCreateOrder($filter: ModelSubscriptionOrderFilterInput) {
+    onCreateOrder(filter: $filter) {
+      id
+      user_id
+      seller_id
+      order_number
+      status
+      items
+      subtotal
+      shipping_cost
+      tax_amount
+      discount_amount
+      total_amount
+      currency
+      shipping_address
+      billing_address
+      payment_method
+      payment_status
+      payment_intent_id
+      tracking_number
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateOrder = /* GraphQL */ `
+  subscription OnUpdateOrder($filter: ModelSubscriptionOrderFilterInput) {
+    onUpdateOrder(filter: $filter) {
+      id
+      user_id
+      seller_id
+      order_number
+      status
+      items
+      subtotal
+      shipping_cost
+      tax_amount
+      discount_amount
+      total_amount
+      currency
+      shipping_address
+      billing_address
+      payment_method
+      payment_status
+      payment_intent_id
+      tracking_number
+      created_at
+      updated_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteOrder = /* GraphQL */ `
+  subscription OnDeleteOrder($filter: ModelSubscriptionOrderFilterInput) {
+    onDeleteOrder(filter: $filter) {
+      id
+      user_id
+      seller_id
+      order_number
+      status
+      items
+      subtotal
+      shipping_cost
+      tax_amount
+      discount_amount
+      total_amount
+      currency
+      shipping_address
+      billing_address
+      payment_method
+      payment_status
+      payment_intent_id
+      tracking_number
+      created_at
+      updated_at
       createdAt
       updatedAt
       __typename
@@ -96,9 +372,14 @@ export const onCreateCategory = /* GraphQL */ `
     onCreateCategory(filter: $filter) {
       id
       name
+      slug
       description
-      imageUrl
-      isActive
+      image_url
+      parent_id
+      sub_categories
+      is_active
+      sort_order
+      created_at
       createdAt
       updatedAt
       __typename
@@ -110,9 +391,14 @@ export const onUpdateCategory = /* GraphQL */ `
     onUpdateCategory(filter: $filter) {
       id
       name
+      slug
       description
-      imageUrl
-      isActive
+      image_url
+      parent_id
+      sub_categories
+      is_active
+      sort_order
+      created_at
       createdAt
       updatedAt
       __typename
@@ -124,124 +410,15 @@ export const onDeleteCategory = /* GraphQL */ `
     onDeleteCategory(filter: $filter) {
       id
       name
+      slug
       description
-      imageUrl
-      isActive
+      image_url
+      parent_id
+      sub_categories
+      is_active
+      sort_order
+      created_at
       createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateProduct = /* GraphQL */ `
-  subscription OnCreateProduct($filter: ModelSubscriptionProductFilterInput) {
-    onCreateProduct(filter: $filter) {
-      id
-      name
-      description
-      price
-      currency
-      imageUrl
-      sellerId
-      categoryId
-      stock
-      approved
-      createdAt
-      approvalStatus
-      isActive
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateProduct = /* GraphQL */ `
-  subscription OnUpdateProduct($filter: ModelSubscriptionProductFilterInput) {
-    onUpdateProduct(filter: $filter) {
-      id
-      name
-      description
-      price
-      currency
-      imageUrl
-      sellerId
-      categoryId
-      stock
-      approved
-      createdAt
-      approvalStatus
-      isActive
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteProduct = /* GraphQL */ `
-  subscription OnDeleteProduct($filter: ModelSubscriptionProductFilterInput) {
-    onDeleteProduct(filter: $filter) {
-      id
-      name
-      description
-      price
-      currency
-      imageUrl
-      sellerId
-      categoryId
-      stock
-      approved
-      createdAt
-      approvalStatus
-      isActive
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onCreateOrder = /* GraphQL */ `
-  subscription OnCreateOrder($filter: ModelSubscriptionOrderFilterInput) {
-    onCreateOrder(filter: $filter) {
-      id
-      userId
-      total
-      currency
-      status
-      createdAt
-      address
-      phone
-      paymentStatus
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateOrder = /* GraphQL */ `
-  subscription OnUpdateOrder($filter: ModelSubscriptionOrderFilterInput) {
-    onUpdateOrder(filter: $filter) {
-      id
-      userId
-      total
-      currency
-      status
-      createdAt
-      address
-      phone
-      paymentStatus
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteOrder = /* GraphQL */ `
-  subscription OnDeleteOrder($filter: ModelSubscriptionOrderFilterInput) {
-    onDeleteOrder(filter: $filter) {
-      id
-      userId
-      total
-      currency
-      status
-      createdAt
-      address
-      phone
-      paymentStatus
       updatedAt
       __typename
     }
@@ -251,13 +428,15 @@ export const onCreateReview = /* GraphQL */ `
   subscription OnCreateReview($filter: ModelSubscriptionReviewFilterInput) {
     onCreateReview(filter: $filter) {
       id
-      productId
-      userId
+      product_id
+      user_id
       rating
+      title
       comment
+      images
+      is_verified_purchase
+      created_at
       createdAt
-      isVerified
-      isFlagged
       updatedAt
       __typename
     }
@@ -267,13 +446,15 @@ export const onUpdateReview = /* GraphQL */ `
   subscription OnUpdateReview($filter: ModelSubscriptionReviewFilterInput) {
     onUpdateReview(filter: $filter) {
       id
-      productId
-      userId
+      product_id
+      user_id
       rating
+      title
       comment
+      images
+      is_verified_purchase
+      created_at
       createdAt
-      isVerified
-      isFlagged
       updatedAt
       __typename
     }
@@ -283,135 +464,230 @@ export const onDeleteReview = /* GraphQL */ `
   subscription OnDeleteReview($filter: ModelSubscriptionReviewFilterInput) {
     onDeleteReview(filter: $filter) {
       id
-      productId
-      userId
+      product_id
+      user_id
       rating
+      title
       comment
+      images
+      is_verified_purchase
+      created_at
       createdAt
-      isVerified
-      isFlagged
       updatedAt
       __typename
     }
   }
 `;
-export const onCreateComplaint = /* GraphQL */ `
-  subscription OnCreateComplaint(
-    $filter: ModelSubscriptionComplaintFilterInput
-  ) {
-    onCreateComplaint(filter: $filter) {
+export const onCreateBanner = /* GraphQL */ `
+  subscription OnCreateBanner($filter: ModelSubscriptionBannerFilterInput) {
+    onCreateBanner(filter: $filter) {
       id
-      userId
-      subject
+      title
+      subtitle
+      image_url
+      link_url
+      position
+      is_active
+      sort_order
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateBanner = /* GraphQL */ `
+  subscription OnUpdateBanner($filter: ModelSubscriptionBannerFilterInput) {
+    onUpdateBanner(filter: $filter) {
+      id
+      title
+      subtitle
+      image_url
+      link_url
+      position
+      is_active
+      sort_order
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteBanner = /* GraphQL */ `
+  subscription OnDeleteBanner($filter: ModelSubscriptionBannerFilterInput) {
+    onDeleteBanner(filter: $filter) {
+      id
+      title
+      subtitle
+      image_url
+      link_url
+      position
+      is_active
+      sort_order
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreatePromotion = /* GraphQL */ `
+  subscription OnCreatePromotion(
+    $filter: ModelSubscriptionPromotionFilterInput
+  ) {
+    onCreatePromotion(filter: $filter) {
+      id
+      code
+      name
+      discount_type
+      discount_value
+      min_order_amount
+      max_discount
+      usage_limit
+      used_count
+      is_active
+      start_date
+      end_date
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdatePromotion = /* GraphQL */ `
+  subscription OnUpdatePromotion(
+    $filter: ModelSubscriptionPromotionFilterInput
+  ) {
+    onUpdatePromotion(filter: $filter) {
+      id
+      code
+      name
+      discount_type
+      discount_value
+      min_order_amount
+      max_discount
+      usage_limit
+      used_count
+      is_active
+      start_date
+      end_date
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeletePromotion = /* GraphQL */ `
+  subscription OnDeletePromotion(
+    $filter: ModelSubscriptionPromotionFilterInput
+  ) {
+    onDeletePromotion(filter: $filter) {
+      id
+      code
+      name
+      discount_type
+      discount_value
+      min_order_amount
+      max_discount
+      usage_limit
+      used_count
+      is_active
+      start_date
+      end_date
+      created_at
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateCountry = /* GraphQL */ `
+  subscription OnCreateCountry($filter: ModelSubscriptionCountryFilterInput) {
+    onCreateCountry(filter: $filter) {
+      id
+      name
+      code
+      currency
+      dial_code
+      is_active
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateCountry = /* GraphQL */ `
+  subscription OnUpdateCountry($filter: ModelSubscriptionCountryFilterInput) {
+    onUpdateCountry(filter: $filter) {
+      id
+      name
+      code
+      currency
+      dial_code
+      is_active
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteCountry = /* GraphQL */ `
+  subscription OnDeleteCountry($filter: ModelSubscriptionCountryFilterInput) {
+    onDeleteCountry(filter: $filter) {
+      id
+      name
+      code
+      currency
+      dial_code
+      is_active
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateBusinessType = /* GraphQL */ `
+  subscription OnCreateBusinessType(
+    $filter: ModelSubscriptionBusinessTypeFilterInput
+  ) {
+    onCreateBusinessType(filter: $filter) {
+      id
+      name
       description
-      status
+      is_active
       createdAt
       updatedAt
-      assignedTo
-      resolution
       __typename
     }
   }
 `;
-export const onUpdateComplaint = /* GraphQL */ `
-  subscription OnUpdateComplaint(
-    $filter: ModelSubscriptionComplaintFilterInput
+export const onUpdateBusinessType = /* GraphQL */ `
+  subscription OnUpdateBusinessType(
+    $filter: ModelSubscriptionBusinessTypeFilterInput
   ) {
-    onUpdateComplaint(filter: $filter) {
+    onUpdateBusinessType(filter: $filter) {
       id
-      userId
-      subject
+      name
       description
-      status
+      is_active
       createdAt
       updatedAt
-      assignedTo
-      resolution
       __typename
     }
   }
 `;
-export const onDeleteComplaint = /* GraphQL */ `
-  subscription OnDeleteComplaint(
-    $filter: ModelSubscriptionComplaintFilterInput
+export const onDeleteBusinessType = /* GraphQL */ `
+  subscription OnDeleteBusinessType(
+    $filter: ModelSubscriptionBusinessTypeFilterInput
   ) {
-    onDeleteComplaint(filter: $filter) {
+    onDeleteBusinessType(filter: $filter) {
       id
-      userId
-      subject
+      name
       description
-      status
-      createdAt
-      updatedAt
-      assignedTo
-      resolution
-      __typename
-    }
-  }
-`;
-export const onCreateDashboardMetrics = /* GraphQL */ `
-  subscription OnCreateDashboardMetrics(
-    $filter: ModelSubscriptionDashboardMetricsFilterInput
-  ) {
-    onCreateDashboardMetrics(filter: $filter) {
-      id
-      totalSales
-      totalExpenses
-      totalProducts
-      totalUsers
-      totalSellers
-      totalBookings
-      ongoingOrders
-      returnsCancellations
-      userRegistrations
-      primeMembers
-      sellerRegistrations
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onUpdateDashboardMetrics = /* GraphQL */ `
-  subscription OnUpdateDashboardMetrics(
-    $filter: ModelSubscriptionDashboardMetricsFilterInput
-  ) {
-    onUpdateDashboardMetrics(filter: $filter) {
-      id
-      totalSales
-      totalExpenses
-      totalProducts
-      totalUsers
-      totalSellers
-      totalBookings
-      ongoingOrders
-      returnsCancellations
-      userRegistrations
-      primeMembers
-      sellerRegistrations
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const onDeleteDashboardMetrics = /* GraphQL */ `
-  subscription OnDeleteDashboardMetrics(
-    $filter: ModelSubscriptionDashboardMetricsFilterInput
-  ) {
-    onDeleteDashboardMetrics(filter: $filter) {
-      id
-      totalSales
-      totalExpenses
-      totalProducts
-      totalUsers
-      totalSellers
-      totalBookings
-      ongoingOrders
-      returnsCancellations
-      userRegistrations
-      primeMembers
-      sellerRegistrations
+      is_active
       createdAt
       updatedAt
       __typename

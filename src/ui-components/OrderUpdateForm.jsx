@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  TextAreaField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getOrder } from "../graphql/queries";
@@ -25,41 +31,103 @@ export default function OrderUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    userId: "",
-    total: "",
-    currency: "",
+    user_id: "",
+    seller_id: "",
+    order_number: "",
     status: "",
-    createdAt: "",
-    address: "",
-    phone: "",
-    paymentStatus: "",
-    updatedAt: "",
+    items: "",
+    subtotal: "",
+    shipping_cost: "",
+    tax_amount: "",
+    discount_amount: "",
+    total_amount: "",
+    currency: "",
+    shipping_address: "",
+    billing_address: "",
+    payment_method: "",
+    payment_status: "",
+    payment_intent_id: "",
+    tracking_number: "",
+    created_at: "",
+    updated_at: "",
   };
-  const [userId, setUserId] = React.useState(initialValues.userId);
-  const [total, setTotal] = React.useState(initialValues.total);
-  const [currency, setCurrency] = React.useState(initialValues.currency);
-  const [status, setStatus] = React.useState(initialValues.status);
-  const [createdAt, setCreatedAt] = React.useState(initialValues.createdAt);
-  const [address, setAddress] = React.useState(initialValues.address);
-  const [phone, setPhone] = React.useState(initialValues.phone);
-  const [paymentStatus, setPaymentStatus] = React.useState(
-    initialValues.paymentStatus
+  const [user_id, setUser_id] = React.useState(initialValues.user_id);
+  const [seller_id, setSeller_id] = React.useState(initialValues.seller_id);
+  const [order_number, setOrder_number] = React.useState(
+    initialValues.order_number
   );
-  const [updatedAt, setUpdatedAt] = React.useState(initialValues.updatedAt);
+  const [status, setStatus] = React.useState(initialValues.status);
+  const [items, setItems] = React.useState(initialValues.items);
+  const [subtotal, setSubtotal] = React.useState(initialValues.subtotal);
+  const [shipping_cost, setShipping_cost] = React.useState(
+    initialValues.shipping_cost
+  );
+  const [tax_amount, setTax_amount] = React.useState(initialValues.tax_amount);
+  const [discount_amount, setDiscount_amount] = React.useState(
+    initialValues.discount_amount
+  );
+  const [total_amount, setTotal_amount] = React.useState(
+    initialValues.total_amount
+  );
+  const [currency, setCurrency] = React.useState(initialValues.currency);
+  const [shipping_address, setShipping_address] = React.useState(
+    initialValues.shipping_address
+  );
+  const [billing_address, setBilling_address] = React.useState(
+    initialValues.billing_address
+  );
+  const [payment_method, setPayment_method] = React.useState(
+    initialValues.payment_method
+  );
+  const [payment_status, setPayment_status] = React.useState(
+    initialValues.payment_status
+  );
+  const [payment_intent_id, setPayment_intent_id] = React.useState(
+    initialValues.payment_intent_id
+  );
+  const [tracking_number, setTracking_number] = React.useState(
+    initialValues.tracking_number
+  );
+  const [created_at, setCreated_at] = React.useState(initialValues.created_at);
+  const [updated_at, setUpdated_at] = React.useState(initialValues.updated_at);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = orderRecord
       ? { ...initialValues, ...orderRecord }
       : initialValues;
-    setUserId(cleanValues.userId);
-    setTotal(cleanValues.total);
-    setCurrency(cleanValues.currency);
+    setUser_id(cleanValues.user_id);
+    setSeller_id(cleanValues.seller_id);
+    setOrder_number(cleanValues.order_number);
     setStatus(cleanValues.status);
-    setCreatedAt(cleanValues.createdAt);
-    setAddress(cleanValues.address);
-    setPhone(cleanValues.phone);
-    setPaymentStatus(cleanValues.paymentStatus);
-    setUpdatedAt(cleanValues.updatedAt);
+    setItems(
+      typeof cleanValues.items === "string" || cleanValues.items === null
+        ? cleanValues.items
+        : JSON.stringify(cleanValues.items)
+    );
+    setSubtotal(cleanValues.subtotal);
+    setShipping_cost(cleanValues.shipping_cost);
+    setTax_amount(cleanValues.tax_amount);
+    setDiscount_amount(cleanValues.discount_amount);
+    setTotal_amount(cleanValues.total_amount);
+    setCurrency(cleanValues.currency);
+    setShipping_address(
+      typeof cleanValues.shipping_address === "string" ||
+        cleanValues.shipping_address === null
+        ? cleanValues.shipping_address
+        : JSON.stringify(cleanValues.shipping_address)
+    );
+    setBilling_address(
+      typeof cleanValues.billing_address === "string" ||
+        cleanValues.billing_address === null
+        ? cleanValues.billing_address
+        : JSON.stringify(cleanValues.billing_address)
+    );
+    setPayment_method(cleanValues.payment_method);
+    setPayment_status(cleanValues.payment_status);
+    setPayment_intent_id(cleanValues.payment_intent_id);
+    setTracking_number(cleanValues.tracking_number);
+    setCreated_at(cleanValues.created_at);
+    setUpdated_at(cleanValues.updated_at);
     setErrors({});
   };
   const [orderRecord, setOrderRecord] = React.useState(orderModelProp);
@@ -79,15 +147,25 @@ export default function OrderUpdateForm(props) {
   }, [idProp, orderModelProp]);
   React.useEffect(resetStateValues, [orderRecord]);
   const validations = {
-    userId: [{ type: "Required" }],
-    total: [{ type: "Required" }],
-    currency: [{ type: "Required" }],
+    user_id: [{ type: "Required" }],
+    seller_id: [],
+    order_number: [{ type: "Required" }],
     status: [{ type: "Required" }],
-    createdAt: [{ type: "Required" }],
-    address: [],
-    phone: [],
-    paymentStatus: [],
-    updatedAt: [{ type: "Required" }],
+    items: [{ type: "Required" }, { type: "JSON" }],
+    subtotal: [{ type: "Required" }],
+    shipping_cost: [],
+    tax_amount: [],
+    discount_amount: [],
+    total_amount: [{ type: "Required" }],
+    currency: [],
+    shipping_address: [{ type: "Required" }, { type: "JSON" }],
+    billing_address: [{ type: "JSON" }],
+    payment_method: [],
+    payment_status: [],
+    payment_intent_id: [],
+    tracking_number: [],
+    created_at: [],
+    updated_at: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -132,15 +210,25 @@ export default function OrderUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          userId,
-          total,
-          currency,
+          user_id,
+          seller_id: seller_id ?? null,
+          order_number,
           status,
-          createdAt,
-          address: address ?? null,
-          phone: phone ?? null,
-          paymentStatus: paymentStatus ?? null,
-          updatedAt,
+          items,
+          subtotal,
+          shipping_cost: shipping_cost ?? null,
+          tax_amount: tax_amount ?? null,
+          discount_amount: discount_amount ?? null,
+          total_amount,
+          currency: currency ?? null,
+          shipping_address,
+          billing_address: billing_address ?? null,
+          payment_method: payment_method ?? null,
+          payment_status: payment_status ?? null,
+          payment_intent_id: payment_intent_id ?? null,
+          tracking_number: tracking_number ?? null,
+          created_at: created_at ?? null,
+          updated_at: updated_at ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -196,101 +284,127 @@ export default function OrderUpdateForm(props) {
         label="User id"
         isRequired={true}
         isReadOnly={false}
-        value={userId}
+        value={user_id}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId: value,
-              total,
-              currency,
+              user_id: value,
+              seller_id,
+              order_number,
               status,
-              createdAt,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.userId ?? value;
+            value = result?.user_id ?? value;
           }
-          if (errors.userId?.hasError) {
-            runValidationTasks("userId", value);
+          if (errors.user_id?.hasError) {
+            runValidationTasks("user_id", value);
           }
-          setUserId(value);
+          setUser_id(value);
         }}
-        onBlur={() => runValidationTasks("userId", userId)}
-        errorMessage={errors.userId?.errorMessage}
-        hasError={errors.userId?.hasError}
-        {...getOverrideProps(overrides, "userId")}
+        onBlur={() => runValidationTasks("user_id", user_id)}
+        errorMessage={errors.user_id?.errorMessage}
+        hasError={errors.user_id?.hasError}
+        {...getOverrideProps(overrides, "user_id")}
       ></TextField>
       <TextField
-        label="Total"
-        isRequired={true}
+        label="Seller id"
+        isRequired={false}
         isReadOnly={false}
-        type="number"
-        step="any"
-        value={total}
-        onChange={(e) => {
-          let value = isNaN(parseFloat(e.target.value))
-            ? e.target.value
-            : parseFloat(e.target.value);
-          if (onChange) {
-            const modelFields = {
-              userId,
-              total: value,
-              currency,
-              status,
-              createdAt,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt,
-            };
-            const result = onChange(modelFields);
-            value = result?.total ?? value;
-          }
-          if (errors.total?.hasError) {
-            runValidationTasks("total", value);
-          }
-          setTotal(value);
-        }}
-        onBlur={() => runValidationTasks("total", total)}
-        errorMessage={errors.total?.errorMessage}
-        hasError={errors.total?.hasError}
-        {...getOverrideProps(overrides, "total")}
-      ></TextField>
-      <TextField
-        label="Currency"
-        isRequired={true}
-        isReadOnly={false}
-        value={currency}
+        value={seller_id}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency: value,
+              user_id,
+              seller_id: value,
+              order_number,
               status,
-              createdAt,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.currency ?? value;
+            value = result?.seller_id ?? value;
           }
-          if (errors.currency?.hasError) {
-            runValidationTasks("currency", value);
+          if (errors.seller_id?.hasError) {
+            runValidationTasks("seller_id", value);
           }
-          setCurrency(value);
+          setSeller_id(value);
         }}
-        onBlur={() => runValidationTasks("currency", currency)}
-        errorMessage={errors.currency?.errorMessage}
-        hasError={errors.currency?.hasError}
-        {...getOverrideProps(overrides, "currency")}
+        onBlur={() => runValidationTasks("seller_id", seller_id)}
+        errorMessage={errors.seller_id?.errorMessage}
+        hasError={errors.seller_id?.hasError}
+        {...getOverrideProps(overrides, "seller_id")}
+      ></TextField>
+      <TextField
+        label="Order number"
+        isRequired={true}
+        isReadOnly={false}
+        value={order_number}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number: value,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.order_number ?? value;
+          }
+          if (errors.order_number?.hasError) {
+            runValidationTasks("order_number", value);
+          }
+          setOrder_number(value);
+        }}
+        onBlur={() => runValidationTasks("order_number", order_number)}
+        errorMessage={errors.order_number?.errorMessage}
+        hasError={errors.order_number?.hasError}
+        {...getOverrideProps(overrides, "order_number")}
       ></TextField>
       <TextField
         label="Status"
@@ -301,15 +415,25 @@ export default function OrderUpdateForm(props) {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency,
+              user_id,
+              seller_id,
+              order_number,
               status: value,
-              createdAt,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
             value = result?.status ?? value;
@@ -324,169 +448,661 @@ export default function OrderUpdateForm(props) {
         hasError={errors.status?.hasError}
         {...getOverrideProps(overrides, "status")}
       ></TextField>
-      <TextField
-        label="Created at"
+      <TextAreaField
+        label="Items"
         isRequired={true}
         isReadOnly={false}
-        type="datetime-local"
-        value={createdAt && convertToLocal(new Date(createdAt))}
-        onChange={(e) => {
-          let value =
-            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
-          if (onChange) {
-            const modelFields = {
-              userId,
-              total,
-              currency,
-              status,
-              createdAt: value,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt,
-            };
-            const result = onChange(modelFields);
-            value = result?.createdAt ?? value;
-          }
-          if (errors.createdAt?.hasError) {
-            runValidationTasks("createdAt", value);
-          }
-          setCreatedAt(value);
-        }}
-        onBlur={() => runValidationTasks("createdAt", createdAt)}
-        errorMessage={errors.createdAt?.errorMessage}
-        hasError={errors.createdAt?.hasError}
-        {...getOverrideProps(overrides, "createdAt")}
-      ></TextField>
-      <TextField
-        label="Address"
-        isRequired={false}
-        isReadOnly={false}
-        value={address}
+        value={items}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency,
+              user_id,
+              seller_id,
+              order_number,
               status,
-              createdAt,
-              address: value,
-              phone,
-              paymentStatus,
-              updatedAt,
+              items: value,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.address ?? value;
+            value = result?.items ?? value;
           }
-          if (errors.address?.hasError) {
-            runValidationTasks("address", value);
+          if (errors.items?.hasError) {
+            runValidationTasks("items", value);
           }
-          setAddress(value);
+          setItems(value);
         }}
-        onBlur={() => runValidationTasks("address", address)}
-        errorMessage={errors.address?.errorMessage}
-        hasError={errors.address?.hasError}
-        {...getOverrideProps(overrides, "address")}
+        onBlur={() => runValidationTasks("items", items)}
+        errorMessage={errors.items?.errorMessage}
+        hasError={errors.items?.hasError}
+        {...getOverrideProps(overrides, "items")}
+      ></TextAreaField>
+      <TextField
+        label="Subtotal"
+        isRequired={true}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={subtotal}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal: value,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.subtotal ?? value;
+          }
+          if (errors.subtotal?.hasError) {
+            runValidationTasks("subtotal", value);
+          }
+          setSubtotal(value);
+        }}
+        onBlur={() => runValidationTasks("subtotal", subtotal)}
+        errorMessage={errors.subtotal?.errorMessage}
+        hasError={errors.subtotal?.hasError}
+        {...getOverrideProps(overrides, "subtotal")}
       ></TextField>
       <TextField
-        label="Phone"
+        label="Shipping cost"
         isRequired={false}
         isReadOnly={false}
-        value={phone}
+        type="number"
+        step="any"
+        value={shipping_cost}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost: value,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.shipping_cost ?? value;
+          }
+          if (errors.shipping_cost?.hasError) {
+            runValidationTasks("shipping_cost", value);
+          }
+          setShipping_cost(value);
+        }}
+        onBlur={() => runValidationTasks("shipping_cost", shipping_cost)}
+        errorMessage={errors.shipping_cost?.errorMessage}
+        hasError={errors.shipping_cost?.hasError}
+        {...getOverrideProps(overrides, "shipping_cost")}
+      ></TextField>
+      <TextField
+        label="Tax amount"
+        isRequired={false}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={tax_amount}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount: value,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.tax_amount ?? value;
+          }
+          if (errors.tax_amount?.hasError) {
+            runValidationTasks("tax_amount", value);
+          }
+          setTax_amount(value);
+        }}
+        onBlur={() => runValidationTasks("tax_amount", tax_amount)}
+        errorMessage={errors.tax_amount?.errorMessage}
+        hasError={errors.tax_amount?.hasError}
+        {...getOverrideProps(overrides, "tax_amount")}
+      ></TextField>
+      <TextField
+        label="Discount amount"
+        isRequired={false}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={discount_amount}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount: value,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.discount_amount ?? value;
+          }
+          if (errors.discount_amount?.hasError) {
+            runValidationTasks("discount_amount", value);
+          }
+          setDiscount_amount(value);
+        }}
+        onBlur={() => runValidationTasks("discount_amount", discount_amount)}
+        errorMessage={errors.discount_amount?.errorMessage}
+        hasError={errors.discount_amount?.hasError}
+        {...getOverrideProps(overrides, "discount_amount")}
+      ></TextField>
+      <TextField
+        label="Total amount"
+        isRequired={true}
+        isReadOnly={false}
+        type="number"
+        step="any"
+        value={total_amount}
+        onChange={(e) => {
+          let value = isNaN(parseFloat(e.target.value))
+            ? e.target.value
+            : parseFloat(e.target.value);
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount: value,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.total_amount ?? value;
+          }
+          if (errors.total_amount?.hasError) {
+            runValidationTasks("total_amount", value);
+          }
+          setTotal_amount(value);
+        }}
+        onBlur={() => runValidationTasks("total_amount", total_amount)}
+        errorMessage={errors.total_amount?.errorMessage}
+        hasError={errors.total_amount?.hasError}
+        {...getOverrideProps(overrides, "total_amount")}
+      ></TextField>
+      <TextField
+        label="Currency"
+        isRequired={false}
+        isReadOnly={false}
+        value={currency}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency,
+              user_id,
+              seller_id,
+              order_number,
               status,
-              createdAt,
-              address,
-              phone: value,
-              paymentStatus,
-              updatedAt,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency: value,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.phone ?? value;
+            value = result?.currency ?? value;
           }
-          if (errors.phone?.hasError) {
-            runValidationTasks("phone", value);
+          if (errors.currency?.hasError) {
+            runValidationTasks("currency", value);
           }
-          setPhone(value);
+          setCurrency(value);
         }}
-        onBlur={() => runValidationTasks("phone", phone)}
-        errorMessage={errors.phone?.errorMessage}
-        hasError={errors.phone?.hasError}
-        {...getOverrideProps(overrides, "phone")}
+        onBlur={() => runValidationTasks("currency", currency)}
+        errorMessage={errors.currency?.errorMessage}
+        hasError={errors.currency?.hasError}
+        {...getOverrideProps(overrides, "currency")}
+      ></TextField>
+      <TextAreaField
+        label="Shipping address"
+        isRequired={true}
+        isReadOnly={false}
+        value={shipping_address}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address: value,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.shipping_address ?? value;
+          }
+          if (errors.shipping_address?.hasError) {
+            runValidationTasks("shipping_address", value);
+          }
+          setShipping_address(value);
+        }}
+        onBlur={() => runValidationTasks("shipping_address", shipping_address)}
+        errorMessage={errors.shipping_address?.errorMessage}
+        hasError={errors.shipping_address?.hasError}
+        {...getOverrideProps(overrides, "shipping_address")}
+      ></TextAreaField>
+      <TextAreaField
+        label="Billing address"
+        isRequired={false}
+        isReadOnly={false}
+        value={billing_address}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address: value,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.billing_address ?? value;
+          }
+          if (errors.billing_address?.hasError) {
+            runValidationTasks("billing_address", value);
+          }
+          setBilling_address(value);
+        }}
+        onBlur={() => runValidationTasks("billing_address", billing_address)}
+        errorMessage={errors.billing_address?.errorMessage}
+        hasError={errors.billing_address?.hasError}
+        {...getOverrideProps(overrides, "billing_address")}
+      ></TextAreaField>
+      <TextField
+        label="Payment method"
+        isRequired={false}
+        isReadOnly={false}
+        value={payment_method}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method: value,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.payment_method ?? value;
+          }
+          if (errors.payment_method?.hasError) {
+            runValidationTasks("payment_method", value);
+          }
+          setPayment_method(value);
+        }}
+        onBlur={() => runValidationTasks("payment_method", payment_method)}
+        errorMessage={errors.payment_method?.errorMessage}
+        hasError={errors.payment_method?.hasError}
+        {...getOverrideProps(overrides, "payment_method")}
       ></TextField>
       <TextField
         label="Payment status"
         isRequired={false}
         isReadOnly={false}
-        value={paymentStatus}
+        value={payment_status}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency,
+              user_id,
+              seller_id,
+              order_number,
               status,
-              createdAt,
-              address,
-              phone,
-              paymentStatus: value,
-              updatedAt,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status: value,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.paymentStatus ?? value;
+            value = result?.payment_status ?? value;
           }
-          if (errors.paymentStatus?.hasError) {
-            runValidationTasks("paymentStatus", value);
+          if (errors.payment_status?.hasError) {
+            runValidationTasks("payment_status", value);
           }
-          setPaymentStatus(value);
+          setPayment_status(value);
         }}
-        onBlur={() => runValidationTasks("paymentStatus", paymentStatus)}
-        errorMessage={errors.paymentStatus?.errorMessage}
-        hasError={errors.paymentStatus?.hasError}
-        {...getOverrideProps(overrides, "paymentStatus")}
+        onBlur={() => runValidationTasks("payment_status", payment_status)}
+        errorMessage={errors.payment_status?.errorMessage}
+        hasError={errors.payment_status?.hasError}
+        {...getOverrideProps(overrides, "payment_status")}
       ></TextField>
       <TextField
-        label="Updated at"
-        isRequired={true}
+        label="Payment intent id"
+        isRequired={false}
+        isReadOnly={false}
+        value={payment_intent_id}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id: value,
+              tracking_number,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.payment_intent_id ?? value;
+          }
+          if (errors.payment_intent_id?.hasError) {
+            runValidationTasks("payment_intent_id", value);
+          }
+          setPayment_intent_id(value);
+        }}
+        onBlur={() =>
+          runValidationTasks("payment_intent_id", payment_intent_id)
+        }
+        errorMessage={errors.payment_intent_id?.errorMessage}
+        hasError={errors.payment_intent_id?.hasError}
+        {...getOverrideProps(overrides, "payment_intent_id")}
+      ></TextField>
+      <TextField
+        label="Tracking number"
+        isRequired={false}
+        isReadOnly={false}
+        value={tracking_number}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number: value,
+              created_at,
+              updated_at,
+            };
+            const result = onChange(modelFields);
+            value = result?.tracking_number ?? value;
+          }
+          if (errors.tracking_number?.hasError) {
+            runValidationTasks("tracking_number", value);
+          }
+          setTracking_number(value);
+        }}
+        onBlur={() => runValidationTasks("tracking_number", tracking_number)}
+        errorMessage={errors.tracking_number?.errorMessage}
+        hasError={errors.tracking_number?.hasError}
+        {...getOverrideProps(overrides, "tracking_number")}
+      ></TextField>
+      <TextField
+        label="Created at"
+        isRequired={false}
         isReadOnly={false}
         type="datetime-local"
-        value={updatedAt && convertToLocal(new Date(updatedAt))}
+        value={created_at && convertToLocal(new Date(created_at))}
         onChange={(e) => {
           let value =
             e.target.value === "" ? "" : new Date(e.target.value).toISOString();
           if (onChange) {
             const modelFields = {
-              userId,
-              total,
-              currency,
+              user_id,
+              seller_id,
+              order_number,
               status,
-              createdAt,
-              address,
-              phone,
-              paymentStatus,
-              updatedAt: value,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at: value,
+              updated_at,
             };
             const result = onChange(modelFields);
-            value = result?.updatedAt ?? value;
+            value = result?.created_at ?? value;
           }
-          if (errors.updatedAt?.hasError) {
-            runValidationTasks("updatedAt", value);
+          if (errors.created_at?.hasError) {
+            runValidationTasks("created_at", value);
           }
-          setUpdatedAt(value);
+          setCreated_at(value);
         }}
-        onBlur={() => runValidationTasks("updatedAt", updatedAt)}
-        errorMessage={errors.updatedAt?.errorMessage}
-        hasError={errors.updatedAt?.hasError}
-        {...getOverrideProps(overrides, "updatedAt")}
+        onBlur={() => runValidationTasks("created_at", created_at)}
+        errorMessage={errors.created_at?.errorMessage}
+        hasError={errors.created_at?.hasError}
+        {...getOverrideProps(overrides, "created_at")}
+      ></TextField>
+      <TextField
+        label="Updated at"
+        isRequired={false}
+        isReadOnly={false}
+        type="datetime-local"
+        value={updated_at && convertToLocal(new Date(updated_at))}
+        onChange={(e) => {
+          let value =
+            e.target.value === "" ? "" : new Date(e.target.value).toISOString();
+          if (onChange) {
+            const modelFields = {
+              user_id,
+              seller_id,
+              order_number,
+              status,
+              items,
+              subtotal,
+              shipping_cost,
+              tax_amount,
+              discount_amount,
+              total_amount,
+              currency,
+              shipping_address,
+              billing_address,
+              payment_method,
+              payment_status,
+              payment_intent_id,
+              tracking_number,
+              created_at,
+              updated_at: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.updated_at ?? value;
+          }
+          if (errors.updated_at?.hasError) {
+            runValidationTasks("updated_at", value);
+          }
+          setUpdated_at(value);
+        }}
+        onBlur={() => runValidationTasks("updated_at", updated_at)}
+        errorMessage={errors.updated_at?.errorMessage}
+        hasError={errors.updated_at?.hasError}
+        {...getOverrideProps(overrides, "updated_at")}
       ></TextField>
       <Flex
         justifyContent="space-between"

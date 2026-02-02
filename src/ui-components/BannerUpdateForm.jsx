@@ -11,18 +11,17 @@ import {
   Flex,
   Grid,
   SwitchField,
-  TextAreaField,
   TextField,
 } from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
-import { getCategory } from "../graphql/queries";
-import { updateCategory } from "../graphql/mutations";
+import { getBanner } from "../graphql/queries";
+import { updateBanner } from "../graphql/mutations";
 const client = generateClient();
-export default function CategoryUpdateForm(props) {
+export default function BannerUpdateForm(props) {
   const {
     id: idProp,
-    category: categoryModelProp,
+    banner: bannerModelProp,
     onSuccess,
     onError,
     onSubmit,
@@ -32,73 +31,60 @@ export default function CategoryUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    name: "",
-    slug: "",
-    description: "",
+    title: "",
+    subtitle: "",
     image_url: "",
-    parent_id: "",
-    sub_categories: "",
+    link_url: "",
+    position: "",
     is_active: false,
     sort_order: "",
     created_at: "",
   };
-  const [name, setName] = React.useState(initialValues.name);
-  const [slug, setSlug] = React.useState(initialValues.slug);
-  const [description, setDescription] = React.useState(
-    initialValues.description
-  );
+  const [title, setTitle] = React.useState(initialValues.title);
+  const [subtitle, setSubtitle] = React.useState(initialValues.subtitle);
   const [image_url, setImage_url] = React.useState(initialValues.image_url);
-  const [parent_id, setParent_id] = React.useState(initialValues.parent_id);
-  const [sub_categories, setSub_categories] = React.useState(
-    initialValues.sub_categories
-  );
+  const [link_url, setLink_url] = React.useState(initialValues.link_url);
+  const [position, setPosition] = React.useState(initialValues.position);
   const [is_active, setIs_active] = React.useState(initialValues.is_active);
   const [sort_order, setSort_order] = React.useState(initialValues.sort_order);
   const [created_at, setCreated_at] = React.useState(initialValues.created_at);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = categoryRecord
-      ? { ...initialValues, ...categoryRecord }
+    const cleanValues = bannerRecord
+      ? { ...initialValues, ...bannerRecord }
       : initialValues;
-    setName(cleanValues.name);
-    setSlug(cleanValues.slug);
-    setDescription(cleanValues.description);
+    setTitle(cleanValues.title);
+    setSubtitle(cleanValues.subtitle);
     setImage_url(cleanValues.image_url);
-    setParent_id(cleanValues.parent_id);
-    setSub_categories(
-      typeof cleanValues.sub_categories === "string" ||
-        cleanValues.sub_categories === null
-        ? cleanValues.sub_categories
-        : JSON.stringify(cleanValues.sub_categories)
-    );
+    setLink_url(cleanValues.link_url);
+    setPosition(cleanValues.position);
     setIs_active(cleanValues.is_active);
     setSort_order(cleanValues.sort_order);
     setCreated_at(cleanValues.created_at);
     setErrors({});
   };
-  const [categoryRecord, setCategoryRecord] = React.useState(categoryModelProp);
+  const [bannerRecord, setBannerRecord] = React.useState(bannerModelProp);
   React.useEffect(() => {
     const queryData = async () => {
       const record = idProp
         ? (
             await client.graphql({
-              query: getCategory.replaceAll("__typename", ""),
+              query: getBanner.replaceAll("__typename", ""),
               variables: { id: idProp },
             })
-          )?.data?.getCategory
-        : categoryModelProp;
-      setCategoryRecord(record);
+          )?.data?.getBanner
+        : bannerModelProp;
+      setBannerRecord(record);
     };
     queryData();
-  }, [idProp, categoryModelProp]);
-  React.useEffect(resetStateValues, [categoryRecord]);
+  }, [idProp, bannerModelProp]);
+  React.useEffect(resetStateValues, [bannerRecord]);
   const validations = {
-    name: [{ type: "Required" }],
-    slug: [],
-    description: [],
-    image_url: [],
-    parent_id: [],
-    sub_categories: [{ type: "JSON" }],
+    title: [{ type: "Required" }],
+    subtitle: [],
+    image_url: [{ type: "Required" }],
+    link_url: [],
+    position: [],
     is_active: [],
     sort_order: [],
     created_at: [],
@@ -146,12 +132,11 @@ export default function CategoryUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
-          slug: slug ?? null,
-          description: description ?? null,
-          image_url: image_url ?? null,
-          parent_id: parent_id ?? null,
-          sub_categories: sub_categories ?? null,
+          title,
+          subtitle: subtitle ?? null,
+          image_url,
+          link_url: link_url ?? null,
+          position: position ?? null,
           is_active: is_active ?? null,
           sort_order: sort_order ?? null,
           created_at: created_at ?? null,
@@ -185,10 +170,10 @@ export default function CategoryUpdateForm(props) {
             }
           });
           await client.graphql({
-            query: updateCategory.replaceAll("__typename", ""),
+            query: updateBanner.replaceAll("__typename", ""),
             variables: {
               input: {
-                id: categoryRecord.id,
+                id: bannerRecord.id,
                 ...modelFields,
               },
             },
@@ -203,120 +188,85 @@ export default function CategoryUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "CategoryUpdateForm")}
+      {...getOverrideProps(overrides, "BannerUpdateForm")}
       {...rest}
     >
       <TextField
-        label="Name"
+        label="Title"
         isRequired={true}
         isReadOnly={false}
-        value={name}
+        value={title}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name: value,
-              slug,
-              description,
+              title: value,
+              subtitle,
               image_url,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active,
               sort_order,
               created_at,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.title ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.title?.hasError) {
+            runValidationTasks("title", value);
           }
-          setName(value);
+          setTitle(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("title", title)}
+        errorMessage={errors.title?.errorMessage}
+        hasError={errors.title?.hasError}
+        {...getOverrideProps(overrides, "title")}
       ></TextField>
       <TextField
-        label="Slug"
+        label="Subtitle"
         isRequired={false}
         isReadOnly={false}
-        value={slug}
+        value={subtitle}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name,
-              slug: value,
-              description,
+              title,
+              subtitle: value,
               image_url,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active,
               sort_order,
               created_at,
             };
             const result = onChange(modelFields);
-            value = result?.slug ?? value;
+            value = result?.subtitle ?? value;
           }
-          if (errors.slug?.hasError) {
-            runValidationTasks("slug", value);
+          if (errors.subtitle?.hasError) {
+            runValidationTasks("subtitle", value);
           }
-          setSlug(value);
+          setSubtitle(value);
         }}
-        onBlur={() => runValidationTasks("slug", slug)}
-        errorMessage={errors.slug?.errorMessage}
-        hasError={errors.slug?.hasError}
-        {...getOverrideProps(overrides, "slug")}
-      ></TextField>
-      <TextField
-        label="Description"
-        isRequired={false}
-        isReadOnly={false}
-        value={description}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              name,
-              slug,
-              description: value,
-              image_url,
-              parent_id,
-              sub_categories,
-              is_active,
-              sort_order,
-              created_at,
-            };
-            const result = onChange(modelFields);
-            value = result?.description ?? value;
-          }
-          if (errors.description?.hasError) {
-            runValidationTasks("description", value);
-          }
-          setDescription(value);
-        }}
-        onBlur={() => runValidationTasks("description", description)}
-        errorMessage={errors.description?.errorMessage}
-        hasError={errors.description?.hasError}
-        {...getOverrideProps(overrides, "description")}
+        onBlur={() => runValidationTasks("subtitle", subtitle)}
+        errorMessage={errors.subtitle?.errorMessage}
+        hasError={errors.subtitle?.hasError}
+        {...getOverrideProps(overrides, "subtitle")}
       ></TextField>
       <TextField
         label="Image url"
-        isRequired={false}
+        isRequired={true}
         isReadOnly={false}
         value={image_url}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url: value,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active,
               sort_order,
               created_at,
@@ -335,69 +285,67 @@ export default function CategoryUpdateForm(props) {
         {...getOverrideProps(overrides, "image_url")}
       ></TextField>
       <TextField
-        label="Parent id"
+        label="Link url"
         isRequired={false}
         isReadOnly={false}
-        value={parent_id}
+        value={link_url}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url,
-              parent_id: value,
-              sub_categories,
+              link_url: value,
+              position,
               is_active,
               sort_order,
               created_at,
             };
             const result = onChange(modelFields);
-            value = result?.parent_id ?? value;
+            value = result?.link_url ?? value;
           }
-          if (errors.parent_id?.hasError) {
-            runValidationTasks("parent_id", value);
+          if (errors.link_url?.hasError) {
+            runValidationTasks("link_url", value);
           }
-          setParent_id(value);
+          setLink_url(value);
         }}
-        onBlur={() => runValidationTasks("parent_id", parent_id)}
-        errorMessage={errors.parent_id?.errorMessage}
-        hasError={errors.parent_id?.hasError}
-        {...getOverrideProps(overrides, "parent_id")}
+        onBlur={() => runValidationTasks("link_url", link_url)}
+        errorMessage={errors.link_url?.errorMessage}
+        hasError={errors.link_url?.hasError}
+        {...getOverrideProps(overrides, "link_url")}
       ></TextField>
-      <TextAreaField
-        label="Sub categories"
+      <TextField
+        label="Position"
         isRequired={false}
         isReadOnly={false}
-        value={sub_categories}
+        value={position}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url,
-              parent_id,
-              sub_categories: value,
+              link_url,
+              position: value,
               is_active,
               sort_order,
               created_at,
             };
             const result = onChange(modelFields);
-            value = result?.sub_categories ?? value;
+            value = result?.position ?? value;
           }
-          if (errors.sub_categories?.hasError) {
-            runValidationTasks("sub_categories", value);
+          if (errors.position?.hasError) {
+            runValidationTasks("position", value);
           }
-          setSub_categories(value);
+          setPosition(value);
         }}
-        onBlur={() => runValidationTasks("sub_categories", sub_categories)}
-        errorMessage={errors.sub_categories?.errorMessage}
-        hasError={errors.sub_categories?.hasError}
-        {...getOverrideProps(overrides, "sub_categories")}
-      ></TextAreaField>
+        onBlur={() => runValidationTasks("position", position)}
+        errorMessage={errors.position?.errorMessage}
+        hasError={errors.position?.hasError}
+        {...getOverrideProps(overrides, "position")}
+      ></TextField>
       <SwitchField
         label="Is active"
         defaultChecked={false}
@@ -407,12 +355,11 @@ export default function CategoryUpdateForm(props) {
           let value = e.target.checked;
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active: value,
               sort_order,
               created_at,
@@ -443,12 +390,11 @@ export default function CategoryUpdateForm(props) {
             : parseInt(e.target.value);
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active,
               sort_order: value,
               created_at,
@@ -477,12 +423,11 @@ export default function CategoryUpdateForm(props) {
             e.target.value === "" ? "" : new Date(e.target.value).toISOString();
           if (onChange) {
             const modelFields = {
-              name,
-              slug,
-              description,
+              title,
+              subtitle,
               image_url,
-              parent_id,
-              sub_categories,
+              link_url,
+              position,
               is_active,
               sort_order,
               created_at: value,
@@ -511,7 +456,7 @@ export default function CategoryUpdateForm(props) {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || categoryModelProp)}
+          isDisabled={!(idProp || bannerModelProp)}
           {...getOverrideProps(overrides, "ResetButton")}
         ></Button>
         <Flex
@@ -523,7 +468,7 @@ export default function CategoryUpdateForm(props) {
             type="submit"
             variation="primary"
             isDisabled={
-              !(idProp || categoryModelProp) ||
+              !(idProp || bannerModelProp) ||
               Object.values(errors).some((e) => e?.hasError)
             }
             {...getOverrideProps(overrides, "SubmitButton")}
