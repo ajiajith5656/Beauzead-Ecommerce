@@ -13,6 +13,8 @@
     "@aws-amplify/auth": "^6.18.0",
     "@aws-amplify/core": "^6.16.0",
     "@aws-amplify/ui-react": "^6.13.2",
+    "@aws-sdk/client-dynamodb": "^3.981.0",
+    "@aws-sdk/lib-dynamodb": "^3.981.0",
     "@stripe/react-stripe-js": "^5.6.0",
     "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.93.2",
