@@ -1,9 +1,4 @@
 version: 1
-backend:
-  phases:
-    build:
-      commands:
-        - echo "Backend already deployed - skipping backend build"
 frontend:
   phases:
     preBuild:
