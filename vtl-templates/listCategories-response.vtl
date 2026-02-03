@@ -1,0 +1,49 @@
+#set($items = [])
+#foreach($item in $ctx.result.items)
+  #set($category = {})
+  $util.qr($category.put("id", $item.categoryId))
+  $util.qr($category.put("categoryId", $item.categoryId))
+  $util.qr($category.put("name", $item.name))
+  #if($item.slug)
+    $util.qr($category.put("slug", $item.slug))
+  #end
+  #if($item.description)
+    $util.qr($category.put("description", $item.description))
+  #end
+  #if($item.image_url)
+    $util.qr($category.put("image_url", $item.image_url))
+  #end
+  #if($item.parent_id)
+    $util.qr($category.put("parent_id", $item.parent_id))
+  #end
+  #if($item.subCategories)
+    #set($subCats = [])
+    #foreach($sub in $item.subCategories)
+      #if($sub.getClass().getSimpleName() == "String")
+        #set($subCat = {})
+        $util.qr($subCat.put("id", $util.autoId()))
+        $util.qr($subCat.put("name", $sub))
+        $util.qr($subCats.add($subCat))
+      #else
+        $util.qr($subCats.add($sub))
+      #end
+    #end
+    $util.qr($category.put("sub_categories", $subCats))
+  #end
+  #if($item.is_active != $null)
+    $util.qr($category.put("is_active", $item.is_active))
+  #else
+    $util.qr($category.put("is_active", true))
+  #end
+  #if($item.sort_order)
+    $util.qr($category.put("sort_order", $item.sort_order))
+  #end
+  #if($item.createdAt)
+    $util.qr($category.put("created_at", $item.createdAt))
+  #end
+  #if($item.updatedAt)
+    $util.qr($category.put("updated_at", $item.updatedAt))
+  #end
+  $util.qr($items.add($category))
+#end
+$util.toJson($items)

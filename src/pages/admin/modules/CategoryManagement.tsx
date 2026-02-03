@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, ChevronDown, ChevronRight, Save, X } from 'lucide-react';
+import { Plus, Edit, Trash2, ChevronDown, ChevronRight, Save, X, Upload } from 'lucide-react';
 import { generateClient } from 'aws-amplify/api';
+import { uploadData } from 'aws-amplify/storage';
 
 const client = generateClient();
 
@@ -100,13 +101,15 @@ export const CategoryManagement: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState({
     name: '',
-    slug: '',
-    description: '',
     image_url: '',
-    is_active: true,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-  const [newSubCategory, setNewSubCategory] = useState({ name: '', description: '' });
+  const [newSubCategory, setNewSubCategory] = useState({ name: '', image_url: '' });
+  const [subImageFile, setSubImageFile] = useState<File | null>(null);
+  const [subImagePreview, setSubImagePreview] = useState<string>('');
 
   useEffect(() => {
     fetchCategories();
@@ -131,6 +134,56 @@ export const CategoryManagement: React.FC = () => {
     }
   };
 
+  const uploadImage = async (file: File, folder: string = 'categories'): Promise<string> => {
+    try {
+      const fileName = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+      await uploadData({
+        key: fileName,
+        data: file,
+        options: {
+          contentType: file.type,
+        }
+      }).result;
+      
+      return `https://beauzeads3bucket234253-dev.s3.us-east-1.amazonaws.com/public/${fileName}`;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+      setSubImageFile(file);
+      setSubImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSave = async () => {
     try {
       if (!formData.name.trim()) {
@@ -138,12 +191,23 @@ export const CategoryManagement: React.FC = () => {
         return;
       }
 
+      if (!editingId && !imageFile) {
+        setError('Category image is required');
+        return;
+      }
+
+      setUploadingImage(true);
+      let imageUrl = formData.image_url;
+      
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
       const input = {
         name: formData.name,
-        slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
-        description: formData.description,
-        image_url: formData.image_url,
-        is_active: formData.is_active,
+        slug: formData.name.toLowerCase().replace(/\s+/g, '-'),
+        image_url: imageUrl,
+        is_active: true,
         sub_categories: subCategories,
       };
 
@@ -168,6 +232,8 @@ export const CategoryManagement: React.FC = () => {
     } catch (err: any) {
       setError(err.message || 'Failed to save category');
       console.error('Error saving category:', err);
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -191,11 +257,9 @@ export const CategoryManagement: React.FC = () => {
     setEditingId(category.categoryId);
     setFormData({
       name: category.name,
-      slug: category.slug || '',
-      description: category.description || '',
       image_url: category.image_url || '',
-      is_active: category.is_active,
     });
+    setImagePreview(category.image_url || '');
     setSubCategories(category.sub_categories || []);
     setShowForm(true);
   };
@@ -203,13 +267,14 @@ export const CategoryManagement: React.FC = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      slug: '',
-      description: '',
       image_url: '',
-      is_active: true,
     });
+    setImageFile(null);
+    setImagePreview('');
     setSubCategories([]);
-    setNewSubCategory({ name: '', description: '' });
+    setNewSubCategory({ name: '', image_url: '' });
+    setSubImageFile(null);
+    setSubImagePreview('');
   };
 
   const toggleExpand = (categoryId: string) => {
@@ -222,21 +287,39 @@ export const CategoryManagement: React.FC = () => {
     setExpandedCategories(newExpanded);
   };
 
-  const addSubCategory = () => {
-    if (!newSubCategory.name.trim()) return;
+  const addSubCategory = async () => {
+    if (!newSubCategory.name.trim()) {
+      setError('Subcategory name is required');
+      return;
+    }
     
-    // Generate truly unique ID using timestamp + random string
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    const subCat: SubCategory = {
-      id: uniqueId,
-      name: newSubCategory.name,
-      slug: newSubCategory.name.toLowerCase().replace(/\s+/g, '-'),
-      description: newSubCategory.description,
-    };
-    
-    setSubCategories([...subCategories, subCat]);
-    setNewSubCategory({ name: '', description: '' });
+    if (!subImageFile) {
+      setError('Subcategory image is required');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      const imageUrl = await uploadImage(subImageFile, 'subcategories');
+      
+      const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      const subCat: SubCategory = {
+        id: uniqueId,
+        name: newSubCategory.name,
+        slug: newSubCategory.name.toLowerCase().replace(/\s+/g, '-'),
+        image_url: imageUrl,
+      };
+      
+      setSubCategories([...subCategories, subCat]);
+      setNewSubCategory({ name: '', image_url: '' });
+      setSubImageFile(null);
+      setSubImagePreview('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to add subcategory');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const removeSubCategory = (id: string) => {
@@ -418,60 +501,33 @@ export const CategoryManagement: React.FC = () => {
                 />
               </div>
 
-              {/* Slug */}
+              {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Slug (URL-friendly name)
+                  Category Image *
                 </label>
-                <input
-                  type="text"
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
-                  placeholder="Auto-generated from name"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
-                  placeholder="Brief description of the category"
-                />
-              </div>
-
-              {/* Image URL */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              {/* Active Status */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  checked={formData.is_active}
-                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4"
-                />
-                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
-                  Active (visible to users)
-                </label>
+                <div className="mt-1 flex items-center gap-4">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                      <p className="mb-2 text-sm text-gray-500">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF (MAX. 5MB)</p>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                </div>
+                {imagePreview && (
+                  <div className="mt-2">
+                    <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
+                  </div>
+                )}
               </div>
 
               {/* Subcategories Section */}
@@ -485,11 +541,11 @@ export const CategoryManagement: React.FC = () => {
                       key={sub.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                     >
-                      <div>
-                        <h4 className="font-medium text-gray-900">{sub.name}</h4>
-                        {sub.description && (
-                          <p className="text-sm text-gray-600">{sub.description}</p>
+                      <div className="flex items-center gap-3">
+                        {sub.image_url && (
+                          <img src={sub.image_url} alt={sub.name} className="w-12 h-12 object-cover rounded" />
                         )}
+                        <h4 className="font-medium text-gray-900">{sub.name}</h4>
                       </div>
                       <button
                         onClick={() => removeSubCategory(sub.id)}
@@ -502,52 +558,64 @@ export const CategoryManagement: React.FC = () => {
                 </div>
 
                 {/* Add New Subcategory */}
-                <div className="space-y-2">
+                <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
                   <input
                     type="text"
+                    placeholder="Subcategory name *"
                     value={newSubCategory.name}
-                    onChange={(e) =>
-                      setNewSubCategory({ ...newSubCategory, name: e.target.value })
-                    }
+                    onChange={(e) => setNewSubCategory({ ...newSubCategory, name: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
-                    placeholder="Subcategory name"
                   />
-                  <input
-                    type="text"
-                    value={newSubCategory.description}
-                    onChange={(e) =>
-                      setNewSubCategory({ ...newSubCategory, description: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
-                    placeholder="Subcategory description (optional)"
-                  />
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subcategory Image *
+                    </label>
+                    <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
+                      <div className="flex flex-col items-center justify-center">
+                        <Upload className="w-6 h-6 mb-1 text-gray-500" />
+                        <p className="text-xs text-gray-500">Click to upload image</p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleSubImageChange}
+                      />
+                    </label>
+                    {subImagePreview && (
+                      <img src={subImagePreview} alt="Sub Preview" className="mt-2 w-20 h-20 object-cover rounded" />
+                    )}
+                  </div>
+                  
                   <button
                     onClick={addSubCategory}
-                    disabled={!newSubCategory.name.trim()}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                    disabled={uploadingImage}
+                    className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50"
                   >
-                    <Plus size={18} />
-                    Add Subcategory
+                    {uploadingImage ? 'Uploading...' : 'Add Subcategory'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end sticky bottom-0 bg-white">
+            <div className="flex justify-end gap-4 p-6 border-t border-gray-200">
               <button
-                onClick={() => setShowForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                onClick={() => {
+                  setShowForm(false);
+                  resetForm();
+                }}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                disabled={!formData.name.trim()}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2"
+                disabled={uploadingImage}
+                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50"
               >
                 <Save size={18} />
-                {editingId ? 'Update' : 'Create'} Category
+                {uploadingImage ? 'Uploading...' : editingId ? 'Update Category' : 'Create Category'}
               </button>
             </div>
           </div>
