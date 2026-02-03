@@ -102,8 +102,14 @@ type ProductConnection {
   nextToken: String
 }
 
+type UserConnection {
+  items: [User]
+  nextToken: String
+}
+
 type Query {
   getUser(id: ID!): User
+  listUsers(limit: Int, nextToken: String): UserConnection
   getCategory(id: ID!): Category
   listCategories: [Category]
   getProduct(id: ID!): Product
@@ -113,6 +119,10 @@ type Query {
 }
 
 type Mutation {
+  banUser(id: ID!): User
+  unbanUser(id: ID!): User
+  deleteUser(id: ID!): Boolean
+  
   createCategory(input: CategoryInput!): Category
   updateCategory(id: ID!, input: CategoryInput!): Category
   deleteCategory(id: ID!): Boolean

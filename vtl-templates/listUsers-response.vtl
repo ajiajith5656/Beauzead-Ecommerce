@@ -1,0 +1,50 @@
+#set($items = [])
+#foreach($item in $ctx.result.items)
+  #set($user = {})
+  $util.qr($user.put("id", $item.userId))
+  $util.qr($user.put("userId", $item.userId))
+  $util.qr($user.put("email", $item.email))
+  #if($item.first_name)
+    $util.qr($user.put("first_name", $item.first_name))
+  #end
+  #if($item.last_name)
+    $util.qr($user.put("last_name", $item.last_name))
+  #end
+  #if($item.phone)
+    $util.qr($user.put("phone", $item.phone))
+  #end
+  #if($item.address)
+    $util.qr($user.put("address", $item.address))
+  #end
+  #if($item.profile_type)
+    $util.qr($user.put("profile_type", $item.profile_type))
+  #end
+  #if($item.avatar_url)
+    $util.qr($user.put("avatar_url", $item.avatar_url))
+  #end
+  #if($item.is_verified != $null)
+    $util.qr($user.put("is_verified", $item.is_verified))
+  #end
+  #if($item.is_banned != $null)
+    $util.qr($user.put("is_banned", $item.is_banned))
+  #end
+  #if($item.total_purchases)
+    $util.qr($user.put("total_purchases", $item.total_purchases))
+  #end
+  #if($item.cancellations)
+    $util.qr($user.put("cancellations", $item.cancellations))
+  #end
+  #if($item.created_at)
+    $util.qr($user.put("created_at", $item.created_at))
+  #end
+  #if($item.updated_at)
+    $util.qr($user.put("updated_at", $item.updated_at))
+  #end
+  $util.qr($items.add($user))
+#end
+{
+  "items": $util.toJson($items),
+  #if($ctx.result.nextToken)
+    "nextToken": "$ctx.result.nextToken"
+  #end
+}

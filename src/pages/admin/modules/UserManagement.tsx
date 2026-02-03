@@ -1,8 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import adminApiService from '../../../services/admin/adminApiService';
-import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
-import { Search, Trash2, Ban } from 'lucide-react';
+import { generateClient } from 'aws-amplify/api';
+import { Loading } from '../components/StatusIndicators';
+import { Search, Trash2, Ban, X } from 'lucide-react';
 import type { User } from '../../../types';
+
+const client = generateClient();
+
+const listUsersQuery = `
+  query ListUsers($limit: Int, $nextToken: String) {
+    listUsers(limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        userId
+        email
+        first_name
+        last_name
+        phone
+        address
+        profile_type
+        avatar_url
+        is_verified
+        is_banned
+        total_purchases
+        cancellations
+        created_at
+        updated_at
+      }
+      nextToken
+    }
+  }
+`;
+
+const banUserMutation = `
+  mutation BanUser($id: ID!) {
+    banUser(id: $id) {
+      id
+      userId
+      is_banned
+      updated_at
+    }
+  }
+`;
+
+const unbanUserMutation = `
+  mutation UnbanUser($id: ID!) {
+    unbanUser(id: $id) {
+      id
+      userId
+      is_banned
+      updated_at
+    }
+  }
+`;
+
+const deleteUserMutation = `
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id)
+  }
+`;
 
 interface PaginationState {
   page: number;
@@ -17,9 +72,10 @@ export const UserManagement: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfileType, setSelectedProfileType] = useState<string>('');
+  const [nextToken, setNextToken] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
-    limit: 10,
+    limit: 50,
     total: 0,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -27,25 +83,29 @@ export const UserManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [pagination.page, searchTerm, selectedProfileType]);
+  }, []);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const result = await adminApiService.getAllUsers(
-        pagination.page,
-        pagination.limit,
-        searchTerm,
-        selectedProfileType
-      );
-      if (result) {
-        setUsers(result.users);
-        setPagination((prev) => ({ ...prev, total: result.total }));
+      const result: any = await client.graphql({
+        query: listUsersQuery,
+        variables: {
+          limit: pagination.limit,
+          nextToken: nextToken,
+        },
+      });
+
+      if (result.data?.listUsers) {
+        const items = result.data.listUsers.items || [];
+        setUsers(items);
+        setNextToken(result.data.listUsers.nextToken);
+        setPagination((prev) => ({ ...prev, total: items.length }));
         setError(null);
       }
-    } catch (err) {
-      setError('Failed to load users');
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load users');
+      console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
     }
@@ -54,13 +114,15 @@ export const UserManagement: React.FC = () => {
   const handleBanUser = async (userId: string) => {
     try {
       setActionLoading(userId);
-      const success = await adminApiService.banUser(userId);
-      if (success) {
-        setSuccess('User banned successfully');
-        fetchUsers();
-      }
-    } catch (err) {
-      setError('Failed to ban user');
+      await client.graphql({
+        query: banUserMutation,
+        variables: { id: userId },
+      });
+      setSuccess('User banned successfully');
+      await fetchUsers();
+    } catch (err: any) {
+      setError(err.message || 'Failed to ban user');
+      console.error('Error banning user:', err);
     } finally {
       setActionLoading(null);
     }
@@ -69,13 +131,15 @@ export const UserManagement: React.FC = () => {
   const handleUnbanUser = async (userId: string) => {
     try {
       setActionLoading(userId);
-      const success = await adminApiService.unbanUser(userId);
-      if (success) {
-        setSuccess('User unbanned successfully');
-        fetchUsers();
-      }
-    } catch (err) {
-      setError('Failed to unban user');
+      await client.graphql({
+        query: unbanUserMutation,
+        variables: { id: userId },
+      });
+      setSuccess('User unbanned successfully');
+      await fetchUsers();
+    } catch (err: any) {
+      setError(err.message || 'Failed to unban user');
+      console.error('Error unbanning user:', err);
     } finally {
       setActionLoading(null);
     }
@@ -84,53 +148,64 @@ export const UserManagement: React.FC = () => {
   const handleDeleteUser = async (userId: string) => {
     try {
       setActionLoading(userId);
-      const success = await adminApiService.deleteUser(userId);
-      if (success) {
-        setSuccess('User deleted successfully');
-        fetchUsers();
-      }
-    } catch (err) {
-      setError('Failed to delete user');
+      await client.graphql({
+        query: deleteUserMutation,
+        variables: { id: userId },
+      });
+      setSuccess('User deleted successfully');
+      await fetchUsers();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete user');
+      console.error('Error deleting user:', err);
     } finally {
       setActionLoading(null);
       setShowDeleteConfirm(null);
     }
   };
 
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  // Client-side filtering
+  const filteredUsers = users.filter(user => {
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase();
+    const matchesSearch = !searchTerm || 
+      fullName.includes(searchTerm.toLowerCase()) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesProfileType = !selectedProfileType || user.profile_type === selectedProfileType;
+
+    return matchesSearch && matchesProfileType;
+  });
+
+  const totalPages = Math.ceil(filteredUsers.length / pagination.limit);
 
   if (loading) return <Loading message="Loading users..." />;
 
   return (
     <div className="space-y-4">
+      {/* Alerts */}
       {error && (
-        <div className="flex gap-2">
-          <ErrorMessage message={error} />
-          <button
-            onClick={() => setError(null)}
-            className="text-red-600 hover:text-red-800"
-          >
-            ✕
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-center">
+          <span className="text-red-800">{error}</span>
+          <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800">
+            <X size={18} />
           </button>
         </div>
       )}
 
       {success && (
-        <div className="flex gap-2">
-          <SuccessMessage message={success} />
-          <button
-            onClick={() => setSuccess(null)}
-            className="text-green-600 hover:text-green-800"
-          >
-            ✕
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex justify-between items-center">
+          <span className="text-green-800">{success}</span>
+          <button onClick={() => setSuccess(null)} className="text-green-600 hover:text-green-800">
+            <X size={18} />
           </button>
         </div>
       )}
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <p className="text-gray-600">Total Users: {pagination.total}</p>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
+          <p className="text-gray-600">Total Users: {filteredUsers.length}</p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -146,7 +221,7 @@ export const UserManagement: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setPagination((prev) => ({ ...prev, page: 1 }));
               }}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
 
@@ -161,6 +236,8 @@ export const UserManagement: React.FC = () => {
             <option value="">All Profile Types</option>
             <option value="member">Member</option>
             <option value="prime">Prime</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
           </select>
         </div>
       </div>
@@ -180,21 +257,27 @@ export const UserManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.length > 0 ? (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.full_name || 'N/A'}</td>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user.userId || user.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      {`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         user.profile_type === 'prime'
                           ? 'bg-purple-100 text-purple-800'
+                          : user.profile_type === 'admin'
+                          ? 'bg-red-100 text-red-800'
+                          : user.profile_type === 'seller'
+                          ? 'bg-orange-100 text-orange-800'
                           : 'bg-blue-100 text-blue-800'
                       }`}>
                         {user.profile_type?.toUpperCase() || 'MEMBER'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">${user.total_purchases?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{user.total_purchases || 0}</td>
                     <td className="px-6 py-4 text-sm">
                       {user.is_banned ? (
                         <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
@@ -211,22 +294,26 @@ export const UserManagement: React.FC = () => {
                         <button
                           onClick={() => {
                             if (user.is_banned) {
-                              handleUnbanUser(user.id);
+                              handleUnbanUser(user.userId || user.id);
                             } else {
-                              handleBanUser(user.id);
+                              handleBanUser(user.userId || user.id);
                             }
                           }}
-                          disabled={actionLoading === user.id}
-                          className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors disabled:opacity-50"
-                          title={user.is_banned ? 'Unban' : 'Ban'}
+                          disabled={actionLoading === (user.userId || user.id)}
+                          className={`p-2 rounded-lg disabled:opacity-50 ${
+                            user.is_banned
+                              ? 'text-green-600 hover:bg-green-50'
+                              : 'text-orange-600 hover:bg-orange-50'
+                          }`}
+                          title={user.is_banned ? 'Unban User' : 'Ban User'}
                         >
                           <Ban size={18} />
                         </button>
                         <button
-                          onClick={() => setShowDeleteConfirm(user.id)}
-                          disabled={actionLoading === user.id}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                          title="Delete"
+                          onClick={() => setShowDeleteConfirm(user.userId || user.id)}
+                          disabled={actionLoading === (user.userId || user.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                          title="Delete User"
                         >
                           <Trash2 size={18} />
                         </button>

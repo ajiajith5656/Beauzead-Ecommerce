@@ -1,17 +1,23 @@
 export interface User {
   id: string;
+  userId?: string;
   email: string;
   role: 'user' | 'seller' | 'admin';
+  first_name?: string;
+  last_name?: string;
   full_name?: string;
   created_at: string;
   approved?: boolean;
   phone?: string;
   address?: string;
-  profile_type?: 'member' | 'prime';
+  profile_type?: 'member' | 'prime' | 'admin' | 'seller';
+  avatar_url?: string;
+  is_verified?: boolean;
   total_purchases?: number;
   cancellations?: number;
   is_banned?: boolean;
   signup_date?: string;
+  updated_at?: string;
 }
 
 export interface Admin {
