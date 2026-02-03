@@ -1,9 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import adminApiService from '../../../services/admin/adminApiService';
-import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
-import { Search, Eye, CheckCircle, XCircle, Power, Plus } from 'lucide-react';
+import { generateClient } from 'aws-amplify/api';
+import { Search, Eye, CheckCircle, XCircle, Power, Plus, X } from 'lucide-react';
 import type { Product } from '../../../types';
+
+const client = generateClient();
+
+const listProductsQuery = `
+  query ListProducts($limit: Int, $nextToken: String) {
+    listProducts(limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        productId
+        name
+        slug
+        description
+        category
+        price
+        discount_price
+        stock
+        sku
+        brand
+        images
+        seller_id
+        approval_status
+        is_active
+        is_featured
+        tags
+        created_at
+        updated_at
+      }
+      nextToken
+    }
+  }
+`;
+
+const approveProductMutation = `
+  mutation ApproveProduct($id: ID!) {
+    approveProduct(id: $id) {
+      id
+      productId
+      approval_status
+      updated_at
+    }
+  }
+`;
+
+const rejectProductMutation = `
+  mutation RejectProduct($id: ID!) {
+    rejectProduct(id: $id) {
+      id
+      productId
+      approval_status
+      updated_at
+    }
+  }
+`;
+
+const toggleProductStatusMutation = `
+  mutation ToggleProductStatus($id: ID!) {
+    toggleProductStatus(id: $id) {
+      id
+      productId
+      is_active
+      updated_at
+    }
+  }
+`;
 
 interface PaginationState {
   page: number;
@@ -23,34 +86,38 @@ export const ProductManagement: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [nextToken, setNextToken] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     page: 1,
-    limit: 10,
+    limit: 50,
     total: 0,
   });
 
   useEffect(() => {
     fetchProducts();
-  }, [pagination.page, searchTerm, approvalFilter, categoryFilter]);
+  }, []);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const result = await adminApiService.getAllProducts(
-        pagination.page,
-        pagination.limit,
-        searchTerm,
-        approvalFilter,
-        categoryFilter
-      );
-      if (result) {
-        setProducts(result.products);
-        setPagination((prev) => ({ ...prev, total: result.total }));
+      const result: any = await client.graphql({
+        query: listProductsQuery,
+        variables: {
+          limit: pagination.limit,
+          nextToken: nextToken,
+        },
+      });
+
+      if (result.data?.listProducts) {
+        const items = result.data.listProducts.items || [];
+        setProducts(items);
+        setNextToken(result.data.listProducts.nextToken);
+        setPagination((prev) => ({ ...prev, total: items.length }));
         setError(null);
       }
-    } catch (err) {
-      setError('Failed to load products');
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load products');
+      console.error('Error fetching products:', err);
     } finally {
       setLoading(false);
     }
@@ -59,13 +126,15 @@ export const ProductManagement: React.FC = () => {
   const handleApprove = async (productId: string) => {
     try {
       setActionLoading(productId);
-      const success = await adminApiService.approveProduct(productId);
-      if (success) {
-        setSuccess('Product approved successfully');
-        fetchProducts();
-      }
-    } catch (err) {
-      setError('Failed to approve product');
+      await client.graphql({
+        query: approveProductMutation,
+        variables: { id: productId },
+      });
+      setSuccess('Product approved successfully');
+      await fetchProducts();
+    } catch (err: any) {
+      setError(err.message || 'Failed to approve product');
+      console.error('Error approving product:', err);
     } finally {
       setActionLoading(null);
     }
@@ -74,50 +143,77 @@ export const ProductManagement: React.FC = () => {
   const handleReject = async (productId: string) => {
     try {
       setActionLoading(productId);
-      const success = await adminApiService.rejectProduct(productId);
-      if (success) {
-        setSuccess('Product rejected');
-        fetchProducts();
-      }
-    } catch (err) {
-      setError('Failed to reject product');
+      await client.graphql({
+        query: rejectProductMutation,
+        variables: { id: productId },
+      });
+      setSuccess('Product rejected');
+      await fetchProducts();
+    } catch (err: any) {
+      setError(err.message || 'Failed to reject product');
+      console.error('Error rejecting product:', err);
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleDisable = async (productId: string) => {
+  const handleToggleStatus = async (productId: string) => {
     try {
       setActionLoading(productId);
-      const result = await adminApiService.disableProduct(productId);
-      if (result) {
-        setSuccess('Product disabled');
-        fetchProducts();
-      }
-    } catch (err) {
-      setError('Failed to disable product');
+      await client.graphql({
+        query: toggleProductStatusMutation,
+        variables: { id: productId },
+      });
+      setSuccess('Product status updated');
+      await fetchProducts();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update product status');
+      console.error('Error toggling status:', err);
     } finally {
       setActionLoading(null);
     }
   };
 
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  // Client-side filtering
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = !searchTerm || 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesApproval = !approvalFilter || product.approval_status === approvalFilter;
+    const matchesCategory = !categoryFilter || product.category === categoryFilter;
 
-  if (loading) return <Loading message="Loading products..." />;
+    return matchesSearch && matchesApproval && matchesCategory;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / pagination.limit);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">Loading products...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
+      {/* Alerts */}
       {error && (
-        <div className="flex gap-2">
-          <ErrorMessage message={error} />
-          <button onClick={() => setError(null)}>✕</button>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex justify-between items-center">
+          <span className="text-red-800">{error}</span>
+          <button onClick={() => setError(null)} className="text-red-600 hover:text-red-800">
+            <X size={18} />
+          </button>
         </div>
       )}
 
       {success && (
-        <div className="flex gap-2">
-          <SuccessMessage message={success} />
-          <button onClick={() => setSuccess(null)}>✕</button>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex justify-between items-center">
+          <span className="text-green-800">{success}</span>
+          <button onClick={() => setSuccess(null)} className="text-green-600 hover:text-green-800">
+            <X size={18} />
+          </button>
         </div>
       )}
 
@@ -125,7 +221,7 @@ export const ProductManagement: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
-          <p className="text-gray-600">Total Products: {pagination.total}</p>
+          <p className="text-gray-600">Total Products: {filteredProducts.length}</p>
         </div>
         <button
           onClick={() => navigate('/admin/products/new')}
@@ -200,20 +296,35 @@ export const ProductManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {products.length > 0 ? (
-                products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{product.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">${product.price.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product.stock}</td>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <tr key={product.productId || product.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <div className="flex items-center gap-3">
+                        {product.images && product.images[0] && (
+                          <img src={product.images[0]} alt={product.name} className="w-10 h-10 object-cover rounded" />
+                        )}
+                        <div>
+                          <div>{product.name}</div>
+                          {product.sku && <div className="text-xs text-gray-500">SKU: {product.sku}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.category || 'N/A'}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                      ${product.price?.toFixed(2) || '0.00'}
+                      {product.discount_price && (
+                        <div className="text-xs text-green-600">${product.discount_price.toFixed(2)}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{product.stock || 0}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         product.approval_status === 'approved' ? 'bg-green-100 text-green-800' :
                         product.approval_status === 'rejected' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {product.approval_status?.toUpperCase() || 'PENDING'}
+                        {(product.approval_status || 'pending').toUpperCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
@@ -238,16 +349,16 @@ export const ProductManagement: React.FC = () => {
                         {product.approval_status === 'pending' && (
                           <>
                             <button
-                              onClick={() => handleApprove(product.id)}
-                              disabled={actionLoading === product.id}
+                              onClick={() => handleApprove(product.productId || product.id)}
+                              disabled={actionLoading === (product.productId || product.id)}
                               className="p-2 text-green-600 hover:bg-green-50 rounded-lg disabled:opacity-50"
                               title="Approve"
                             >
                               <CheckCircle size={18} />
                             </button>
                             <button
-                              onClick={() => handleReject(product.id)}
-                              disabled={actionLoading === product.id}
+                              onClick={() => handleReject(product.productId || product.id)}
+                              disabled={actionLoading === (product.productId || product.id)}
                               className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
                               title="Reject"
                             >
@@ -255,16 +366,14 @@ export const ProductManagement: React.FC = () => {
                             </button>
                           </>
                         )}
-                        {product.is_active && (
-                          <button
-                            onClick={() => handleDisable(product.id)}
-                            disabled={actionLoading === product.id}
-                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg disabled:opacity-50"
-                            title="Disable"
-                          >
-                            <Power size={18} />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleToggleStatus(product.productId || product.id)}
+                          disabled={actionLoading === (product.productId || product.id)}
+                          className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg disabled:opacity-50"
+                          title="Toggle Status"
+                        >
+                          <Power size={18} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -336,23 +445,23 @@ export const ProductManagement: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Sub Category</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.sub_category || 'N/A'}</p>
+                  <p className="text-lg font-semibold text-gray-900">N/A</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Price</p>
-                  <p className="text-lg font-semibold text-gray-900">${selectedProduct.price.toFixed(2)}</p>
+                  <p className="text-lg font-semibold text-gray-900">${selectedProduct.price?.toFixed(2) || '0.00'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Stock</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.stock} units</p>
+                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.stock || 0} units</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Rating</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.rating || 'N/A'} ⭐</p>
+                  <p className="text-sm text-gray-600">Brand</p>
+                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.brand || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Discount</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.discount || 0}%</p>
+                  <p className="text-sm text-gray-600">Discount Price</p>
+                  <p className="text-lg font-semibold text-gray-900">{selectedProduct.discount_price ? `$${selectedProduct.discount_price.toFixed(2)}` : 'N/A'}</p>
                 </div>
               </div>
 

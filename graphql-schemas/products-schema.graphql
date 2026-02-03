@@ -1,0 +1,134 @@
+type User {
+  id: ID!
+  email: String!
+  first_name: String
+  last_name: String
+  phone: String
+  address: String
+  profile_type: String
+  avatar_url: String
+  is_verified: Boolean
+  is_banned: Boolean
+  created_at: String
+  updated_at: String
+}
+
+type SubCategory {
+  id: String!
+  name: String!
+  slug: String
+  description: String
+  image_url: String
+}
+
+type Category {
+  id: ID!
+  categoryId: String!
+  name: String!
+  slug: String
+  description: String
+  image_url: String
+  parent_id: String
+  sub_categories: [SubCategory]
+  is_active: Boolean
+  sort_order: Int
+  created_at: String
+  updated_at: String
+}
+
+type Product {
+  id: ID!
+  productId: String!
+  name: String!
+  slug: String
+  description: String
+  category: String
+  price: Float!
+  discount_price: Float
+  stock: Int!
+  sku: String
+  brand: String
+  images: [String]
+  seller_id: String!
+  approval_status: String
+  is_active: Boolean!
+  is_featured: Boolean
+  tags: [String]
+  specifications: String
+  created_at: String
+  updated_at: String
+}
+
+input SubCategoryInput {
+  id: String
+  name: String!
+  slug: String
+  description: String
+  image_url: String
+}
+
+input CategoryInput {
+  name: String!
+  slug: String
+  description: String
+  image_url: String
+  parent_id: String
+  sub_categories: [SubCategoryInput]
+  is_active: Boolean
+  sort_order: Int
+}
+
+input ProductInput {
+  name: String!
+  slug: String
+  description: String
+  category: String
+  price: Float!
+  discount_price: Float
+  stock: Int!
+  sku: String
+  brand: String
+  images: [String]
+  seller_id: String
+  approval_status: String
+  is_active: Boolean
+  is_featured: Boolean
+  tags: [String]
+  specifications: String
+}
+
+type ProductConnection {
+  items: [Product]
+  nextToken: String
+}
+
+type Query {
+  getUser(id: ID!): User
+  getCategory(id: ID!): Category
+  listCategories: [Category]
+  getProduct(id: ID!): Product
+  listProducts(limit: Int, nextToken: String): ProductConnection
+  listProductsByStatus(approval_status: String!, limit: Int): [Product]
+  listProductsBySeller(seller_id: String!, limit: Int): [Product]
+}
+
+type Mutation {
+  createCategory(input: CategoryInput!): Category
+  updateCategory(id: ID!, input: CategoryInput!): Category
+  deleteCategory(id: ID!): Boolean
+  addSubCategory(categoryId: ID!, subCategory: SubCategoryInput!): Category
+  updateSubCategory(categoryId: ID!, subCategoryId: ID!, subCategory: SubCategoryInput!): Category
+  removeSubCategory(categoryId: ID!, subCategoryId: ID!): Category
+  
+  createProduct(input: ProductInput!): Product
+  updateProduct(id: ID!, input: ProductInput!): Product
+  deleteProduct(id: ID!): Boolean
+  approveProduct(id: ID!): Product
+  rejectProduct(id: ID!): Product
+  toggleProductStatus(id: ID!): Product
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

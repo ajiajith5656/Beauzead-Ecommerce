@@ -1,0 +1,16 @@
+#set($now = $util.time.nowISO8601())
+
+{
+  "version": "2017-02-28",
+  "operation": "UpdateItem",
+  "key": {
+    "productId": $util.dynamodb.toDynamoDBJson($ctx.args.id)
+  },
+  "update": {
+    "expression": "SET approval_status = :approved, updated_at = :now",
+    "expressionValues": {
+      ":approved": $util.dynamodb.toDynamoDBJson("approved"),
+      ":now": $util.dynamodb.toDynamoDBJson($now)
+    }
+  }
+}

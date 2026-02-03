@@ -46,9 +46,12 @@ export interface Seller {
 
 export interface Product {
   id: string;
+  productId?: string;
   name: string;
+  slug?: string;
   description: string;
   price: number;
+  discount_price?: number;
   currency: string;
   image_url: string;
   seller_id: string;
@@ -56,6 +59,7 @@ export interface Product {
   stock: number;
   approved: boolean;
   created_at: string;
+  updated_at?: string;
   brand?: string;
   rating?: number;
   discount?: number;
@@ -64,8 +68,9 @@ export interface Product {
   sub_category?: string;
   sku?: string;
   images?: string[];
-  updated_at?: string;
   is_active?: boolean;
+  is_featured?: boolean;
+  tags?: string[];
 }
 
 export interface CartItem {
