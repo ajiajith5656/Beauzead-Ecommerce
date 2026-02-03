@@ -120,6 +120,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const appsyncEndpoint = import.meta.env.VITE_APPSYNC_ENDPOINT;
       const apiKey = import.meta.env.VITE_APPSYNC_API_KEY;
       
+      console.log('Fetching user profile for userId:', userId);
+      console.log('AppSync endpoint:', appsyncEndpoint);
+      
       if (!appsyncEndpoint || !apiKey) {
         console.error('AppSync configuration missing');
         return null;
@@ -152,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       const result = await response.json();
+      console.log('AppSync response:', result);
       
       if (result.data?.getUser) {
         const userData: User = {
@@ -161,11 +165,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role: result.data.getUser.profile_type as 'user' | 'seller' | 'admin' || 'user',
         };
         
+        console.log('Mapped user data:', userData);
+        
         setUser(userData);
         if (userData.role) {
           setAuthRole(userData.role);
         }
         return userData;
+      } else {
+        console.log('No user data found in AppSync response');
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -218,10 +226,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (authUser) {
         profile = await fetchUserProfile(authUser.username);
+        console.log('Fetched user profile:', profile);
       }
 
       // Determine the final role and set it in state
       const finalRole = profile?.role || roleFromSession || null;
+      console.log('Final role determined:', finalRole, 'from profile:', profile?.role, 'from session:', roleFromSession);
+      
       if (finalRole) {
         setAuthRole(finalRole);
       }

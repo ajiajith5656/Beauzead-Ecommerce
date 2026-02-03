@@ -35,39 +35,39 @@ const SellerLogin: React.FC = () => {
       console.log('No existing session to sign out');
     }
 
-    const { error: signInError } = await signIn(email, password);
+    const result = await signIn(email, password);
 
-    setIsLoading(false);
-    if (signInError) {
+    if (!result.success || result.error) {
       // Better error messages
-      const errorMessage = signInError.message || '';
+      const errorMessage = result.error?.message || '';
       if (errorMessage.includes('Incorrect username or password')) {
         setError('Invalid email or password. Please try again.');
       } else if (errorMessage.includes('User does not exist')) {
         setError('No account found with this email. Please sign up first.');
+      } else if (errorMessage.includes('NotAuthorizedException')) {
+        setError('Incorrect email or password.');
       } else {
         setError(errorMessage || 'Failed to sign in');
       }
+      setIsLoading(false);
       return;
     }
 
-    // Wait for authRole to be set in context
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const finalRole = authRole;
-    
-    if (finalRole === 'admin') {
-      window.location.href = '/admin';
-      return;
-    }
-
-    if (finalRole === 'seller') {
-      window.location.href = '/seller/dashboard';
-      return;
-    }
-
-    // Role is 'user' or something else
-    window.location.href = '/';
+    // Wait a moment for the user profile to be fetched
+    setTimeout(() => {
+      // Redirect based on the actual user role from the result
+      const userRole = result.role;
+      
+      if (userRole === 'admin') {
+        window.location.href = '/admin';
+      } else if (userRole === 'seller') {
+        window.location.href = '/seller/dashboard';
+      } else {
+        // User role or unknown - go to homepage
+        window.location.href = '/';
+      }
+      setIsLoading(false);
+    }, 500);
   };
 
   return (
