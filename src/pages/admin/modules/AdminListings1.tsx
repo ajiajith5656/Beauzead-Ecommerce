@@ -152,7 +152,7 @@ export const AdminListings1: React.FC = () => {
               handleInputChange('categoryId', e.target.value);
               handleInputChange('subCategoryId', '');
             }}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           >
             <option value="">Select Category</option>
             {categories.map((cat) => (
@@ -171,7 +171,7 @@ export const AdminListings1: React.FC = () => {
             value={step1.subCategoryId}
             onChange={(e) => handleInputChange('subCategoryId', e.target.value)}
             disabled={!step1.categoryId}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100"
           >
             <option value="">Select Sub-Category</option>
             {subCategories.map((sub: any) => (
@@ -191,7 +191,7 @@ export const AdminListings1: React.FC = () => {
             value={step1.productTypeId}
             onChange={(e) => handleInputChange('productTypeId', e.target.value)}
             placeholder="e.g., T-Shirt, Jeans, Sneakers"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
       </div>
@@ -206,7 +206,7 @@ export const AdminListings1: React.FC = () => {
           value={step1.productTitle}
           onChange={(e) => handleInputChange('productTitle', e.target.value.slice(0, 250))}
           placeholder="Enter product title"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
         />
         <p className="text-sm text-gray-500 mt-1">{step1.productTitle.length}/250 characters</p>
       </div>
@@ -222,7 +222,7 @@ export const AdminListings1: React.FC = () => {
             value={step1.brandName}
             onChange={(e) => handleInputChange('brandName', e.target.value)}
             placeholder="Enter brand name"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
 
@@ -238,7 +238,7 @@ export const AdminListings1: React.FC = () => {
               handleInputChange('modelNumber', value);
             }}
             placeholder="e.g., ABC123XYZ"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           />
           {step1.modelNumber && (step1.modelNumber.length < 8 || step1.modelNumber.length > 20) && (
             <p className="text-sm text-red-500 mt-1">Model number must be 8-20 characters</p>
@@ -256,7 +256,7 @@ export const AdminListings1: React.FC = () => {
           onChange={(e) => handleInputChange('shortDescription', e.target.value.slice(0, 350))}
           placeholder="Enter a brief description of the product"
           rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent resize-none"
         />
         <p className="text-sm text-gray-500 mt-1">{step1.shortDescription.length}/350 characters</p>
       </div>
@@ -272,7 +272,7 @@ export const AdminListings1: React.FC = () => {
           onChange={(e) => handleInputChange('stock', parseInt(e.target.value) || 0)}
           placeholder="0"
           min="0"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
         />
       </div>
 

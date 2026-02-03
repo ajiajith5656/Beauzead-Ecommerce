@@ -86,7 +86,7 @@ export const AdminListing5: React.FC = () => {
               min="0"
               step="0.1"
               placeholder="0.0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
           <div>
@@ -99,7 +99,7 @@ export const AdminListing5: React.FC = () => {
               onChange={(e) => handleInputChange('packageLength', parseFloat(e.target.value) || 0)}
               min="0"
               placeholder="0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
           <div>
@@ -112,7 +112,7 @@ export const AdminListing5: React.FC = () => {
               onChange={(e) => handleInputChange('packageWidth', parseFloat(e.target.value) || 0)}
               min="0"
               placeholder="0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
           <div>
@@ -125,7 +125,7 @@ export const AdminListing5: React.FC = () => {
               onChange={(e) => handleInputChange('packageHeight', parseFloat(e.target.value) || 0)}
               min="0"
               placeholder="0"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
         </div>
@@ -238,7 +238,7 @@ export const AdminListing5: React.FC = () => {
               value={step5.manufacturerName}
               onChange={(e) => handleInputChange('manufacturerName', e.target.value)}
               placeholder="Enter manufacturer/brand name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
           <div>
@@ -250,7 +250,7 @@ export const AdminListing5: React.FC = () => {
               value={step5.manufacturerAddress}
               onChange={(e) => handleInputChange('manufacturerAddress', e.target.value)}
               placeholder="City, Country"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
         </div>
@@ -264,7 +264,7 @@ export const AdminListing5: React.FC = () => {
             onChange={(e) => handleInputChange('packingDetails', e.target.value)}
             placeholder="e.g., Box, Bubble wrap, Thermocol packaging..."
             rows={2}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent resize-none"
           />
         </div>
       </div>

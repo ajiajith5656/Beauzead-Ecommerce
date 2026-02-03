@@ -369,7 +369,7 @@ export const ProductVariantManagement: React.FC = () => {
                     value={formData.sellerCode || ''}
                     onChange={(e) => setFormData({ ...formData, sellerCode: e.target.value })}
                     placeholder="e.g., SC-001"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
               </div>
 
@@ -379,7 +379,7 @@ export const ProductVariantManagement: React.FC = () => {
                 <select
                   value={formData.color || ''}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select Color</option>
                   {colors.map((c) => (
@@ -397,7 +397,7 @@ export const ProductVariantManagement: React.FC = () => {
                   <select
                     value={formData.sizeSystem || 'INTL_ALPHA'}
                     onChange={(e) => setFormData({ ...formData, sizeSystem: e.target.value, sizeValue: '' })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {APPAREL_SIZE_SYSTEMS.map((s) => (
                       <option key={s} value={s}>
@@ -412,7 +412,7 @@ export const ProductVariantManagement: React.FC = () => {
                   <select
                     value={formData.sizeValue || ''}
                     onChange={(e) => setFormData({ ...formData, sizeValue: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Size</option>
                     {sizeOptions.map((size) => (
@@ -433,7 +433,7 @@ export const ProductVariantManagement: React.FC = () => {
                     value={formData.price || 0}
                     onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                     placeholder="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -444,7 +444,7 @@ export const ProductVariantManagement: React.FC = () => {
                     value={formData.stock || 0}
                     onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })}
                     placeholder="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -495,7 +495,7 @@ export const ProductVariantManagement: React.FC = () => {
                   value={newColor.name}
                   onChange={(e) => setNewColor({ ...newColor, name: e.target.value })}
                   placeholder="e.g., Midnight Blue"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 

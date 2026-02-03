@@ -119,7 +119,7 @@ export const OrderManagement: React.FC = () => {
             setStatusFilter(e.target.value);
             setPagination((prev) => ({ ...prev, page: 1 }));
           }}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
         >
           <option value="">All Statuses</option>
           {statuses.map((status) => (
@@ -256,7 +256,7 @@ export const OrderManagement: React.FC = () => {
                   value={selectedOrder.status}
                   onChange={(e) => handleUpdateStatus(selectedOrder.id, e.target.value)}
                   disabled={actionLoading === selectedOrder.id}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black disabled:opacity-50"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black disabled:opacity-50"
                 >
                   {statuses.map((status) => (
                     <option key={status} value={status}>{status.toUpperCase()}</option>
@@ -302,7 +302,7 @@ export const OrderManagement: React.FC = () => {
                   value={refundAmount}
                   onChange={(e) => setRefundAmount(parseFloat(e.target.value))}
                   max={selectedOrder.total}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                 />
                 <p className="text-xs text-gray-600 mt-1">Max: ${selectedOrder.total.toFixed(2)}</p>
               </div>

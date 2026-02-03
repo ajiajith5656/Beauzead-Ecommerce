@@ -284,7 +284,7 @@ export const AdminListing4: React.FC = () => {
             onChange={(e) => updateStep4({ stockQuantity: parseInt(e.target.value) || 0 })}
             min="0"
             placeholder="0"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           />
         </div>
       </div>

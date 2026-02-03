@@ -156,7 +156,7 @@ export const UserManagement: React.FC = () => {
               setSelectedProfileType(e.target.value);
               setPagination((prev) => ({ ...prev, page: 1 }));
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black focus:border-transparent"
           >
             <option value="">All Profile Types</option>
             <option value="member">Member</option>

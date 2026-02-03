@@ -413,7 +413,7 @@ export const CategoryManagement: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                   placeholder="e.g., Electronics"
                 />
               </div>
@@ -427,7 +427,7 @@ export const CategoryManagement: React.FC = () => {
                   type="text"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                   placeholder="Auto-generated from name"
                 />
               </div>
@@ -441,7 +441,7 @@ export const CategoryManagement: React.FC = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                   placeholder="Brief description of the category"
                 />
               </div>
@@ -455,7 +455,7 @@ export const CategoryManagement: React.FC = () => {
                   type="url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -509,7 +509,7 @@ export const CategoryManagement: React.FC = () => {
                     onChange={(e) =>
                       setNewSubCategory({ ...newSubCategory, name: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                     placeholder="Subcategory name"
                   />
                   <input
@@ -518,7 +518,7 @@ export const CategoryManagement: React.FC = () => {
                     onChange={(e) =>
                       setNewSubCategory({ ...newSubCategory, description: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                     placeholder="Subcategory description (optional)"
                   />
                   <button

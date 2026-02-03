@@ -62,7 +62,7 @@ export const ReportsManagement: React.FC = () => {
             <select
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             >
               <option value="sales">Sales</option>
               <option value="orders">Orders</option>
@@ -79,7 +79,7 @@ export const ReportsManagement: React.FC = () => {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -89,7 +89,7 @@ export const ReportsManagement: React.FC = () => {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -100,7 +100,7 @@ export const ReportsManagement: React.FC = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="Category name"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -111,7 +111,7 @@ export const ReportsManagement: React.FC = () => {
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               placeholder="Country"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             />
           </div>
 
@@ -120,7 +120,7 @@ export const ReportsManagement: React.FC = () => {
             <select
               value={format}
               onChange={(e) => setFormat(e.target.value as 'csv' | 'excel' | 'pdf')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
             >
               <option value="csv">CSV</option>
               <option value="excel">Excel</option>

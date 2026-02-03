@@ -129,7 +129,7 @@ export const KYCRequirementManagement: React.FC = () => {
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     placeholder="e.g., India"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600"
                     required
                   />
                 </div>
@@ -140,7 +140,7 @@ export const KYCRequirementManagement: React.FC = () => {
                     value={formData.registrationType}
                     onChange={(e) => setFormData({ ...formData, registrationType: e.target.value })}
                     placeholder="e.g., Individual"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600"
                     required
                   />
                 </div>
@@ -152,7 +152,7 @@ export const KYCRequirementManagement: React.FC = () => {
                   value={formData.requiredDocuments}
                   onChange={(e) => setFormData({ ...formData, requiredDocuments: e.target.value })}
                   placeholder="e.g., PAN, GST"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600"
                   required
                 />
               </div>
@@ -163,7 +163,7 @@ export const KYCRequirementManagement: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Additional notes..."
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-600"
                 />
               </div>
               <div className="flex gap-4">

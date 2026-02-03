@@ -97,7 +97,7 @@ export const ComplaintManagement: React.FC = () => {
             setStatusFilter(e.target.value);
             setPagination((prev) => ({ ...prev, page: 1 }));
           }}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
         >
           <option value="">All Status</option>
           <option value="open">Open</option>
@@ -222,7 +222,7 @@ export const ComplaintManagement: React.FC = () => {
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                 >
                   <option value="open">Open</option>
                   <option value="in_progress">In Progress</option>
@@ -236,7 +236,7 @@ export const ComplaintManagement: React.FC = () => {
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-black"
                   placeholder="Add resolution notes..."
                 />
               </div>
