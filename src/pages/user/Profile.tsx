@@ -55,7 +55,7 @@ export const Profile: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+              <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
               <p className="text-gray-600 mt-2">Manage your account settings and preferences</p>
             </div>
             <div className="flex gap-3">

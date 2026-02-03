@@ -9,7 +9,7 @@ export const RefundPolicy: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
             <RotateCcw className="w-8 h-8 text-gold" />
-            <h1 className="text-4xl font-bold text-gold">Refund Policy</h1>
+            <h1 className="text-2xl font-bold text-gold">Refund Policy</h1>
           </div>
           <p className="text-gray-400">Last updated: February 1, 2026</p>
         </div>

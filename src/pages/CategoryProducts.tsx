@@ -106,7 +106,7 @@ export const CategoryProducts: React.FC = () => {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gold mb-2">
+            <h1 className="text-2xl font-bold text-gold mb-2">
               {category.icon} {category.name}
             </h1>
             <p className="text-gray-400">{filteredProducts.length} products</p>
@@ -271,7 +271,7 @@ export const CategoryProducts: React.FC = () => {
           <div className="md:col-span-3">
             {filteredProducts.length === 0 ? (
               <div className="bg-gray-900 border border-gray-800 rounded-lg p-12 text-center">
-                <h2 className="text-2xl font-bold text-white mb-2">No Products Found</h2>
+                <h2 className="text-xl font-semibold text-white mb-2">No Products Found</h2>
                 <p className="text-gray-400 mb-6">
                   Try adjusting your filters to find what you're looking for.
                 </p>

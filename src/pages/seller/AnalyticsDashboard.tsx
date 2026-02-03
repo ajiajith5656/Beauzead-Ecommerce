@@ -59,7 +59,7 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Sales Analytics</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Sales Analytics</h1>
           <p className="text-gray-600 mt-2">Track your sales performance and metrics</p>
         </div>
 
@@ -88,7 +88,7 @@ export const AnalyticsDashboard: React.FC = () => {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900">
                     {typeof metric.value === 'number' && metric.value > 100
                       ? `₹${metric.value.toLocaleString()}`
                       : `${metric.value}${metric.label.includes('%') ? '%' : ''}`}

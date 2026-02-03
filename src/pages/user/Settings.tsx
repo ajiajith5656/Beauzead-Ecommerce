@@ -185,7 +185,7 @@ export const UserSettings: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <SettingsIcon className="h-8 w-8 text-gold" />
-            <h1 className="text-4xl font-bold text-gold">Settings</h1>
+            <h1 className="text-2xl font-bold text-gold">Settings</h1>
           </div>
           <p className="text-gray-400">Manage your account preferences</p>
         </div>

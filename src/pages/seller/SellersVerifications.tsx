@@ -97,7 +97,7 @@ const SellersVerifications: React.FC<SellersVerificationsProps> = ({ onBack, onP
         </button>
 
         <header className="mb-16">
-          <h1 className="text-4xl font-semibold mb-3">Store Verification</h1>
+          <h1 className="text-2xl font-semibold mb-3">Store Verification</h1>
           <p className="text-gray-500 text-sm font-medium">Complete your business profile to start selling globally.</p>
         </header>
 

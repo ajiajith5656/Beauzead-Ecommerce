@@ -140,7 +140,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
         <div className="w-24 h-24 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
           <CheckCircle2 size={56} className="text-green-500 animate-in zoom-in duration-500" />
         </div>
-        <h2 className="text-3xl font-semibold mb-4">Successfully Submitted</h2>
+        <h2 className="text-xl font-semibold mb-4">Successfully Submitted</h2>
         <div className="bg-[#0a0a0a] border border-gray-900 rounded-2xl px-8 py-4 mb-8">
           <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">Seller Verification ID</p>
           <p className="text-xl font-mono text-yellow-500 font-bold">{submissionId}</p>

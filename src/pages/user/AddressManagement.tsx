@@ -101,7 +101,7 @@ const UserAddressManagement: React.FC = () => {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Addresses</h1>
+          <h1 className="text-2xl font-bold mb-2">My Addresses</h1>
           <p className="text-gray-400">Manage your delivery addresses</p>
         </div>
 

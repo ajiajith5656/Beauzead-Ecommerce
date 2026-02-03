@@ -61,7 +61,7 @@ export const WriteReview: React.FC = () => {
       <div className="max-w-3xl mx-auto px-4">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Write a Review</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Write a Review</h1>
           <p className="text-gray-600 mt-2">Share your experience with this product</p>
         </div>
 

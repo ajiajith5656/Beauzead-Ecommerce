@@ -208,7 +208,7 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">Wallet & Payouts</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Wallet & Payouts</h2>
               <p className="text-gray-600 text-sm font-medium mt-1">Manage your earnings and withdrawals</p>
             </div>
             <button className="border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center gap-2">
@@ -380,7 +380,7 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
             {/* Available Balance Display */}
             <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-6 mb-6 text-white">
               <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">Available Balance</p>
-              <p className="text-4xl font-bold">{formatPrice(walletBalance.available)}</p>
+              <p className="text-2xl font-bold">{formatPrice(walletBalance.available)}</p>
             </div>
 
             {/* Withdrawal Amount */}

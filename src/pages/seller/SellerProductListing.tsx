@@ -385,7 +385,7 @@ const StatCard = ({ label, value, icon }: any) => (
     </div>
     <div>
       <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest mb-1">{label}</p>
-      <h3 className="text-3xl font-semibold text-white tracking-tight">{value}</h3>
+      <h3 className="text-xl font-semibold text-white tracking-tight">{value}</h3>
     </div>
   </div>
 );

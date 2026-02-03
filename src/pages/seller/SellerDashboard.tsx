@@ -145,7 +145,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
               <Menu size={24} />
             </button>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-tight truncate">
+              <h2 className="text-lg sm:text-xl font-semibold text-white tracking-tight truncate">
                 {activeSection === 'overview' ? 'Overview' : activeSection.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}
               </h2>
               <p className="text-gray-500 text-xs sm:text-sm font-medium mt-0.5 sm:mt-1">Manage your premium marketplace presence</p>
@@ -212,7 +212,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
             <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 size={40} className="text-white" />
             </div>
-            <h3 className="text-3xl font-bold text-white mb-2">KYC Submitted Successfully</h3>
+            <h3 className="text-xl font-bold text-white mb-2">KYC Submitted Successfully</h3>
             <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">Your KYC verification has been submitted for review. Our compliance team will verify your documents within 48-72 hours. You'll receive an email update once the review is complete.</p>
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-6 py-4 inline-block mb-8">
               <p className="text-green-400 font-bold text-sm uppercase tracking-wider">Status: Pending Admin Review</p>
@@ -231,7 +231,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-900 border border-gray-800 rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-gray-600">
                <ShieldCheck size={32} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
              </div>
-             <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3">Access Restricted</h3>
+             <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Access Restricted</h3>
              <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium mb-6 sm:mb-8 md:mb-10 lg:mb-12 max-w-lg mx-auto leading-relaxed">Full dashboard capabilities are unlocked once your business verification is completed and approved by our administration team.</p>
              {verificationStatus === 'unverified' && (
                <button 
@@ -247,7 +247,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
         {activeSection === 'settings' && (
           <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center">
             <Settings size={40} className="mx-auto mb-4 sm:mb-6 md:mb-8 text-gray-800 sm:w-12 sm:h-12 md:w-16 md:h-16" />
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2 sm:mb-3">Store Configuration</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Store Configuration</h3>
             <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium">Store profile and policy settings are being updated for production.</p>
           </div>
         )}
@@ -372,7 +372,7 @@ const MerchantStat = ({ label, value, trend, icon, positive }: { label: string, 
       </div>
     </div>
     <p className="text-[9px] sm:text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-0.5 sm:mb-1">{label}</p>
-    <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white tracking-tight">{value}</h3>
+    <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">{value}</h3>
   </div>
 );
 
