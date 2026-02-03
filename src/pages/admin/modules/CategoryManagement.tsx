@@ -225,8 +225,11 @@ export const CategoryManagement: React.FC = () => {
   const addSubCategory = () => {
     if (!newSubCategory.name.trim()) return;
     
+    // Generate truly unique ID using timestamp + random string
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
     const subCat: SubCategory = {
-      id: Date.now().toString(),
+      id: uniqueId,
       name: newSubCategory.name,
       slug: newSubCategory.name.toLowerCase().replace(/\s+/g, '-'),
       description: newSubCategory.description,
