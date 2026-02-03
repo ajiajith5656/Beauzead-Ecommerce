@@ -116,22 +116,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string): Promise<User | null> => {
     try {
-      if (!import.meta.env.VITE_API_ENDPOINT) {
+      // Fetch user profile using AppSync GraphQL
+      const appsyncEndpoint = import.meta.env.VITE_APPSYNC_ENDPOINT;
+      const apiKey = import.meta.env.VITE_APPSYNC_API_KEY;
+      
+      if (!appsyncEndpoint || !apiKey) {
+        console.error('AppSync configuration missing');
         return null;
       }
 
-      const { data, error } = await apiClient.get<User>(`/users/${userId}`);
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
-      }
-
-      if (data) {
-        setUser(data);
-        if (data.role) {
-          setAuthRole(data.role);
+      const query = `
+        query GetUser($userId: ID!) {
+          getUser(userId: $userId) {
+            userId
+            email
+            phone
+            first_name
+            last_name
+            profile_type
+            is_verified
+          }
         }
-        return data;
+      `;
+
+      const response = await fetch(appsyncEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({
+          query,
+          variables: { userId: userId }
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.data?.getUser) {
+        const userData: User = {
+          id: result.data.getUser.userId,
+          email: result.data.getUser.email || '',
+          name: `${result.data.getUser.first_name || ''} ${result.data.getUser.last_name || ''}`.trim(),
+          role: result.data.getUser.profile_type as 'user' | 'seller' | 'admin' || 'user',
+        };
+        
+        setUser(userData);
+        if (userData.role) {
+          setAuthRole(userData.role);
+        }
+        return userData;
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
