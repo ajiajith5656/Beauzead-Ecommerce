@@ -83,6 +83,16 @@ const OTPVerification: React.FC = () => {
               navigate('/', { state: { loginSuccess: true } });
             }
           }, 2000);
+        } else if (result.alreadyConfirmed) {
+          // User is already confirmed and signed in
+          setError('This account is already verified. Redirecting to login...');
+          setTimeout(() => {
+            if (purpose === 'seller-signup' || role === 'seller') {
+              navigate('/seller/login');
+            } else {
+              navigate('/login');
+            }
+          }, 2000);
         } else {
           setError(result.error?.message || 'Failed to verify OTP. Please try again.');
           setIsLoading(false);

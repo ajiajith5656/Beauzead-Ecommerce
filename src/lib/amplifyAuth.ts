@@ -81,13 +81,18 @@ class AmplifyAuthService {
       });
 
       if (isSignUpComplete) {
-        await autoSignIn();
+        try {
+          await autoSignIn();
+        } catch (autoSignInError: any) {
+          // If autoSignIn fails because user is already signed in, that's okay
+          console.log('AutoSignIn skipped - user may already be signed in');
+        }
       }
 
       return { isSignUpComplete, nextStep };
     } catch (error: any) {
       console.error('Confirm signup error:', error);
-      throw new Error(error.message || 'Failed to confirm sign up');
+      throw error;
     }
   }
 

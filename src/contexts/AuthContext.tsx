@@ -238,16 +238,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const result = await amplifyAuthService.confirmSignUp(email, code);
       
+      // After OTP confirmation, user is automatically signed in by Cognito
+      // Fetch the current auth user
       const authUser = await amplifyAuthService.getCurrentAuthUser();
       setCurrentAuthUser(authUser);
 
       if (authUser) {
+        // Fetch user profile from DynamoDB
         await fetchUserProfile(authUser.username);
       }
 
       return { success: true, ...result };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Confirm signup error:', error);
+      
+      // Handle case where user is already confirmed
+      if (error.name === 'NotAuthorizedException' || error.message?.includes('already') || error.message?.includes('CONFIRMED')) {
+        return { success: false, error, alreadyConfirmed: true };
+      }
+      
       return { success: false, error };
     }
   };
