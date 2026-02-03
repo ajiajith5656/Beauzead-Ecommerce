@@ -1,7 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import adminApiService from '../../../services/admin/adminApiService';
+import { generateClient } from 'aws-amplify/api';
 import { Loading, ErrorMessage } from '../components/StatusIndicators';
 import type { DashboardData } from '../../../types';
+
+const client = generateClient();
+
+// GraphQL queries
+const listUsersQuery = `
+  query ListUsers {
+    listUsers {
+      items {
+        userId
+        profile_type
+        created_at
+      }
+    }
+  }
+`;
+
+const listCategoriesQuery = `
+  query ListCategories {
+    listCategories {
+      items {
+        categoryId
+        name
+      }
+    }
+  }
+`;
+
+const listProductsQuery = `
+  query ListProducts {
+    listProducts {
+      items {
+        productId
+        name
+        status
+      }
+    }
+  }
+`;
 
 interface MetricCardProps {
   title: string;
@@ -34,15 +72,71 @@ export const AdminOverview: React.FC = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const result = await adminApiService.getDashboardMetrics();
-        if (result) {
-          setData(result);
-        } else {
-          setError('Failed to load dashboard metrics');
-        }
+        // Fetch users
+        const usersResponse: any = await client.graphql({
+          query: listUsersQuery,
+        });
+        const users = usersResponse.data.listUsers.items || [];
+
+        // Fetch categories
+        const categoriesResponse: any = await client.graphql({
+          query: listCategoriesQuery,
+        });
+        const categories = categoriesResponse.data.listCategories.items || [];
+
+        // Fetch products
+        const productsResponse: any = await client.graphql({
+          query: listProductsQuery,
+        });
+        const products = productsResponse.data.listProducts.items || [];
+
+        // Calculate metrics
+        const totalUsers = users.filter((u: any) => u.profile_type !== 'seller' && u.profile_type !== 'admin').length;
+        const totalSellers = users.filter((u: any) => u.profile_type === 'seller').length;
+        const primeMembers = users.filter((u: any) => u.profile_type === 'prime').length;
+        const totalProducts = products.length;
+        const activeProducts = products.filter((p: any) => p.status === 'active').length;
+
+        // Get current month registrations
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const userRegistrationsThisMonth = users.filter((u: any) => {
+          if (!u.created_at) return false;
+          const date = new Date(u.created_at);
+          return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+        }).length;
+
+        const sellerRegistrationsThisMonth = users.filter((u: any) => {
+          if (!u.created_at || u.profile_type !== 'seller') return false;
+          const date = new Date(u.created_at);
+          return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+        }).length;
+
+        setData({
+          metrics: {
+            total_sales: 0, // TODO: Add orders table
+            total_expenses: 0, // TODO: Add expenses tracking
+            total_products: totalProducts,
+            total_users: totalUsers,
+            total_sellers: totalSellers,
+            total_bookings: 0, // TODO: Add orders table
+            ongoing_orders: 0, // TODO: Add orders table
+            returns_cancellations: 0, // TODO: Add returns tracking
+          },
+          user_registrations: userRegistrationsThisMonth,
+          prime_members: primeMembers,
+          seller_registrations: sellerRegistrationsThisMonth,
+          top_categories: categories.slice(0, 5).map((c: any) => ({
+            id: c.categoryId,
+            name: c.name,
+          })),
+          top_sellers: [], // TODO: Add seller revenue tracking
+        });
+
+        setError(null);
       } catch (err) {
-        setError('Error loading dashboard data');
-        console.error(err);
+        console.error('Error loading dashboard data:', err);
+        setError('Failed to load dashboard metrics');
       } finally {
         setLoading(false);
       }
