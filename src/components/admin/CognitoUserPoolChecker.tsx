@@ -51,13 +51,13 @@ export const CognitoUserPoolChecker: React.FC = () => {
 
         <div className="bg-blue-50 p-4 rounded">
           <p className="font-semibold text-lg">User Pool</p>
-          <p className="text-sm text-gray-600 font-mono">us-east-1_PPPmNH7HL</p>
+          <p className="text-sm text-gray-600 font-mono">us-east-1_nJrPofo9q</p>
         </div>
 
         <div className="bg-blue-50 p-4 rounded">
           <p className="font-semibold text-lg">GraphQL Endpoint</p>
           <p className="text-sm text-gray-600 break-all">
-            https://woqi3tosm5a2jnj4w6zit2mfye.appsync-api.us-east-1.amazonaws.com/graphql
+            https://uw322tx4wff55fvtas3uonlviy.appsync-api.us-east-1.amazonaws.com/graphql
           </p>
         </div>
 
