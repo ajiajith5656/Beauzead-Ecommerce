@@ -157,11 +157,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('AppSync response:', result);
       
       if (result.data?.getUser) {
-        const fullName = `${result.data.getUser.first_name || ''} ${result.data.getUser.last_name || ''}`.trim();
         const userData: User = {
           id: result.data.getUser.id,
           email: result.data.getUser.email || '',
           role: result.data.getUser.profile_type as 'user' | 'seller' | 'admin' || 'user',
+          created_at: new Date().toISOString(),
         };
         
         console.log('Mapped user data:', userData);
