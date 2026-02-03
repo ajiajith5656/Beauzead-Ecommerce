@@ -1,0 +1,77 @@
+#set($categoryId = $util.autoId())
+#set($now = $util.time.nowISO8601())
+
+## Generate slug if not provided
+#if($ctx.args.input.slug && $ctx.args.input.slug != "")
+  #set($slug = $ctx.args.input.slug)
+#else
+  #set($slug = $ctx.args.input.name.toLowerCase().replaceAll("[^a-z0-9]+", "-"))
+#end
+
+## Process sub_categories if provided
+#set($subCategories = [])
+#if($ctx.args.input.sub_categories && $ctx.args.input.sub_categories.size() > 0)
+  #foreach($sub in $ctx.args.input.sub_categories)
+    ## Generate unique ID for each subcategory
+    #if($sub.id && $sub.id != "")
+      #set($subId = $sub.id)
+    #else
+      #set($subId = $util.autoId())
+    #end
+    
+    ## Generate slug for each subcategory
+    #if($sub.slug && $sub.slug != "")
+      #set($subSlug = $sub.slug)
+    #else
+      #set($subSlug = $sub.name.toLowerCase().replaceAll("[^a-z0-9]+", "-"))
+    #end
+    
+    #set($subCat = {
+      "id": $subId,
+      "name": $sub.name,
+      "slug": $subSlug
+    })
+    
+    #if($sub.description && $sub.description != "")
+      $util.qr($subCat.put("description", $sub.description))
+    #end
+    
+    #if($sub.image_url && $sub.image_url != "")
+      $util.qr($subCat.put("image_url", $sub.image_url))
+    #end
+    
+    $util.qr($subCategories.add($subCat))
+  #end
+#end
+
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+    "categoryId": $util.dynamodb.toDynamoDBJson($categoryId)
+  },
+  "attributeValues": {
+    "id": $util.dynamodb.toDynamoDBJson($categoryId),
+    "categoryId": $util.dynamodb.toDynamoDBJson($categoryId),
+    "name": $util.dynamodb.toDynamoDBJson($ctx.args.input.name),
+    "slug": $util.dynamodb.toDynamoDBJson($slug),
+    "is_active": $util.dynamodb.toDynamoDBJson($ctx.args.input.is_active),
+    "created_at": $util.dynamodb.toDynamoDBJson($now),
+    "updated_at": $util.dynamodb.toDynamoDBJson($now)
+    #if($ctx.args.input.description)
+      ,"description": $util.dynamodb.toDynamoDBJson($ctx.args.input.description)
+    #end
+    #if($ctx.args.input.image_url)
+      ,"image_url": $util.dynamodb.toDynamoDBJson($ctx.args.input.image_url)
+    #end
+    #if($ctx.args.input.parent_id)
+      ,"parent_id": $util.dynamodb.toDynamoDBJson($ctx.args.input.parent_id)
+    #end
+    #if($ctx.args.input.sort_order)
+      ,"sort_order": $util.dynamodb.toDynamoDBJson($ctx.args.input.sort_order)
+    #end
+    #if($subCategories.size() > 0)
+      ,"sub_categories": $util.dynamodb.toDynamoDBJson($subCategories)
+    #end
+  }
+}
