@@ -17,10 +17,10 @@ export const Categories: React.FC = () => {
   };
 
   return (
-    <div className="bg-black py-6 border-b border-gray-800">
+    <div className="bg-black py-3 sm:py-6 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gold">Shop by Category</h2>
+        <div className="flex items-center justify-between mb-2 sm:mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-gold">Shop by Category</h2>
           <div className="flex space-x-2">
             <button
               onClick={() => scroll('left')}
@@ -46,10 +46,10 @@ export const Categories: React.FC = () => {
             <Link
               key={category.id}
               to={`/category/${category.id}`}
-              className="flex-shrink-0 w-24 cursor-pointer group"
+              className="flex-shrink-0 w-20 sm:w-24 cursor-pointer group"
             >
-              <div className="bg-gray-900 border-2 border-gray-800 rounded-lg p-4 hover:border-gold transition-all duration-200 group-hover:scale-105">
-                <div className="text-4xl text-center mb-2">{category.icon}</div>
+              <div className="bg-gray-900 border-2 border-gray-800 rounded-lg p-2 sm:p-4 hover:border-gold transition-all duration-200 group-hover:scale-105">
+                <div className="text-3xl sm:text-4xl text-center mb-1 sm:mb-2">{category.icon}</div>
                 <div className="text-xs text-white text-center font-medium truncate">
                   {category.name}
                 </div>
