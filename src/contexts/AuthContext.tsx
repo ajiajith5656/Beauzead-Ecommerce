@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import '../lib/amplifyConfig'; // Initialize Amplify
 import amplifyAuthService, { type AuthUser } from '../lib/amplifyAuth';
-import apiClient from '../lib/api';
 import type { User } from '../types';
 
 interface AuthContextType {
@@ -158,10 +157,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('AppSync response:', result);
       
       if (result.data?.getUser) {
+        const fullName = `${result.data.getUser.first_name || ''} ${result.data.getUser.last_name || ''}`.trim();
         const userData: User = {
           id: result.data.getUser.id,
           email: result.data.getUser.email || '',
-          name: `${result.data.getUser.first_name || ''} ${result.data.getUser.last_name || ''}`.trim(),
           role: result.data.getUser.profile_type as 'user' | 'seller' | 'admin' || 'user',
         };
         

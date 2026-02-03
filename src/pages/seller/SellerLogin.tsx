@@ -4,7 +4,7 @@ import { Eye, EyeOff, Lock, Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext';
 
 const SellerLogin: React.FC = () => {
-  const { signIn, signOut, authRole } = useAuth();
+  const { signIn, signOut } = useAuth();
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
