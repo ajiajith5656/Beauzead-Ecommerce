@@ -129,9 +129,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       const query = `
-        query GetUser($userId: ID!) {
-          getUser(userId: $userId) {
-            userId
+        query GetUser($id: ID!) {
+          getUser(id: $id) {
+            id
             email
             phone
             first_name
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
         body: JSON.stringify({
           query,
-          variables: { userId: userId }
+          variables: { id: userId }
         })
       });
 
@@ -159,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (result.data?.getUser) {
         const userData: User = {
-          id: result.data.getUser.userId,
+          id: result.data.getUser.id,
           email: result.data.getUser.email || '',
           name: `${result.data.getUser.first_name || ''} ${result.data.getUser.last_name || ''}`.trim(),
           role: result.data.getUser.profile_type as 'user' | 'seller' | 'admin' || 'user',
