@@ -75,18 +75,21 @@ export const AdminOverview: React.FC = () => {
         // Fetch users
         const usersResponse: any = await client.graphql({
           query: listUsersQuery,
+          authMode: 'apiKey',
         });
         const users = usersResponse.data.listUsers.items || [];
 
         // Fetch categories
         const categoriesResponse: any = await client.graphql({
           query: listCategoriesQuery,
+          authMode: 'apiKey',
         });
         const categories = categoriesResponse.data.listCategories.items || [];
 
         // Fetch products
         const productsResponse: any = await client.graphql({
           query: listProductsQuery,
+          authMode: 'apiKey',
         });
         const products = productsResponse.data.listProducts.items || [];
 

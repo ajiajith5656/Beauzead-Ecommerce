@@ -90,6 +90,7 @@ export const UserManagement: React.FC = () => {
       setLoading(true);
       const result: any = await client.graphql({
         query: listUsersQuery,
+        authMode: 'apiKey',
         variables: {
           limit: pagination.limit,
           nextToken: nextToken,
@@ -116,6 +117,7 @@ export const UserManagement: React.FC = () => {
       setActionLoading(userId);
       await client.graphql({
         query: banUserMutation,
+        authMode: 'apiKey',
         variables: { id: userId },
       });
       setSuccess('User banned successfully');
@@ -133,6 +135,7 @@ export const UserManagement: React.FC = () => {
       setActionLoading(userId);
       await client.graphql({
         query: unbanUserMutation,
+        authMode: 'apiKey',
         variables: { id: userId },
       });
       setSuccess('User unbanned successfully');
@@ -150,6 +153,7 @@ export const UserManagement: React.FC = () => {
       setActionLoading(userId);
       await client.graphql({
         query: deleteUserMutation,
+        authMode: 'apiKey',
         variables: { id: userId },
       });
       setSuccess('User deleted successfully');

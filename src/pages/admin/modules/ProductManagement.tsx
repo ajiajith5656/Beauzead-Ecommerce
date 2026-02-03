@@ -102,6 +102,7 @@ export const ProductManagement: React.FC = () => {
       setLoading(true);
       const result: any = await client.graphql({
         query: listProductsQuery,
+        authMode: 'apiKey',
         variables: {
           limit: pagination.limit,
           nextToken: nextToken,
@@ -128,6 +129,7 @@ export const ProductManagement: React.FC = () => {
       setActionLoading(productId);
       await client.graphql({
         query: approveProductMutation,
+        authMode: 'apiKey',
         variables: { id: productId },
       });
       setSuccess('Product approved successfully');
@@ -145,6 +147,7 @@ export const ProductManagement: React.FC = () => {
       setActionLoading(productId);
       await client.graphql({
         query: rejectProductMutation,
+        authMode: 'apiKey',
         variables: { id: productId },
       });
       setSuccess('Product rejected');
@@ -162,6 +165,7 @@ export const ProductManagement: React.FC = () => {
       setActionLoading(productId);
       await client.graphql({
         query: toggleProductStatusMutation,
+        authMode: 'apiKey',
         variables: { id: productId },
       });
       setSuccess('Product status updated');

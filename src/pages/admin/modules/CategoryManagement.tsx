@@ -120,6 +120,7 @@ export const CategoryManagement: React.FC = () => {
       setLoading(true);
       const result: any = await client.graphql({
         query: listCategoriesQuery,
+        authMode: 'apiKey',
       });
       
       if (result.data?.listCategories) {
@@ -214,12 +215,14 @@ export const CategoryManagement: React.FC = () => {
       if (editingId) {
         await client.graphql({
           query: updateCategoryMutation,
+          authMode: 'apiKey',
           variables: { id: editingId, input },
         });
         setSuccess('Category updated successfully');
       } else {
         await client.graphql({
           query: createCategoryMutation,
+          authMode: 'apiKey',
           variables: { input },
         });
         setSuccess('Category created successfully');
@@ -243,6 +246,7 @@ export const CategoryManagement: React.FC = () => {
     try {
       await client.graphql({
         query: deleteCategoryMutation,
+        authMode: 'apiKey',
         variables: { id: categoryId },
       });
       setSuccess('Category deleted successfully');
