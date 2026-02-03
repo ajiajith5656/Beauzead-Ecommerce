@@ -95,7 +95,6 @@ export const AdminOverview: React.FC = () => {
         const totalSellers = users.filter((u: any) => u.profile_type === 'seller').length;
         const primeMembers = users.filter((u: any) => u.profile_type === 'prime').length;
         const totalProducts = products.length;
-        const activeProducts = products.filter((p: any) => p.status === 'active').length;
 
         // Get current month registrations
         const currentMonth = new Date().getMonth();
