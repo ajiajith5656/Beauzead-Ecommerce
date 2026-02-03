@@ -167,6 +167,7 @@ function App() {
                   {/* Admin Routes */}
                   <Route path="/admin/login" element={<Navigate to="/seller/login" replace />} />
                   <Route path="/admin/signup" element={<Navigate to="/seller/login" replace />} />
+                  <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
                   
                   {/* Admin Layout Routes */}
                   <Route element={<AdminLayout />}>

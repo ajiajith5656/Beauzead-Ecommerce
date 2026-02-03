@@ -41,13 +41,15 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
 
     const result = await signIn(email, password);
 
-    if (result.error) {
+    if (!result.success || result.error) {
       // Better error messages
-      const errorMessage = result.error.message || '';
+      const errorMessage = result.error?.message || '';
       if (errorMessage.includes('Incorrect username or password')) {
         setError('Invalid email or password. Please try again.');
       } else if (errorMessage.includes('User does not exist')) {
         setError('No account found with this email. Please sign up first.');
+      } else if (errorMessage.includes('NotAuthorizedException')) {
+        setError('Incorrect email or password.');
       } else {
         setError(errorMessage || 'Failed to sign in');
       }
@@ -57,10 +59,12 @@ export const Login: React.FC<LoginProps> = ({ role = 'user' }) => {
 
     // Wait a moment for the user profile to be fetched
     setTimeout(() => {
-      // Redirect based on role - the AuthContext will handle role verification
-      if (role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (role === 'seller') {
+      // Redirect based on the actual user role from the result
+      const userRole = result.role || role;
+      
+      if (userRole === 'admin') {
+        navigate('/admin');
+      } else if (userRole === 'seller') {
         navigate('/seller/dashboard');
       } else {
         navigate('/'); // Users go to homepage
