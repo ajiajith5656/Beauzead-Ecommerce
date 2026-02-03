@@ -146,7 +146,7 @@ export const CategoryManagement: React.FC = () => {
         }
       }).result;
       
-      return `https://beauzeads3bucket234253-dev.s3.us-east-1.amazonaws.com/public/${fileName}`;
+      return `https://beauzead-store-images.s3.us-east-1.amazonaws.com/public/${fileName}`;
     } catch (error) {
       console.error('Error uploading image:', error);
       throw new Error('Failed to upload image');
