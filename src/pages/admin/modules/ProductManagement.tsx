@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import { Search, Eye, CheckCircle, XCircle, Power, Plus, X } from 'lucide-react';
 import type { Product } from '../../../types';
+import { logger } from '../../../utils/logger';
 
 const client = generateClient();
 
@@ -118,7 +119,7 @@ export const ProductManagement: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load products');
-      console.error('Error fetching products:', err);
+      logger.error(err as Error, { context: 'Error fetching products' });
     } finally {
       setLoading(false);
     }
@@ -136,7 +137,7 @@ export const ProductManagement: React.FC = () => {
       await fetchProducts();
     } catch (err: any) {
       setError(err.message || 'Failed to approve product');
-      console.error('Error approving product:', err);
+      logger.error(err as Error, { context: 'Error approving product' });
     } finally {
       setActionLoading(null);
     }
@@ -154,7 +155,7 @@ export const ProductManagement: React.FC = () => {
       await fetchProducts();
     } catch (err: any) {
       setError(err.message || 'Failed to reject product');
-      console.error('Error rejecting product:', err);
+      logger.error(err as Error, { context: 'Error rejecting product' });
     } finally {
       setActionLoading(null);
     }
@@ -172,7 +173,7 @@ export const ProductManagement: React.FC = () => {
       await fetchProducts();
     } catch (err: any) {
       setError(err.message || 'Failed to update product status');
-      console.error('Error toggling status:', err);
+      logger.error(err as Error, { context: 'Error toggling product status' });
     } finally {
       setActionLoading(null);
     }

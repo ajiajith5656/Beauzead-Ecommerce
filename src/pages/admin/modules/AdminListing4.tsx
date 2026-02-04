@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { useProductListing, type DeliveryCountry } from '../../../contexts/ProductListingContext';
 import adminApiService from '../../../services/admin/adminApiService';
@@ -67,7 +68,7 @@ export const AdminListing4: React.FC = () => {
       setError(null);
     } catch (err) {
       setError('Failed to load countries');
-      console.error(err);
+      logger.error(err as Error, { context: 'Admin listing 4 error' });
     } finally {
       setLoading(false);
     }

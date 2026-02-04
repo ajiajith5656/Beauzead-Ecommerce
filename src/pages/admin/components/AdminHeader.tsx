@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { signOut } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import { Menu, LogOut, X } from 'lucide-react';
+import { useAuth } from '../../../contexts/AuthContext';
+import { logger } from '../../../utils/logger';
 
 interface AdminHeaderProps {
   adminName: string;
@@ -11,6 +12,7 @@ interface AdminHeaderProps {
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({ adminName, adminId, onMenuToggle }) => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
@@ -27,10 +29,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ adminName, adminId, on
       setStatusMessage('Logged out successfully. Redirecting...');
       setTimeout(() => {
         setShowLogoutDialog(false);
-        navigate('/seller/login');
+        navigate('/seller');
       }, 600);
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error(error as Error, { context: 'Admin logout error' });
       setStatusType('error');
       setStatusMessage('Failed to logout. Please try again.');
     } finally {

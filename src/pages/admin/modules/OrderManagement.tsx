@@ -3,6 +3,7 @@ import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
 import { Eye, DollarSign } from 'lucide-react';
 import type { Order } from '../../../types';
+import { logger } from '../../../utils/logger';
 
 interface PaginationState {
   page: number;
@@ -46,7 +47,7 @@ export const OrderManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load orders');
-      console.error(err);
+      logger.error(err as Error, { context: 'Order management error' });
     } finally {
       setLoading(false);
     }

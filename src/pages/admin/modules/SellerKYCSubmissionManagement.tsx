@@ -1,6 +1,7 @@
 import React from 'react';
 import { TableManager } from './TableManager';
 import type { TableConfig } from './TableManager';
+import { logger } from '../../../utils/logger';
 
 export const SellerKYCSubmissionManagement: React.FC = () => {
   const config: TableConfig = {
@@ -31,15 +32,15 @@ export const SellerKYCSubmissionManagement: React.FC = () => {
       ];
     },
     onAdd: async (data) => {
-      console.log('Add KYC submission:', data);
+      logger.log('KYC submission added', { data });
       return true;
     },
     onEdit: async (id, data) => {
-      console.log('Edit KYC submission:', id, data);
+      logger.log('KYC submission edited', { id, data });
       return true;
     },
     onDelete: async (id) => {
-      console.log('Delete KYC submission:', id);
+      logger.log('KYC submission deleted', { id });
       return true;
     },
   };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { 
   LayoutDashboard, ShoppingBag, DollarSign, BarChart2, 
   Package, Settings, LogOut, Bell, TrendingUp, 
@@ -200,7 +201,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
             sellerFullName={sellerFullName}
             sellerCountry={sellerCountry}
             onSubmit={(data: SellerKYC) => {
-              console.log('KYC submitted:', data);
+              logger.log('KYC submitted', { data });
               setKycSubmitted(true);
             }}
             onCancel={() => setActiveSection('overview')}

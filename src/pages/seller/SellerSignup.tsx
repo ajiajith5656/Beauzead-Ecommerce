@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import {
   Loader2,
   Mail,
@@ -97,7 +98,7 @@ const SellerSignup: React.FC = () => {
           setFormData(prev => ({ ...prev, businessTypeId: mappedBusinessTypes[0].id }));
         }
       } catch (error) {
-        console.error('❌ Error fetching data:', error);
+        logger.error(error as Error, { context: 'Error fetching data for signup' });
         setError('Failed to load countries and business types');
       }
     };

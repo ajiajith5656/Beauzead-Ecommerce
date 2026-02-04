@@ -3,6 +3,7 @@ import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage } from '../components/StatusIndicators';
 import { Flag, Trash2 } from 'lucide-react';
 import type { Review } from '../../../types';
+import { logger } from '../../../utils/logger';
 
 interface PaginationState {
   page: number;
@@ -36,7 +37,7 @@ export const ReviewManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load reviews');
-      console.error(err);
+      logger.error(err as Error, { context: 'Review management error' });
     } finally {
       setLoading(false);
     }

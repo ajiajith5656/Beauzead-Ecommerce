@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from '../../../utils/logger';
 import { TableManager } from './TableManager';
 import type { TableConfig } from './TableManager';
 
@@ -37,15 +38,15 @@ export const DashboardMetricsManagement: React.FC = () => {
       ];
     },
     onAdd: async (data) => {
-      console.log('Add metrics:', data);
+      logger.log('Metrics added', { data });
       return true;
     },
     onEdit: async (id, data) => {
-      console.log('Edit metrics:', id, data);
+      logger.log('Metrics edited', { id, data });
       return true;
     },
     onDelete: async (id) => {
-      console.log('Delete metrics:', id);
+      logger.log('Metrics deleted', { id });
       return true;
     },
   };

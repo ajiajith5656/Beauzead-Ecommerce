@@ -15,7 +15,8 @@ import ForgotPassword from './pages/user/ForgotPassword';
 import Profile from './pages/user/Profile';
 import OrderDetails from './pages/user/OrderDetails';
 import WriteReview from './pages/user/WriteReview';
-import SellerDashboard from './pages/seller/SellerDashboard';
+// import SellerDashboard from './pages/seller/SellerDashboard'; // Unused - using SellerDashboardWrapper instead
+import { SellerDashboardWrapper } from './pages/seller/SellerDashboardWrapper';
 import { SellerLanding } from './pages/seller/SellerLanding';
 import SellerSignup from './pages/seller/SellerSignup';
 import SellerLogin from './pages/seller/SellerLogin';
@@ -53,6 +54,7 @@ import UserAddressManagement from './pages/user/AddressManagement';
 import AdminAddressManagement from './pages/admin/components/AdminAddressManagement';
 import OTPVerification from './pages/OTPVerification';
 import NewPassword from './pages/NewPassword';
+// import Checkout from './pages/user/Checkout'; // TODO: Fix props issue
 import { ProductListingLayout } from './pages/admin/modules/ProductListingLayout';
 import { AdminListings1 } from './pages/admin/modules/AdminListings1';
 import { AdminListings2 } from './pages/admin/modules/AdminListings2';
@@ -70,24 +72,31 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     if (loading || !authRole) return;
 
-    // SELLER ROUTES: Allow seller OR admin
-    if (path.startsWith('/seller/dashboard') || path.startsWith('/seller/products') || 
-        path.startsWith('/seller/orders') || path.startsWith('/seller/wallet')) {
-      if (authRole !== 'seller' && authRole !== 'admin') {
-        window.location.href = '/seller/login';
-      }
-    }
-
     // ADMIN ROUTES: Allow admin ONLY
     if (path.startsWith('/admin') && !path.includes('/login') && !path.includes('/signup')) {
       if (authRole !== 'admin') {
+        console.log('Unauthorized access to admin route, redirecting to seller landing');
+        window.location.href = '/seller';
+      }
+    }
+
+    // SELLER ROUTES: Allow seller OR admin
+    if (path.startsWith('/seller/dashboard') || path.startsWith('/seller/products') || 
+        path.startsWith('/seller/orders') || path.startsWith('/seller/wallet') ||
+        path.startsWith('/seller/analytics') || path.startsWith('/seller/profile')) {
+      if (authRole !== 'seller' && authRole !== 'admin') {
+        console.log('Unauthorized access to seller dashboard, redirecting to seller login');
         window.location.href = '/seller/login';
       }
     }
 
-    // USER DASHBOARD: Allow user ONLY
-    if (path.startsWith('/user/dashboard')) {
+    // USER ROUTES: Allow user ONLY (protected user pages)
+    if (path.startsWith('/orders') || path.startsWith('/profile') || 
+        path.startsWith('/wishlist') || path.startsWith('/cart') ||
+        path.startsWith('/checkout') || path.startsWith('/settings') ||
+        path.startsWith('/notifications') || path.startsWith('/user/')) {
       if (authRole !== 'user') {
+        console.log('Unauthorized access to user route, redirecting to login');
         window.location.href = '/login';
       }
     }
@@ -138,6 +147,8 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/products/:productId/review" element={<WriteReview />} />
                   <Route path="/user/addresses" element={<UserAddressManagement />} />
+                  {/* TODO: Fix Checkout route - needs props from cart context */}
+                  {/* <Route path="/checkout" element={<Checkout />} /> */}
                   
                   {/* Seller Routes */}
                   <Route path="/seller" element={<SellerLanding />} />
@@ -148,21 +159,7 @@ function App() {
                   <Route path="/seller/forgot-password" element={<SellerForgotPassword />} />
                   <Route path="/seller/analytics" element={<AnalyticsDashboard />} />
                   <Route path="/seller/profile" element={<SellerProfile />} />
-                  <Route 
-                    path="/seller/dashboard" 
-                    element={
-                      <SellerDashboard 
-                        onLogout={() => window.location.href = '/seller/login'}
-                        sellerEmail="seller@example.com"
-                        onNavigate={(view: string) => {
-                          if (view === 'seller-dashboard') window.location.href = '/seller/dashboard';
-                          if (view === 'seller-verify') window.location.href = '/seller/verify';
-                          if (view === 'seller-product-listing') window.location.href = '/seller/products';
-                        }}
-                        verificationStatus="unverified"
-                      />
-                    } 
-                  />
+                  <Route path="/seller/dashboard" element={<SellerDashboardWrapper />} />
                   
                   {/* Admin Routes */}
                   <Route path="/admin/login" element={<Navigate to="/seller/login" replace />} />

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { logger } from '../../../utils/logger';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
 import type {
@@ -149,7 +150,7 @@ export const AccountsManagement: React.FC = () => {
       setError(null);
     } catch (err) {
       setError('Failed to load account data');
-      console.error(err);
+      logger.error(err as Error, { context: 'Accounts management error' });
     } finally {
       setLoading(false);
     }

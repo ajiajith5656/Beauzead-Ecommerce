@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, TrendingUp, TrendingDown, 
@@ -169,7 +170,7 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
 
   const handleWithdraw = () => {
     // API call would go here
-    console.log('Withdraw request:', withdrawAmount, selectedAccount);
+    logger.log('Withdraw request', { amount: withdrawAmount, account: selectedAccount });
     setShowWithdrawModal(false);
     setWithdrawAmount('');
   };

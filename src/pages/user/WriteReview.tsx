@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Upload, Send } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 export const WriteReview: React.FC = () => {
   const { productId } = useParams();
@@ -35,7 +36,7 @@ export const WriteReview: React.FC = () => {
     setIsSubmitting(true);
     try {
       // TODO: Implement review submission API call
-      console.log({
+      logger.log('Review submitted', {
         productId,
         rating,
         title,
@@ -49,7 +50,7 @@ export const WriteReview: React.FC = () => {
       alert('Review submitted successfully!');
       navigate(`/products/${productId}`);
     } catch (error) {
-      console.error('Error submitting review:', error);
+      logger.error(error as Error, { context: 'Error submitting review' });
       alert('Failed to submit review');
     } finally {
       setIsSubmitting(false);

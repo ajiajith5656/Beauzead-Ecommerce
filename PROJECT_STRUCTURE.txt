@@ -1,0 +1,280 @@
+.
+├── amplify-backup
+│   ├── #current-cloud-backend
+│   │   ├── api
+│   │   │   └── beauzeadecommerce
+│   │   ├── amplify-meta.json
+│   │   ├── backend-config.json
+│   │   └── tags.json
+│   ├── backend
+│   │   ├── api
+│   │   │   └── beauzeadecommerce
+│   │   ├── types
+│   │   │   └── amplify-dependent-resources-ref.d.ts
+│   │   ├── amplify-meta.json
+│   │   ├── backend-config.json
+│   │   └── tags.json
+│   ├── hooks
+│   │   └── README.md
+│   ├── README.md
+│   └── cli.json
+├── aws
+│   ├── README.md
+│   ├── THIRD_PARTY_LICENSES
+│   └── install
+├── export-amplify-stack
+│   └── amplify-export-BeauzeadEcommerce
+│       ├── api
+│       │   └── beauzeadecommerce
+│       ├── auth
+│       │   ├── beauzeadecommercebbc17bd3
+│       │   └── userPoolGroups
+│       ├── function
+│       │   └── beauzeadPostConfirmation
+│       ├── amplify-export-manifest.json
+│       ├── category-stack-mapping.json
+│       ├── export-tags.json
+│       └── root-stack-template.json
+├── graphql-schemas
+│   └── products-schema.graphql
+├── public
+│   ├── images
+│   │   ├── banners
+│   │   │   ├── ad-banner-1.png
+│   │   │   ├── ad-banner-2.png
+│   │   │   ├── ad-banner-3.png
+│   │   │   ├── banner1.png
+│   │   │   ├── banner10.png
+│   │   │   ├── banner2.png
+│   │   │   ├── banner3.png
+│   │   │   ├── banner4.png
+│   │   │   ├── banner5.png
+│   │   │   ├── banner6.png
+│   │   │   ├── banner7.png
+│   │   │   ├── banner8.png
+│   │   │   └── banner9.png
+│   │   └── logo
+│   │       └── logo.svg
+│   ├── _redirects
+│   └── vite.svg
+├── scripts
+│   ├── createBusinessTypeTable.py
+│   ├── insertBusinessTypes.js
+│   ├── insertCountries.js
+│   ├── measurement-types-batch.json
+│   ├── seedCountries.js
+│   ├── seedCountries.sh
+│   ├── seedCountriesSimple.js
+│   ├── seedCountriesToDynamoDB.py
+│   └── seedMeasurementData.js
+├── src
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── admin
+│   │   │   └── CognitoUserPoolChecker.tsx
+│   │   ├── auth
+│   │   │   ├── AmplifyAuthComponents.tsx
+│   │   │   ├── Login.tsx
+│   │   │   └── Signup.tsx
+│   │   ├── layout
+│   │   │   ├── Categories.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
+│   │   │   ├── HeroCarousel.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   └── Search.tsx
+│   │   ├── products
+│   │   │   └── ProductCard.tsx
+│   │   ├── AddressForm.tsx
+│   │   └── ImageUpload.tsx
+│   ├── contexts
+│   │   ├── AuthContext.tsx
+│   │   ├── CartContext.tsx
+│   │   ├── CurrencyContext.tsx
+│   │   ├── ProductListingContext.tsx
+│   │   └── WishlistContext.tsx
+│   ├── data
+│   │   ├── categoriesSeedData.ts
+│   │   ├── kycRequirementsData.ts
+│   │   ├── mockData.ts
+│   │   └── productImagesData.ts
+│   ├── graphql
+│   │   ├── mutations.js
+│   │   ├── queries.js
+│   │   ├── schema.json
+│   │   └── subscriptions.js
+│   ├── lib
+│   │   ├── amplifyAuth.ts
+│   │   ├── amplifyConfig.ts
+│   │   ├── api.ts
+│   │   └── supabase.ts
+│   ├── pages
+│   │   ├── admin
+│   │   │   ├── components
+│   │   │   ├── modules
+│   │   │   └── AdminLayout.tsx
+│   │   ├── seller
+│   │   │   ├── AnalyticsDashboard.tsx
+│   │   │   ├── SellerDashboard.tsx
+│   │   │   ├── SellerDashboardWrapper.tsx
+│   │   │   ├── SellerForgotPassword.tsx
+│   │   │   ├── SellerKYCVerification.tsx
+│   │   │   ├── SellerLanding.tsx
+│   │   │   ├── SellerLogin.tsx
+│   │   │   ├── SellerOrderManagement.tsx
+│   │   │   ├── SellerProductImageManagement.tsx
+│   │   │   ├── SellerProductListing.tsx
+│   │   │   ├── SellerProfile.tsx
+│   │   │   ├── SellerSignup.tsx
+│   │   │   ├── SellerVerifyUploads.tsx
+│   │   │   ├── SellerWallet.tsx
+│   │   │   └── SellersVerifications.tsx
+│   │   ├── user
+│   │   │   ├── AddressManagement.tsx
+│   │   │   ├── Cart.tsx
+│   │   │   ├── Checkout.tsx
+│   │   │   ├── ForgotPassword.tsx
+│   │   │   ├── MyOrders.tsx
+│   │   │   ├── Notifications.tsx
+│   │   │   ├── OrderDetails.tsx
+│   │   │   ├── OrderTracking.tsx
+│   │   │   ├── Profile.tsx
+│   │   │   ├── Settings.tsx
+│   │   │   ├── Wishlist.tsx
+│   │   │   └── WriteReview.tsx
+│   │   ├── CategoryProducts.tsx
+│   │   ├── NewHome.tsx
+│   │   ├── NewPassword.tsx
+│   │   ├── OTPVerification.tsx
+│   │   ├── PrivacyPolicy.tsx
+│   │   ├── ProductDetailsPage.tsx
+│   │   ├── RefundPolicy.tsx
+│   │   ├── ShippingPolicy.tsx
+│   │   └── TermsService.tsx
+│   ├── services
+│   │   ├── admin
+│   │   │   └── adminApiService.ts
+│   │   ├── categoryService.ts
+│   │   ├── databaseService.ts
+│   │   ├── imageService.ts
+│   │   ├── kycService.ts
+│   │   └── stripeService.ts
+│   ├── types
+│   │   └── index.ts
+│   ├── ui-components
+│   │   ├── BannerCreateForm.d.ts
+│   │   ├── BannerCreateForm.jsx
+│   │   ├── BannerUpdateForm.d.ts
+│   │   ├── BannerUpdateForm.jsx
+│   │   ├── BusinessTypeBzdcoreCreateForm.d.ts
+│   │   ├── BusinessTypeBzdcoreCreateForm.jsx
+│   │   ├── BusinessTypeBzdcoreUpdateForm.d.ts
+│   │   ├── BusinessTypeBzdcoreUpdateForm.jsx
+│   │   ├── BusinessTypeCreateForm.d.ts
+│   │   ├── BusinessTypeCreateForm.jsx
+│   │   ├── BusinessTypeUpdateForm.d.ts
+│   │   ├── BusinessTypeUpdateForm.jsx
+│   │   ├── CategoryCreateForm.d.ts
+│   │   ├── CategoryCreateForm.jsx
+│   │   ├── CategoryUpdateForm.d.ts
+│   │   ├── CategoryUpdateForm.jsx
+│   │   ├── ComplaintCreateForm.d.ts
+│   │   ├── ComplaintCreateForm.jsx
+│   │   ├── ComplaintUpdateForm.d.ts
+│   │   ├── ComplaintUpdateForm.jsx
+│   │   ├── CountryCreateForm.d.ts
+│   │   ├── CountryCreateForm.jsx
+│   │   ├── CountryListBzdcoreCreateForm.d.ts
+│   │   ├── CountryListBzdcoreCreateForm.jsx
+│   │   ├── CountryListBzdcoreUpdateForm.d.ts
+│   │   ├── CountryListBzdcoreUpdateForm.jsx
+│   │   ├── CountryUpdateForm.d.ts
+│   │   ├── CountryUpdateForm.jsx
+│   │   ├── DashboardMetricsCreateForm.d.ts
+│   │   ├── DashboardMetricsCreateForm.jsx
+│   │   ├── DashboardMetricsUpdateForm.d.ts
+│   │   ├── DashboardMetricsUpdateForm.jsx
+│   │   ├── NewForm1.d.ts
+│   │   ├── NewForm1.jsx
+│   │   ├── OrderCreateForm.d.ts
+│   │   ├── OrderCreateForm.jsx
+│   │   ├── OrderUpdateForm.d.ts
+│   │   ├── OrderUpdateForm.jsx
+│   │   ├── ProductCreateForm.d.ts
+│   │   ├── ProductCreateForm.jsx
+│   │   ├── ProductUpdateForm.d.ts
+│   │   ├── ProductUpdateForm.jsx
+│   │   ├── PromotionCreateForm.d.ts
+│   │   ├── PromotionCreateForm.jsx
+│   │   ├── PromotionUpdateForm.d.ts
+│   │   ├── PromotionUpdateForm.jsx
+│   │   ├── ReviewCreateForm.d.ts
+│   │   ├── ReviewCreateForm.jsx
+│   │   ├── ReviewUpdateForm.d.ts
+│   │   ├── ReviewUpdateForm.jsx
+│   │   ├── SellerCreateForm.d.ts
+│   │   ├── SellerCreateForm.jsx
+│   │   ├── SellerUpdateForm.d.ts
+│   │   ├── SellerUpdateForm.jsx
+│   │   ├── UserCreateForm.d.ts
+│   │   ├── UserCreateForm.jsx
+│   │   ├── UserUpdateForm.d.ts
+│   │   ├── UserUpdateForm.jsx
+│   │   ├── index.js
+│   │   ├── studioTheme.js
+│   │   ├── studioTheme.js.d.ts
+│   │   └── utils.js
+│   ├── utils
+│   │   ├── authGuard.ts
+│   │   ├── cognito-checker.ts
+│   │   ├── currency.ts
+│   │   └── imageUpload.ts
+│   ├── App.tsx
+│   ├── constants.ts
+│   ├── index.css
+│   └── main.tsx
+├── vtl-templates
+│   ├── approveProduct-request.vtl
+│   ├── banUser-request.vtl
+│   ├── createCategory-request.vtl
+│   ├── deleteUser-request.vtl
+│   ├── listCategories-response.vtl
+│   ├── listProducts-request.vtl
+│   ├── listProducts-response.vtl
+│   ├── listUsers-request.vtl
+│   ├── listUsers-response.vtl
+│   ├── rejectProduct-request.vtl
+│   ├── response.vtl
+│   ├── toggleProductStatus-request.vtl
+│   └── unbanUser-request.vtl
+├── AUTHENTICATION_STRUCTURE.md
+├── COMMANDS_COPY_PASTE.sh
+├── GET_ENDPOINT.sh
+├── IAM_POLICY_DYNAMODB_SEED.json
+├── IAM_POLICY_KYC_S3_DYNAMODB.json
+├── MANUAL_CONSOLE_STEPS.txt
+├── PROJECT_STRUCTURE.txt
+├── SIMPLE_3_COMMANDS.sh
+├── STEP2_CHECK_STATUS.sh
+├── amplify.yml
+├── check-aws-free-tier.sh
+├── configure-aurora-connection.sh
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── populate-tables.py
+├── postcss.config.js
+├── setup-aurora-custom.sh
+├── setup-aurora-free-tier-now.sh
+├── setup-aurora-free-tier-simple.sh
+├── setup-aurora-free-tier.sh
+├── setup-aurora-instant.sh
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+49 directories, 229 files

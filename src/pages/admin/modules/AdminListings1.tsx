@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { useProductListing, type SizeVariant, type ColorVariant } from '../../../contexts/ProductListingContext';
 import adminApiService from '../../../services/admin/adminApiService';
@@ -77,7 +78,7 @@ export const AdminListings1: React.FC = () => {
       setError(null);
     } catch (err) {
       setError('Failed to load data');
-      console.error(err);
+      logger.error(err as Error, { context: 'Admin listings error' });
     } finally {
       setLoading(false);
     }

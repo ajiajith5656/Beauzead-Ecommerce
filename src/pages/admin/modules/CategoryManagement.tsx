@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, ChevronDown, ChevronRight, Save, X, Upload } from 'lucide-react';
 import { generateClient } from 'aws-amplify/api';
 import { uploadData } from 'aws-amplify/storage';
+import { logger } from '../../../utils/logger';
 
 const client = generateClient();
 
@@ -129,7 +130,7 @@ export const CategoryManagement: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load categories');
-      console.error('Error fetching categories:', err);
+      logger.error(err as Error, { context: 'Error fetching categories' });
     } finally {
       setLoading(false);
     }
@@ -148,7 +149,7 @@ export const CategoryManagement: React.FC = () => {
       
       return `https://beauzead-store-images.s3.us-east-1.amazonaws.com/public/${fileName}`;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      logger.error(error as Error, { context: 'Error uploading image' });
       throw new Error('Failed to upload image');
     }
   };
@@ -234,7 +235,7 @@ export const CategoryManagement: React.FC = () => {
       resetForm();
     } catch (err: any) {
       setError(err.message || 'Failed to save category');
-      console.error('Error saving category:', err);
+      logger.error(err as Error, { context: 'Error saving category' });
     } finally {
       setUploadingImage(false);
     }
@@ -253,7 +254,7 @@ export const CategoryManagement: React.FC = () => {
       await fetchCategories();
     } catch (err: any) {
       setError(err.message || 'Failed to delete category');
-      console.error('Error deleting category:', err);
+      logger.error(err as Error, { context: 'Error deleting category' });
     }
   };
 

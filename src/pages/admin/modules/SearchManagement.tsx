@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Download } from 'lucide-react';
+import { logger } from '../../../utils/logger';
 
 interface SearchResult {
   type: 'user' | 'seller' | 'product' | 'order';
@@ -31,7 +32,7 @@ export const SearchManagement: React.FC = () => {
     setIsSearching(true);
     try {
       // TODO: Implement search API call
-      console.log('Searching for:', searchQuery, 'Filters:', selectedFilters);
+      logger.log('Search initiated', { query: searchQuery, filters: selectedFilters });
 
       // Mock results
       const mockResults: SearchResult[] = [
@@ -61,7 +62,7 @@ export const SearchManagement: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 800));
       setResults(mockResults);
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error(error as Error, { context: 'Search failed' });
       alert('Search failed. Please try again.');
     } finally {
       setIsSearching(false);

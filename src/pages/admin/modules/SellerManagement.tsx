@@ -3,6 +3,7 @@ import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
 import { Search, Eye, CheckCircle, XCircle } from 'lucide-react';
 import type { Seller } from '../../../types';
+import { logger } from '../../../utils/logger';
 
 interface PaginationState {
   page: number;
@@ -46,7 +47,7 @@ export const SellerManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load sellers');
-      console.error(err);
+      logger.error(err as Error, { context: 'Seller management error' });
     } finally {
       setLoading(false);
     }

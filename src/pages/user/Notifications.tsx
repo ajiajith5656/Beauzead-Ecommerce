@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
@@ -83,7 +84,7 @@ export const NotificationsPage: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 800));
         setNotifications(mockNotifications);
       } catch (error) {
-        console.error('Failed to load notifications:', error);
+        logger.error(error as Error, { context: 'Failed to load notifications' });
       } finally {
         setLoading(false);
       }

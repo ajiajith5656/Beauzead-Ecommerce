@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import logger from '../utils/logger';
 import { fetchExchangeRates } from '../utils/currency';
 
 interface CurrencyContextType {
@@ -49,7 +50,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const fetchedRates = await fetchExchangeRates();
         setRates(fetchedRates);
       } catch (error) {
-        console.error('Failed to load exchange rates:', error);
+        logger.error(error as Error, { context: 'Failed to load exchange rates' });
       } finally {
         setLoading(false);
       }

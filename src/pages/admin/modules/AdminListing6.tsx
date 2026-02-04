@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { useProductListing, type OfferRule } from '../../../contexts/ProductListingContext';
 import adminApiService from '../../../services/admin/adminApiService';
@@ -100,7 +101,7 @@ export const AdminListing6: React.FC = () => {
       setError(null);
       
       const productData = getSubmitData();
-      console.log('Submitting product:', productData);
+      logger.log('Product submitted', { productData });
       
       // Call the API to create the product
       const result = await adminApiService.createProduct(productData as any);

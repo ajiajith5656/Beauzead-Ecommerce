@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
@@ -66,7 +67,7 @@ export const UserSettings: React.FC = () => {
           phone: '+91 9876543210',
         }));
       } catch (error) {
-        console.error('Failed to load settings:', error);
+        logger.error(error as Error, { context: 'Failed to load settings' });
       } finally {
         setLoading(false);
       }

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Product } from '../types';
+import logger from '../utils/logger';
 
 interface WishlistContextType {
   items: Product[];
@@ -21,7 +22,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         setItems(JSON.parse(savedWishlist));
       } catch (error) {
-        console.error('Failed to load wishlist:', error);
+        logger.error(error as Error, { context: 'Failed to load wishlist' });
       }
     }
   }, []);

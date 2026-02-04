@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
@@ -67,7 +68,7 @@ export const MyOrders: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setOrders(mockOrders);
       } catch (error) {
-        console.error('Failed to load orders:', error);
+        logger.error(error as Error, { context: 'Failed to load orders' });
       } finally {
         setLoading(false);
       }

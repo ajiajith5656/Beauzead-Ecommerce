@@ -7,6 +7,7 @@ import { useWishlist } from '../../contexts/WishlistContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { SUPPORTED_CURRENCIES } from '../../utils/currency';
 import { requireLogin } from '../../utils/authGuard';
+import logger from '../../utils/logger';
 
 export const Header: React.FC = () => {
   const { user, currentAuthUser, signOut } = useAuth();
@@ -60,13 +61,24 @@ export const Header: React.FC = () => {
     }
     
     setNavigationLoading(true);
-    await signOut();
-    setShowProfileDropdown(false);
-    setShowMobileMenu(false);
-    setTimeout(() => {
-      navigate('/');
+    try {
+      const roleBeforeSignout = await signOut();
+      setShowProfileDropdown(false);
+      setShowMobileMenu(false);
+      
+      // Redirect based on previous role
+      setTimeout(() => {
+        if (roleBeforeSignout && (roleBeforeSignout === 'admin' || roleBeforeSignout === 'seller')) {
+          navigate('/seller');
+        } else {
+          navigate('/');
+        }
+        setNavigationLoading(false);
+      }, 300);
+    } catch (error) {
+      logger.error(error as Error, { context: 'Logout error' });
       setNavigationLoading(false);
-    }, 300);
+    }
   };
 
   // Get display name from user

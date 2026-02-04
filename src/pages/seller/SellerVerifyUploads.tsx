@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { 
   ArrowLeft, CheckCircle2, X, Loader2, Image, 
   FileStack, CreditCard, Landmark, Upload
@@ -57,7 +58,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
         await getKYCRequirementsByCountry(sellerCountry);
         // In the future, dynamically generate upload fields based on requirements
       } catch (error) {
-        console.error('Failed to fetch KYC requirements:', error);
+        logger.error(error as Error, { context: 'Failed to fetch KYC requirements' });
       }
     };
     

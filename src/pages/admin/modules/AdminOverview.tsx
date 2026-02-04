@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../../../utils/logger';
 import { generateClient } from 'aws-amplify/api';
 import { Loading, ErrorMessage } from '../components/StatusIndicators';
 import type { DashboardData } from '../../../types';
@@ -137,7 +138,7 @@ export const AdminOverview: React.FC = () => {
 
         setError(null);
       } catch (err) {
-        console.error('Error loading dashboard data:', err);
+        logger.error(err as Error, { context: 'Error loading dashboard data' });
         setError('Failed to load dashboard metrics');
       } finally {
         setLoading(false);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from '../../../utils/logger';
 import { TableManager } from './TableManager';
 import type { TableConfig } from './TableManager';
 
@@ -29,15 +30,15 @@ export const BusinessTypeManagement: React.FC = () => {
       ];
     },
     onAdd: async (data) => {
-      console.log('Add business type:', data);
+      logger.log('Business type added', { data });
       return true;
     },
     onEdit: async (id, data) => {
-      console.log('Edit business type:', id, data);
+      logger.log('Business type edited', { id, data });
       return true;
     },
     onDelete: async (id) => {
-      console.log('Delete business type:', id);
+      logger.log('Business type deleted', { id });
       return true;
     },
   };

@@ -3,6 +3,7 @@ import { generateClient } from 'aws-amplify/api';
 import { Loading } from '../components/StatusIndicators';
 import { Search, Trash2, Ban, X } from 'lucide-react';
 import type { User } from '../../../types';
+import { logger } from '../../../utils/logger';
 
 const client = generateClient();
 
@@ -106,7 +107,7 @@ export const UserManagement: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load users');
-      console.error('Error fetching users:', err);
+      logger.error(err as Error, { context: 'Error fetching users' });
     } finally {
       setLoading(false);
     }
@@ -124,7 +125,7 @@ export const UserManagement: React.FC = () => {
       await fetchUsers();
     } catch (err: any) {
       setError(err.message || 'Failed to ban user');
-      console.error('Error banning user:', err);
+      logger.error(err as Error, { context: 'Error banning user' });
     } finally {
       setActionLoading(null);
     }
@@ -142,7 +143,7 @@ export const UserManagement: React.FC = () => {
       await fetchUsers();
     } catch (err: any) {
       setError(err.message || 'Failed to unban user');
-      console.error('Error unbanning user:', err);
+      logger.error(err as Error, { context: 'Error unbanning user' });
     } finally {
       setActionLoading(null);
     }
@@ -160,7 +161,7 @@ export const UserManagement: React.FC = () => {
       await fetchUsers();
     } catch (err: any) {
       setError(err.message || 'Failed to delete user');
-      console.error('Error deleting user:', err);
+      logger.error(err as Error, { context: 'Error deleting user' });
     } finally {
       setActionLoading(null);
       setShowDeleteConfirm(null);

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { Edit2, Save, X, Upload } from 'lucide-react';
 
 export const SellerProfile: React.FC = () => {
@@ -42,7 +43,7 @@ export const SellerProfile: React.FC = () => {
 
   const handleSave = () => {
     // TODO: Implement save API call
-    console.log('Saving profile:', formData);
+    logger.log('Profile saved', { formData });
     setIsEditing(false);
   };
 

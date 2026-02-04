@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Trash2, Lock } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export const Profile: React.FC = () => {
 
   const handleSaveProfile = () => {
     // TODO: Implement profile update API call
-    console.log('Saving profile:', formData);
+    logger.log('Profile saved', { formData });
     setIsEditing(false);
   };
 
@@ -39,7 +40,7 @@ export const Profile: React.FC = () => {
   const handleDeleteAccount = () => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       // TODO: Implement account deletion API call
-      console.log('Deleting account');
+      logger.log('Account deletion requested', {});
     }
   };
 

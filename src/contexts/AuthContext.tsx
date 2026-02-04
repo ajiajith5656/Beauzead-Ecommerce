@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import '../lib/amplifyConfig'; // Initialize Amplify
 import amplifyAuthService, { type AuthUser } from '../lib/amplifyAuth';
 import type { User } from '../types';
+import logger from '../utils/logger';
+import { userSignupSchema, userLoginSchema, passwordResetSchema } from '../utils/validation';
 
 interface AuthContextType {
   user: User | null;
@@ -13,7 +15,7 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ success: boolean; isSignedIn?: boolean; role?: User['role'] | null; error?: any }>;
-  signOut: () => Promise<void>;
+  signOut: () => Promise<'user' | 'seller' | 'admin' | null>;
   resetPassword: (email: string) => Promise<any>;
   confirmPasswordReset: (email: string, code: string, newPassword: string) => Promise<any>;
   confirmSignUp: (email: string, code: string) => Promise<any>;
@@ -35,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const decoded = atob(normalized);
       return JSON.parse(decoded);
     } catch (error) {
-      console.error('Failed to decode JWT payload:', error);
+      logger.error(error as Error, { context: 'JWT decode failed' });
       return null;
     }
   };
@@ -46,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const idToken = session?.tokens?.idToken?.toString();
       const payload = decodeJwtPayload(idToken);
       
-      console.log('JWT Payload for role detection:', {
+      logger.debug('JWT Payload for role detection:', {
         'custom:role': payload?.['custom:role'],
         'role': payload?.role,
         'cognito:groups': payload?.['cognito:groups'],
@@ -62,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : undefined) ||
         null;
 
-      console.log('Resolved role from JWT:', roleFromToken);
+      logger.debug('Resolved role from JWT:', roleFromToken);
 
       if (roleFromToken) {
         setAuthRole(roleFromToken);
@@ -70,23 +72,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // FALLBACK: If no role in JWT, check phone_number attribute to determine role
-      console.log('No role found in JWT, attempting fallback role detection...');
+      logger.debug('No role found in JWT, attempting fallback role detection...');
       
       const phoneNumber = payload?.phone_number as string | undefined;
       
       if (phoneNumber) {
-        console.log('phone_number exists in JWT → assigning seller role (fallback)');
+        logger.debug('phone_number exists in JWT → assigning seller role (fallback)');
         setAuthRole('seller');
         return 'seller';
       } else {
-        console.log('No phone_number in JWT → assigning user role (fallback)');
+        logger.debug('No phone_number in JWT → assigning user role (fallback)');
         setAuthRole('user');
         return 'user';
       }
     } catch (error) {
-      console.error('Failed to resolve role from session:', error);
+      logger.error(error as Error, { context: 'Failed to resolve role from session' });
       // Final fallback: assume user role
-      console.warn('Failed to resolve role, defaulting to user role');
+      logger.warn('Failed to resolve role, defaulting to user role');
       setAuthRole('user');
       return 'user';
     }
@@ -104,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await fetchUserProfile(authUser.username);
         }
       } catch (error) {
-        console.error('Error checking auth status:', error);
+        logger.error(error as Error, { context: 'Error checking auth status' });
       } finally {
         setLoading(false);
       }
@@ -119,11 +121,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const appsyncEndpoint = import.meta.env.VITE_APPSYNC_ENDPOINT;
       const apiKey = import.meta.env.VITE_APPSYNC_API_KEY;
       
-      console.log('Fetching user profile for userId:', userId);
-      console.log('AppSync endpoint:', appsyncEndpoint);
+      logger.debug('Fetching user profile for userId:', userId);
+      logger.debug('AppSync endpoint:', appsyncEndpoint);
       
       if (!appsyncEndpoint || !apiKey) {
-        console.error('AppSync configuration missing');
+        logger.error('AppSync configuration missing');
         return null;
       }
 
@@ -154,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       const result = await response.json();
-      console.log('AppSync response:', result);
+      logger.api('POST', appsyncEndpoint, response.status);
       
       if (result.data?.getUser) {
         const userData: User = {
@@ -164,7 +166,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           created_at: new Date().toISOString(),
         };
         
-        console.log('Mapped user data:', userData);
+        logger.debug('Mapped user data:', userData);
         
         setUser(userData);
         if (userData.role) {
@@ -172,46 +174,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return userData;
       } else {
-        console.log('No user data found in AppSync response');
+        logger.warn('No user data found in AppSync response');
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      logger.error(error as Error, { context: 'Error fetching user profile' });
     }
     return null;
   };
 
   const signUp = async (email: string, password: string, role: 'user' | 'seller' | 'admin', fullName: string, currency?: string, phoneNumber?: string) => {
     try {
-      const signupResult = await amplifyAuthService.signup({
+      // Validate input
+      const validatedData = userSignupSchema.parse({
         email,
         password,
-        name: fullName,
-        phone_number: phoneNumber, // Only passed for sellers
-        role, // Pass role to service
+        fullName,
+        role,
+        phoneNumber,
+        currency,
       });
 
-      // Call backend API to add user to group
-      // This would require your backend to have an endpoint that can add users to Cognito groups
-      // For now, the role will be determined from the JWT token if configured properly
-      // The system will work once the backend Lambda creates the group assignment
+      const signupResult = await amplifyAuthService.signup({
+        email: validatedData.email,
+        password: validatedData.password,
+        name: validatedData.fullName,
+        phone_number: validatedData.phoneNumber,
+        role: validatedData.role,
+      });
+
+      logger.auth('User signed up', signupResult.userId);
 
       // Store currency preference
-      if (currency) {
-        localStorage.setItem(`currency_${signupResult.userId}`, currency);
+      if (validatedData.currency) {
+        localStorage.setItem(`currency_${signupResult.userId}`, validatedData.currency);
       }
 
       return { success: true, userId: signupResult.userId, isSignUpComplete: signupResult.isSignUpComplete };
     } catch (error) {
-      console.error('Signup error:', error);
+      logger.error(error as Error, { context: 'Signup error' });
       return { success: false, error };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Validate input
+      const validatedData = userLoginSchema.parse({ email, password });
+
       const result = await amplifyAuthService.signin({
-        email,
-        password,
+        email: validatedData.email,
+        password: validatedData.password,
       });
 
       // Wait for session to be established after signin
@@ -225,16 +237,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (authUser) {
         profile = await fetchUserProfile(authUser.username);
-        console.log('Fetched user profile:', profile);
+        logger.debug('Fetched user profile:', profile);
       }
 
       // Determine the final role and set it in state
       const finalRole = profile?.role || roleFromSession || null;
-      console.log('Final role determined:', finalRole, 'from profile:', profile?.role, 'from session:', roleFromSession);
+      logger.auth('User signed in', authUser?.username);
+      logger.debug('Final role determined:', finalRole, 'from profile:', profile?.role, 'from session:', roleFromSession);
       
       if (finalRole) {
         setAuthRole(finalRole);
       }
+
+      // Set user context for error tracking
+      logger.setUser(authUser ? {
+        id: authUser.username,
+        email: profile?.email,
+        role: finalRole || undefined,
+      } : null);
 
       return {
         success: true,
@@ -242,28 +262,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: finalRole,
       };
     } catch (error) {
-      console.error('Signin error:', error);
+      logger.error(error as Error, { context: 'Signin error' });
       return { success: false, error };
     }
   };
 
   const signOut = async () => {
     try {
+      const roleBeforeSignout = authRole;
       await amplifyAuthService.signout();
       setUser(null);
       setCurrentAuthUser(null);
       setAuthRole(null);
+      
+      // Clear any localStorage items
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Clear user context in error tracking
+      logger.setUser(null);
+      logger.auth('User signed out', roleBeforeSignout || 'unknown');
+      
+      // Return the role for navigation purposes
+      return roleBeforeSignout;
     } catch (error) {
-      console.error('Signout error:', error);
+      logger.error(error as Error, { context: 'Signout error' });
+      throw error;
     }
   };
 
   const resetPassword = async (email: string) => {
     try {
-      const result = await amplifyAuthService.initiatePasswordReset(email);
+      const validatedData = passwordResetSchema.parse({ email });
+      const result = await amplifyAuthService.initiatePasswordReset(validatedData.email);
+      logger.auth('Password reset initiated', validatedData.email);
       return { success: true, ...result };
     } catch (error) {
-      console.error('Password reset error:', error);
+      logger.error(error as Error, { context: 'Password reset error' });
       return { success: false, error };
     }
   };
@@ -271,9 +306,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const confirmPasswordReset = async (email: string, code: string, newPassword: string) => {
     try {
       await amplifyAuthService.confirmPasswordReset(email, code, newPassword);
+      logger.auth('Password reset confirmed', email);
       return { success: true };
     } catch (error) {
-      console.error('Confirm password reset error:', error);
+      logger.error(error as Error, { context: 'Confirm password reset error' });
       return { success: false, error };
     }
   };
@@ -290,11 +326,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (authUser) {
         // Fetch user profile from DynamoDB
         await fetchUserProfile(authUser.username);
+        logger.auth('User confirmed signup', authUser.username);
       }
 
       return { success: true, ...result };
     } catch (error: any) {
-      console.error('Confirm signup error:', error);
+      logger.error(error as Error, { context: 'Confirm signup error' });
       
       // Handle case where user is already confirmed
       if (error.name === 'NotAuthorizedException' || error.message?.includes('already') || error.message?.includes('CONFIRMED')) {

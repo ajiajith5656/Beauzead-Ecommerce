@@ -1,4 +1,5 @@
 import React from 'react';
+import { logger } from '../../../utils/logger';
 import { TableManager } from './TableManager';
 import type { TableConfig } from './TableManager';
 
@@ -26,15 +27,15 @@ export const CountryListManagement: React.FC = () => {
       ];
     },
     onAdd: async (data) => {
-      console.log('Add country:', data);
+      logger.log('Country added', { data });
       return true;
     },
     onEdit: async (id, data) => {
-      console.log('Edit country:', id, data);
+      logger.log('Country edited', { id, data });
       return true;
     },
     onDelete: async (id) => {
-      console.log('Delete country:', id);
+      logger.log('Country deleted', { id });
       return true;
     },
   };

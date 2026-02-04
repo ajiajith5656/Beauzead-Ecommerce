@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Package, Truck, RotateCcw, Download } from 'lucide-react';
 
@@ -63,12 +64,12 @@ export const OrderDetails: React.FC = () => {
   };
 
   const handleInitiateReturn = (itemId: string) => {
-    console.log('Initiating return for item:', itemId);
+    logger.log('Return initiated', { itemId });
     // TODO: Implement return initiation
   };
 
   const handleDownloadInvoice = () => {
-    console.log('Downloading invoice for order:', orderId);
+    logger.log('Invoice downloaded', { orderId });
     // TODO: Implement invoice download
   };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../../../utils/logger';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
 import { Eye } from 'lucide-react';
@@ -42,7 +43,7 @@ export const ComplaintManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load complaints');
-      console.error(err);
+      logger.error(err as Error, { context: 'Complaint management error' });
     } finally {
       setLoading(false);
     }

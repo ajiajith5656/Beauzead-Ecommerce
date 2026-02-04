@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { Product } from '../types';
+import logger from '../utils/logger';
 
 interface CartItem {
   product: Product;
@@ -28,7 +29,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         setItems(JSON.parse(savedCart));
       } catch (error) {
-        console.error('Failed to load cart:', error);
+        logger.error(error as Error, { context: 'Failed to load cart' });
       }
     }
   }, []);

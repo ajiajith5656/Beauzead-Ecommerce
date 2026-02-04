@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import {
   ChevronRight,
   ChevronLeft,
@@ -367,7 +368,7 @@ const SellerKYCVerification: React.FC<SellerKYCVerificationProps> = ({
         setErrors({ submit: result.error || 'Failed to submit KYC form. Please try again.' });
       }
     } catch (error) {
-      console.error('Error submitting KYC:', error);
+      logger.error(error as Error, { context: 'Error submitting KYC' });
       setErrors({
         submit: `Failed to submit KYC form: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });

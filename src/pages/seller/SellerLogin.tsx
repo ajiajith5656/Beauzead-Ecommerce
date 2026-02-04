@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { Link, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Lock, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -32,7 +33,7 @@ const SellerLogin: React.FC = () => {
       await signOut();
     } catch (err) {
       // Ignore signout errors, continue with login
-      console.log('No existing session to sign out');
+      logger.log('No existing session', {});
     }
 
     const result = await signIn(email, password);

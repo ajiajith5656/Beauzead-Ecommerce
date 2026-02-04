@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '../../utils/logger';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, CheckCircle, XCircle,
@@ -153,7 +154,7 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
 
   const confirmAction = () => {
     // Here you would make API call
-    console.log('Action confirmed:', showActionModal, selectedOrder?.orderId);
+    logger.log('Order action confirmed', { action: showActionModal, orderId: selectedOrder?.orderId });
     setShowActionModal(null);
     setSelectedOrder(null);
     setTrackingId('');

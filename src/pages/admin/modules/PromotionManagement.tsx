@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../../../utils/logger';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage } from '../components/StatusIndicators';
 import { Plus, Edit, Trash2 } from 'lucide-react';
@@ -23,7 +24,7 @@ export const PromotionManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load promotions');
-      console.error(err);
+      logger.error(err as Error, { context: 'Promotion management error' });
     } finally {
       setLoading(false);
     }

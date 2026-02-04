@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../../../utils/logger';
 import adminApiService from '../../../services/admin/adminApiService';
 import { Loading, ErrorMessage, SuccessMessage } from '../components/StatusIndicators';
 import { Plus, Edit, Trash2 } from 'lucide-react';
@@ -28,7 +29,7 @@ export const BannerManagement: React.FC = () => {
       }
     } catch (err) {
       setError('Failed to load banners');
-      console.error(err);
+      logger.error(err as Error, { context: 'Banner management error' });
     } finally {
       setLoading(false);
     }
