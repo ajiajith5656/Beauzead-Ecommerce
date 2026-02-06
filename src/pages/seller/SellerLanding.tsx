@@ -148,7 +148,7 @@ export const SellerLanding = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               <Link
                 to="/seller/signup"
-                className="group relative px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50"
+                className="group relative px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-amber-500/50"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Get Started
@@ -159,7 +159,7 @@ export const SellerLanding = () => {
               
               <Link
                 to="/seller/signup"
-                className="px-8 py-4 bg-slate-800 text-amber-400 font-bold text-lg rounded-full border-2 border-amber-500/50 hover:bg-slate-700 hover:border-amber-400 transition-all hover:scale-105"
+                className="px-5 py-3 bg-slate-800 text-amber-400 font-bold text-lg rounded-full border-2 border-amber-500/50 hover:bg-slate-700 hover:border-amber-400 transition-all hover:scale-105"
               >
                 Sell Now
               </Link>
@@ -246,7 +246,7 @@ export const SellerLanding = () => {
           <div className="text-center mt-12">
             <Link
               to="/seller/signup"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-all hover:shadow-xl hover:shadow-amber-500/50"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-all hover:shadow-xl hover:shadow-amber-500/50"
             >
               Start Your Journey
               <TrendingUp className="w-5 h-5" />
@@ -289,7 +289,7 @@ export const SellerLanding = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/seller/signup"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-all hover:shadow-xl hover:shadow-amber-500/50"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-bold text-lg rounded-full hover:scale-105 transition-all hover:shadow-xl hover:shadow-amber-500/50"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 Start Selling Today
@@ -297,7 +297,7 @@ export const SellerLanding = () => {
               
               <Link
                 to="/seller/login"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-slate-800 text-amber-400 font-bold text-lg rounded-full border-2 border-amber-500/50 hover:bg-slate-700 hover:border-amber-400 transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-slate-800 text-amber-400 font-bold text-lg rounded-full border-2 border-amber-500/50 hover:bg-slate-700 hover:border-amber-400 transition-all hover:scale-105"
               >
                 Existing Seller Login
                 <ArrowRight className="w-5 h-5" />

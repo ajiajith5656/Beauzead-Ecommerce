@@ -1,61 +1,226 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Star, Upload, Send } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { generateClient } from 'aws-amplify/api';
+import { uploadData, getUrl } from 'aws-amplify/storage';
+import { Star, Upload, Send, Loader2, Package, AlertCircle } from 'lucide-react';
+import logger from '../../utils/logger';
+import { useAuth } from '../../contexts/AuthContext';
+import { getProduct } from '../../graphql/queries';
+import { createReview } from '../../graphql/mutations';
+
+const client = generateClient();
+
+interface Product {
+  id: string;
+  name: string;
+  image_url?: string;
+  price: number;
+  images?: string[];
+}
 
 export const WriteReview: React.FC = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { user, currentAuthUser } = useAuth();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState('');
   const [review, setReview] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [benefits, setBenefits] = useState<string[]>([]);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  // Mock product data - TODO: Fetch from API
-  const product = {
-    id: productId,
-    name: 'Premium Headphones',
-    image: 'https://via.placeholder.com/200',
-    price: 2999.99
-  };
+  // Fetch product data on mount
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) {
+        setError('Product ID is missing');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response: any = await client.graphql({
+          query: getProduct,
+          variables: { id: productId },
+        });
+
+        if (response.data?.getProduct) {
+          setProduct(response.data.getProduct);
+        } else {
+          setError('Product not found');
+        }
+      } catch (error) {
+        logger.error(error as Error, { context: 'Failed to fetch product for review' });
+        setError('Failed to load product details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImages(Array.from(e.target.files));
+      const files = Array.from(e.target.files);
+      // Limit to 5 images
+      if (files.length + images.length > 5) {
+        alert('Maximum 5 images allowed');
+        return;
+      }
+      // Check file size (max 5MB each)
+      const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        alert('Some images exceed 5MB. Please choose smaller files.');
+        return;
+      }
+      setImages([...images, ...files]);
+    }
+  };
+
+  const handleBenefitToggle = (benefit: string) => {
+    setBenefits(prev => 
+      prev.includes(benefit) 
+        ? prev.filter(b => b !== benefit)
+        : [...prev, benefit]
+    );
+  };
+
+  const uploadReviewImages = async (): Promise<string[]> => {
+    if (images.length === 0) return [];
+
+    try {
+      const uploadPromises = images.map(async (file, index) => {
+        const timestamp = Date.now();
+        const fileName = `${productId}-${timestamp}-${index}-${file.name}`;
+        const key = `reviews/${fileName}`;
+
+        await uploadData({
+          key,
+          data: file,
+          options: {
+            contentType: file.type,
+          },
+        }).result;
+
+        const urlResult = await getUrl({ key });
+        return urlResult.url.toString();
+      });
+
+      return await Promise.all(uploadPromises);
+    } catch (error) {
+      logger.error(error as Error, { context: 'Failed to upload review images' });
+      throw new Error('Failed to upload images');
     }
   };
 
   const handleSubmitReview = async () => {
+    // Validation
     if (!rating || !title.trim() || !review.trim()) {
-      alert('Please fill all required fields');
+      alert('Please fill all required fields: Rating, Title, and Review');
+      return;
+    }
+
+    if (!agreeToTerms) {
+      alert('Please agree to the terms before submitting');
+      return;
+    }
+
+    const userId = user?.id || currentAuthUser?.username;
+    if (!userId) {
+      alert('You must be logged in to submit a review');
+      navigate('/login');
+      return;
+    }
+
+    if (!productId) {
+      alert('Product ID is missing');
       return;
     }
 
     setIsSubmitting(true);
+    setError(null);
+
     try {
-      // TODO: Implement review submission API call
-      logger.log('Review submitted', {
-        productId,
-        rating,
-        title,
-        review,
-        images
+      // Upload images first (if any)
+      const uploadedImageUrls = await uploadReviewImages();
+
+      // Submit review to backend
+      const reviewInput = {
+        product_id: productId,
+        user_id: userId,
+        rating: rating,
+        title: title.trim(),
+        comment: review.trim(),
+        images: uploadedImageUrls,
+        is_verified_purchase: false, // TODO: Check if user actually purchased this product
+      };
+
+      const response: any = await client.graphql({
+        query: createReview,
+        variables: {
+          input: reviewInput,
+        },
       });
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      alert('Review submitted successfully!');
-      navigate(`/products/${productId}`);
+
+      if (response.data?.createReview) {
+        logger.log('Review submitted successfully', {
+          reviewId: response.data.createReview.id,
+          productId,
+          rating,
+        });
+        alert('Review submitted successfully! Thank you for your feedback.');
+        navigate(`/products/${productId}`);
+      } else {
+        throw new Error('Failed to create review');
+      }
     } catch (error) {
       logger.error(error as Error, { context: 'Error submitting review' });
-      alert('Failed to submit review');
+      setError('Failed to submit review. Please try again.');
+      alert('Failed to submit review. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+          <span className="text-lg text-gray-700">Loading product details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Unable to Load Product</h2>
+            <p className="text-gray-600 mb-6">{error || 'Product not found'}</p>
+            <button
+              onClick={() => navigate('/')}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Go to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -69,11 +234,17 @@ export const WriteReview: React.FC = () => {
         {/* Product Card */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex gap-6">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-32 h-32 object-cover rounded-lg"
-            />
+            {product.image_url || (product.images && product.images.length > 0) ? (
+              <img
+                src={product.image_url || product.images![0]}
+                alt={product.name}
+                className="w-32 h-32 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Package className="h-12 w-12 text-gray-400" />
+              </div>
+            )}
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-gray-900">{product.name}</h2>
               <p className="text-gray-600 mt-2">Product ID: {product.id}</p>
@@ -156,7 +327,7 @@ export const WriteReview: React.FC = () => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Add Photos (Optional)
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p className="text-gray-600 mb-2">
                 Drag and drop your images here or click to select
@@ -212,6 +383,8 @@ export const WriteReview: React.FC = () => {
                 <label key={benefit} className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={benefits.includes(benefit)}
+                    onChange={() => handleBenefitToggle(benefit)}
                     className="w-4 h-4 rounded border-gray-300"
                   />
                   <span className="text-gray-700">{benefit}</span>
@@ -225,6 +398,8 @@ export const WriteReview: React.FC = () => {
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
                 className="w-4 h-4 mt-1"
                 required
               />
@@ -239,17 +414,27 @@ export const WriteReview: React.FC = () => {
           <div className="flex gap-4 pt-6 border-t">
             <button
               onClick={() => navigate(`/products/${productId}`)}
-              className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition font-semibold"
+              disabled={isSubmitting}
+              className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition font-semibold disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmitReview}
-              disabled={isSubmitting}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2 disabled:bg-blue-400"
+              disabled={isSubmitting || !agreeToTerms}
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold flex items-center justify-center gap-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              <Send className="w-4 h-4" />
-              {isSubmitting ? 'Submitting...' : 'Submit Review'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Submit Review
+                </>
+              )}
             </button>
           </div>
         </div>

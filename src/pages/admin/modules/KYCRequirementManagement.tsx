@@ -105,7 +105,7 @@ export const KYCRequirementManagement: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">KYC Requirements</h1>
+            <h1 className="text-xl font-bold text-gray-900">KYC Requirements</h1>
             <p className="text-gray-600 mt-2">Manage verification requirements by country and registration type</p>
           </div>
           <button
@@ -188,13 +188,13 @@ export const KYCRequirementManagement: React.FC = () => {
         {/* Requirements List */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="animate-spin text-blue-600" size={40} />
+            <Loader2 className="animate-spin text-blue-600" size={24} />
           </div>
         ) : (
           <div className="space-y-8">
             {Object.keys(groupedByCountry).sort().map((country) => (
               <div key={country} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3">
                   <h3 className="text-lg font-bold text-white">{country}</h3>
                 </div>
                 <div className="overflow-x-auto">
@@ -210,10 +210,10 @@ export const KYCRequirementManagement: React.FC = () => {
                     <tbody className="divide-y">
                       {groupedByCountry[country].map((req: KYCRequirement) => (
                         <tr key={req.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{req.registrationType}</td>
-                          <td className="px-6 py-4 text-sm text-gray-700">{req.requiredDocuments}</td>
-                          <td className="px-6 py-4 text-sm text-gray-600">{req.description || '—'}</td>
-                          <td className="px-6 py-4 text-right space-x-2">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{req.registrationType}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700">{req.requiredDocuments}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{req.description || '—'}</td>
+                          <td className="px-4 py-3 text-right space-x-2">
                             <button
                               onClick={() => handleEdit(req)}
                               className="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1"

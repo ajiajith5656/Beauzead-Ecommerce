@@ -111,7 +111,7 @@ export const AuditLogs: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
+          <h1 className="text-xl font-bold text-gray-900">Audit Logs</h1>
           <p className="text-gray-600 mt-2">Track all administrative actions and changes</p>
         </div>
 
@@ -187,40 +187,40 @@ export const AuditLogs: React.FC = () => {
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Timestamp</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Admin</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Action</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Resource</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">IP Address</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Details</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Timestamp</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Admin</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Resource</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">IP Address</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Details</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {logs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-gray-400" />
                         {log.timestamp}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{log.admin}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600">{log.admin}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getActionColor(log.action)}`}>
                         {log.action}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {log.resource} ({log.resourceId})
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(log.status)}`}>
                         {log.status === 'success' ? 'Success' : 'Failed'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-mono">{log.ipAddress}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600 font-mono">{log.ipAddress}</td>
+                    <td className="px-4 py-3 text-sm">
                       <button className="text-blue-600 hover:text-blue-700 flex items-center gap-1">
                         <Eye className="w-4 h-4" />
                         View
@@ -250,7 +250,7 @@ export const AuditLogs: React.FC = () => {
         </div>
 
         {/* Log Details Modal Info */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-900 mb-2">Need detailed information?</h3>
           <p className="text-blue-800 text-sm">
             Click "View" on any log to see complete details including request payload, response, and affected records.

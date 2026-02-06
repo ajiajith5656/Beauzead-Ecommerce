@@ -225,7 +225,7 @@ export const ProductManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Product Management</h2>
+          <h2 className="text-xl font-bold text-gray-900">Product Management</h2>
           <p className="text-gray-600">Total Products: {filteredProducts.length}</p>
         </div>
         <button
@@ -304,7 +304,7 @@ export const ProductManagement: React.FC = () => {
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
                   <tr key={product.productId || product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-3">
                         {product.images && product.images[0] && (
                           <img src={product.images[0]} alt={product.name} className="w-10 h-10 object-cover rounded" />
@@ -315,15 +315,15 @@ export const ProductManagement: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product.category || 'N/A'}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    <td className="px-4 py-3 text-sm text-gray-600">{product.category || 'N/A'}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                       ${product.price?.toFixed(2) || '0.00'}
                       {product.discount_price && (
                         <div className="text-xs text-green-600">${product.discount_price.toFixed(2)}</div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product.stock || 0}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600">{product.stock || 0}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         product.approval_status === 'approved' ? 'bg-green-100 text-green-800' :
                         product.approval_status === 'rejected' ? 'bg-red-100 text-red-800' :
@@ -332,14 +332,14 @@ export const ProductManagement: React.FC = () => {
                         {(product.approval_status || 'pending').toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {product.is_active ? 'ACTIVE' : 'DISABLED'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -425,7 +425,7 @@ export const ProductManagement: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Product Details</h2>
+              <h2 className="text-xl font-bold text-gray-900">Product Details</h2>
               <button
                 onClick={() => setShowDetails(false)}
                 className="text-gray-500 hover:text-gray-700 text-2xl"

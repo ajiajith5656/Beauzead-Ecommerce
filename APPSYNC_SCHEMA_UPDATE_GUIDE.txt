@@ -1,0 +1,115 @@
+
+═══════════════════════════════════════════════════════════════
+  📝 HOW TO ADD STRIPE MUTATIONS TO APPSYNC SCHEMA
+═══════════════════════════════════════════════════════════════
+
+🔗 STEP 1: Open This URL
+──────────────────────────────────────────────────────────────
+https://us-east-1.console.aws.amazon.com/appsync/home?region=us-east-1#/kodgcazqazgf5eiaxjzr6xravq/v1/schema
+
+
+📋 STEP 2: Find the "Mutation" Type in the Schema Editor
+──────────────────────────────────────────────────────────────
+Scroll down in the schema editor until you see:
+
+    type Mutation {
+      banUser(id: ID!): User
+      unbanUser(id: ID!): User
+      deleteUser(id: ID!): Boolean
+      
+      createCategory(input: CategoryInput!): Category
+      updateCategory(id: ID!, input: CategoryInput!): Category
+      deleteCategory(id: ID!): Boolean
+      addSubCategory(categoryId: ID!, subCategory: SubCategoryInput!): Category
+      updateSubCategory(categoryId: ID!, subCategoryId: ID!, subCategory: SubCategoryInput!): Category
+      removeSubCategory(categoryId: ID!, subCategoryId: ID!): Category
+      
+      createProduct(input: ProductInput!): Product
+      updateProduct(id: ID!, input: ProductInput!): Product
+      deleteProduct(id: ID!): Boolean
+      approveProduct(id: ID!): Product
+      rejectProduct(id: ID!): Product
+      toggleProductStatus(id: ID!): Product
+    }
+                                                   👆 HERE
+                                          BEFORE THE CLOSING }
+
+
+✏️ STEP 3: Add These 4 Lines BEFORE the closing }
+──────────────────────────────────────────────────────────────
+Copy and paste these 4 lines:
+
+  createStripePaymentIntent(input: AWSJSON!): AWSJSON
+  confirmPaymentAndCreateOrder(input: AWSJSON!): AWSJSON
+  processRefund(input: AWSJSON!): AWSJSON
+  processSellerPayout(input: AWSJSON!): AWSJSON
+
+
+📄 STEP 4: It Should Look Like This After Adding:
+──────────────────────────────────────────────────────────────
+    type Mutation {
+      banUser(id: ID!): User
+      unbanUser(id: ID!): User
+      deleteUser(id: ID!): Boolean
+      
+      createCategory(input: CategoryInput!): Category
+      updateCategory(id: ID!, input: CategoryInput!): Category
+      deleteCategory(id: ID!): Boolean
+      addSubCategory(categoryId: ID!, subCategory: SubCategoryInput!): Category
+      updateSubCategory(categoryId: ID!, subCategoryId: ID!, subCategory: SubCategoryInput!): Category
+      removeSubCategory(categoryId: ID!, subCategoryId: ID!): Category
+      
+      createProduct(input: ProductInput!): Product
+      updateProduct(id: ID!, input: ProductInput!): Product
+      deleteProduct(id: ID!): Boolean
+      approveProduct(id: ID!): Product
+      rejectProduct(id: ID!): Product
+      toggleProductStatus(id: ID!): Product
+      
+      createStripePaymentIntent(input: AWSJSON!): AWSJSON
+      confirmPaymentAndCreateOrder(input: AWSJSON!): AWSJSON
+      processRefund(input: AWSJSON!): AWSJSON
+      processSellerPayout(input: AWSJSON!): AWSJSON
+    }
+
+
+💾 STEP 5: Click "Save Schema" Button (Top Right)
+──────────────────────────────────────────────────────────────
+Click the orange "Save Schema" button at the top right corner
+
+
+🔗 STEP 6: Attach Resolvers
+──────────────────────────────────────────────────────────────
+After saving, click on each mutation name in the sidebar:
+
+1. Click "createStripePaymentIntent"
+   → Click "Attach" under "Data source name"
+   → Select "PaymentIntentDataSource"
+   → Click "Save Resolver"
+
+2. Click "confirmPaymentAndCreateOrder"
+   → Click "Attach"
+   → Select "ConfirmPaymentDataSource"
+   → Click "Save Resolver"
+
+3. Click "processRefund"
+   → Click "Attach"
+   → Select "RefundDataSource"
+   → Click "Save Resolver"
+
+4. Click "processSellerPayout"
+   → Click "Attach"
+   → Select "PayoutDataSource"
+   → Click "Save Resolver"
+
+
+✅ DONE! Your payment system is now fully connected!
+══════════════════════════════════════════════════════════════
+
+Test it by:
+1. Going to your app: /checkout/shipping
+2. Add items to cart and proceed through checkout
+3. Use test card: 4242 4242 4242 4242
+4. Any expiry date in the future
+5. Any 3-digit CVC
+

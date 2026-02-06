@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logger } from '../../utils/logger';
+import { useAuth } from '../../contexts/AuthContext';
+import { generateClient } from 'aws-amplify/api';
+import { ordersBySeller } from '../../graphql/queries';
 import { 
   LayoutDashboard, ShoppingBag, DollarSign, BarChart2, 
   Package, Settings, LogOut, Bell, TrendingUp, 
   MoreVertical, Clock, AlertTriangle, ArrowUpRight, ArrowDownRight,
-  ShieldCheck, X, Info, Menu, Shield, CheckCircle2
+  ShieldCheck, X, Info, Menu, Shield, Loader2
 } from 'lucide-react';
-import SellerKYCVerification from './SellerKYCVerification';
-import type { SellerKYC } from '../../types';
+import SellerVerificationPage from './SellerVerificationPage';
+import type { Seller } from '../../types';
 
 interface SellerDashboardProps {
   onLogout: () => void;
@@ -30,12 +33,99 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
   onNavigate, 
   verificationStatus 
 }) => {
+  const { user } = useAuth();
+  const client = generateClient();
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [kycSubmitted, setKycSubmitted] = useState(false);
+  const [_kycSubmitted, setKycSubmitted] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const isPending = verificationStatus === 'pending';
   const isVerified = verificationStatus === 'verified';
+  const sellerId = (user as any)?.attributes?.sub || user?.id;
+
+  // Fetch orders for dashboard stats
+  useEffect(() => {
+    if (sellerId && isVerified) {
+      fetchOrders();
+    } else {
+      setLoading(false);
+    }
+  }, [sellerId, isVerified]);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response: any = await client.graphql({
+        query: ordersBySeller,
+        variables: {
+          seller_id: sellerId,
+          sortDirection: 'DESC',
+          limit: 50
+        }
+      });
+
+      if (response.data?.ordersBySeller?.items) {
+        setOrders(response.data.ordersBySeller.items);
+      }
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate dashboard statistics
+  const calculateStats = () => {
+    const PLATFORM_FEE = 0.10;
+    let totalPayouts = 0;
+    let activeOrders = 0;
+    let deliveredOrders = 0;
+    const recentOrders: any[] = [];
+
+    orders.forEach(order => {
+      // Calculate payouts (delivered orders only)
+      if (order.status === 'delivered') {
+        const netAmount = (order.total_amount || 0) * (1 - PLATFORM_FEE);
+        totalPayouts += netAmount;
+        deliveredOrders++;
+      }
+      
+      // Count active orders
+      if (['new', 'processing', 'shipped'].includes(order.status)) {
+        activeOrders++;
+      }
+      
+      // Collect recent orders (last 5)
+      if (recentOrders.length < 5) {
+        recentOrders.push(order);
+      }
+    });
+
+    const totalOrders = orders.length;
+    const conversionRate = totalOrders > 0 ? ((deliveredOrders / totalOrders) * 100).toFixed(1) : '0';
+
+    return {
+      totalPayouts,
+      activeOrders,
+      totalOrders,
+      conversionRate: parseFloat(conversionRate),
+      recentOrders
+    };
+  };
+
+  const stats = isVerified ? calculateStats() : {
+    totalPayouts: 0,
+    activeOrders: 0,
+    totalOrders: 0,
+    conversionRate: 0,
+    recentOrders: []
+  };
 
   // Prevent body scroll when mobile menu is open
   React.useEffect(() => {
@@ -192,45 +282,32 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
           </div>
         </header>
 
-        {activeSection === 'overview' && renderOverview(verificationStatus, onNavigate, () => setActiveSection('verification'))}
+        {activeSection === 'overview' && renderOverview(verificationStatus, onNavigate, () => setActiveSection('verification'), stats, loading, error, fetchOrders)}
         
-        {activeSection === 'verification' && !kycSubmitted && (
-          <SellerKYCVerification 
-            sellerEmail={sellerEmail}
-            sellerPhone={sellerPhone}
-            sellerFullName={sellerFullName}
-            sellerCountry={sellerCountry}
-            onSubmit={(data: SellerKYC) => {
-              logger.log('KYC submitted', { data });
-              setKycSubmitted(true);
+        {activeSection === 'verification' && (
+          <SellerVerificationPage 
+            seller={{
+              seller_id: (user as any)?.attributes?.sub || user?.id || 'seller-id',
+              email: sellerEmail,
+              phone_number: sellerPhone,
+              full_name: sellerFullName,
+              country: sellerCountry,
+              kyc_status: verificationStatus,
+            } as unknown as Seller}
+            onStatusUpdate={(updates) => {
+              logger.log('Verification status updated', { updates });
+              if (updates.kyc_status === 'pending' || updates.kyc_status === 'verified') {
+                setKycSubmitted(true);
+              }
             }}
             onCancel={() => setActiveSection('overview')}
           />
         )}
         
-        {activeSection === 'verification' && kycSubmitted && (
-          <div className="bg-green-500/5 border border-green-500/20 rounded-2xl p-12 text-center animate-in fade-in duration-500">
-            <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 size={40} className="text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">KYC Submitted Successfully</h3>
-            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">Your KYC verification has been submitted for review. Our compliance team will verify your documents within 48-72 hours. You'll receive an email update once the review is complete.</p>
-            <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-6 py-4 inline-block mb-8">
-              <p className="text-green-400 font-bold text-sm uppercase tracking-wider">Status: Pending Admin Review</p>
-            </div>
-            <button
-              onClick={() => setActiveSection('overview')}
-              className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl font-bold transition-colors"
-            >
-              Back to Overview
-            </button>
-          </div>
-        )}
-        
         {activeSection !== 'overview' && activeSection !== 'settings' && !isVerified && (
           <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center animate-in fade-in duration-500">
              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-900 border border-gray-800 rounded-lg sm:rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-gray-600">
-               <ShieldCheck size={32} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
+               <ShieldCheck size={24} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
              </div>
              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Access Restricted</h3>
              <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium mb-6 sm:mb-8 md:mb-10 lg:mb-12 max-w-lg mx-auto leading-relaxed">Full dashboard capabilities are unlocked once your business verification is completed and approved by our administration team.</p>
@@ -247,7 +324,7 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
 
         {activeSection === 'settings' && (
           <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 lg:p-20 text-center">
-            <Settings size={40} className="mx-auto mb-4 sm:mb-6 md:mb-8 text-gray-800 sm:w-12 sm:h-12 md:w-16 md:h-16" />
+            <Settings size={24} className="mx-auto mb-4 sm:mb-6 md:mb-8 text-gray-800 sm:w-12 sm:h-12 md:w-16 md:h-16" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Store Configuration</h3>
             <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium">Store profile and policy settings are being updated for production.</p>
           </div>
@@ -257,13 +334,21 @@ const SellerDashboard: React.FC<SellerDashboardProps> = ({
   );
 };
 
-const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigate: (v: any) => void, onVerificationClick?: () => void) => (
+const renderOverview = (
+  status: 'unverified' | 'pending' | 'verified', 
+  onNavigate: (v: any) => void, 
+  onVerificationClick?: () => void,
+  stats?: any,
+  loading?: boolean,
+  error?: string | null,
+  onRetry?: () => void
+) => (
   <div className="animate-in fade-in duration-500">
     {status === 'unverified' && (
       <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 md:mb-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6 transition-all hover:bg-yellow-500/10">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
           <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-yellow-500 rounded-lg sm:rounded-xl flex items-center justify-center text-black shadow-2xl shadow-yellow-500/20 flex-shrink-0">
-            <AlertTriangle size={28} className="sm:w-8 sm:h-8" />
+            <AlertTriangle size={22} className="sm:w-8 sm:h-8" />
           </div>
           <div className="flex-1">
             <h4 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1">Store Verification Required</h4>
@@ -283,7 +368,7 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
       <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl sm:rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 md:mb-10 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full">
           <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-blue-500 rounded-lg sm:rounded-xl flex items-center justify-center text-white shadow-2xl shadow-blue-500/20 flex-shrink-0">
-            <Clock size={28} className="sm:w-8 sm:h-8" />
+            <Clock size={22} className="sm:w-8 sm:h-8" />
           </div>
           <div className="flex-1">
             <h4 className="text-lg sm:text-xl md:text-2xl font-semibold mb-1">Review In Progress</h4>
@@ -296,17 +381,64 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
       </div>
     )}
 
+    {loading && status === 'verified' && (
+      <div className="bg-[#0a0a0a] border border-gray-900 rounded-xl p-12 flex items-center justify-center gap-4 mb-6">
+        <Loader2 className="w-6 h-6 animate-spin text-yellow-500" />
+        <span className="text-gray-500">Loading dashboard data...</span>
+      </div>
+    )}
+
+    {error && status === 'verified' && (
+      <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-6 mb-6 flex items-center justify-between">
+        <span className="text-red-400 text-sm">{error}</span>
+        <button
+          onClick={onRetry}
+          className="text-red-400 hover:text-red-300 text-sm font-bold underline"
+        >
+          Retry
+        </button>
+      </div>
+    )}
+
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12">
-      <MerchantStat label="Total Payouts" value={status === 'verified' ? "$12,850.00" : "$0.00"} trend={status === 'verified' ? "+14.2%" : "0%"} icon={<DollarSign />} positive />
-      <MerchantStat label="Active Orders" value={status === 'verified' ? "28" : "0"} trend={status === 'verified' ? "+5.1%" : "0%"} icon={<Package />} positive />
-      <MerchantStat label="Store Visits" value={status === 'verified' ? "5.2k" : "0"} trend={status === 'verified' ? "-2.4%" : "0%"} icon={<BarChart2 />} positive={status === 'verified' ? false : true} />
-      <MerchantStat label="Growth Rate" value={status === 'verified' ? "24%" : "0%"} trend={status === 'verified' ? "+12.1%" : "0%"} icon={<TrendingUp />} positive />
+      <MerchantStat 
+        label="Total Payouts" 
+        value={status === 'verified' ? `₹${(stats?.totalPayouts || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "₹0.00"} 
+        trend={status === 'verified' ? "+14.2%" : "0%"} 
+        icon={<DollarSign />} 
+        positive 
+        loading={loading && status === 'verified'}
+      />
+      <MerchantStat 
+        label="Active Orders" 
+        value={status === 'verified' ? String(stats?.activeOrders || 0) : "0"} 
+        trend={status === 'verified' ? "+5.1%" : "0%"} 
+        icon={<Package />} 
+        positive 
+        loading={loading && status === 'verified'}
+      />
+      <MerchantStat 
+        label="Total Orders" 
+        value={status === 'verified' ? String(stats?.totalOrders || 0) : "0"} 
+        trend={status === 'verified' ? "+8.3%" : "0%"} 
+        icon={<ShoppingBag />} 
+        positive 
+        loading={loading && status === 'verified'}
+      />
+      <MerchantStat 
+        label="Conversion Rate" 
+        value={status === 'verified' ? `${stats?.conversionRate || 0}%` : "0%"} 
+        trend={status === 'verified' ? "+12.1%" : "0%"} 
+        icon={<TrendingUp />} 
+        positive 
+        loading={loading && status === 'verified'}
+      />
     </div>
 
     <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
       <div className="lg:col-span-2 bg-[#0a0a0a] border border-gray-900 rounded-xl sm:rounded-2xl md:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center items-center text-center group hover:border-yellow-500/20 transition-all">
         <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gray-900 rounded-xl sm:rounded-2xl flex items-center justify-center text-gray-700 mb-4 sm:mb-6 md:mb-8 border border-gray-800 group-hover:scale-110 transition-transform">
-          <BarChart2 size={32} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
+          <BarChart2 size={24} className="sm:w-10 sm:h-10 md:w-12 md:h-12" />
         </div>
         <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2">Performance Analytics</h3>
         <p className="text-gray-500 text-xs sm:text-sm md:text-base font-medium max-w-sm leading-relaxed">Deep-learning sales insights and global traffic trends will be available once your store is active.</p>
@@ -318,15 +450,29 @@ const renderOverview = (status: 'unverified' | 'pending' | 'verified', onNavigat
           <button className="text-yellow-500 hover:text-white transition-colors"><MoreVertical size={18} /></button>
         </h3>
         <div className="space-y-10 flex-1">
-          {status === 'verified' ? (
-            <>
-              <RecentOrder customer="James Winston" amount="$1,200.00" time="2 hours ago" status="Shipped" />
-              <RecentOrder customer="Elena Russo" amount="$450.00" time="5 hours ago" status="Placed" />
-              <RecentOrder customer="Marcus Kane" amount="$890.00" time="1 day ago" status="Delivered" />
-            </>
+          {loading && status === 'verified' ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 text-xs font-semibold gap-4">
+              <Loader2 size={24} className="animate-spin" />
+              Loading orders...
+            </div>
+          ) : status === 'verified' && stats?.recentOrders && stats.recentOrders.length > 0 ? (
+            stats.recentOrders.map((order: any) => (
+              <RecentOrder
+                key={order.id}
+                orderId={order.order_number}
+                amount={`₹${(order.total_amount || 0).toLocaleString('en-IN')}`}
+                time={new Date(order.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                status={order.status}
+              />
+            ))
+          ) : status === 'verified' && (!stats?.recentOrders || stats.recentOrders.length === 0) ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-700 text-xs font-semibold uppercase tracking-widest gap-4 opacity-50">
+               <Package size={24} className="text-gray-800" />
+               No Orders Yet
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-700 text-xs font-semibold uppercase tracking-widest gap-4 opacity-50">
-               <Package size={40} className="text-gray-800" />
+               <Package size={24} className="text-gray-800" />
                No Transaction Logs
             </div>
           )}
@@ -361,7 +507,7 @@ const NavItem = ({ icon, label, active, onClick, disabled = false, badge }: { ic
   </button>
 );
 
-const MerchantStat = ({ label, value, trend, icon, positive }: { label: string, value: string, trend: string, icon: React.ReactNode, positive: boolean }) => (
+const MerchantStat = ({ label, value, trend, icon, positive, loading }: { label: string, value: string, trend: string, icon: React.ReactNode, positive: boolean, loading?: boolean }) => (
   <div className="bg-[#0a0a0a] border border-gray-900 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl hover:border-yellow-500/30 transition-all group">
     <div className="flex justify-between items-start mb-3 sm:mb-4 md:mb-6">
       <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-black border border-gray-800 rounded-lg sm:rounded-xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
@@ -373,23 +519,41 @@ const MerchantStat = ({ label, value, trend, icon, positive }: { label: string, 
       </div>
     </div>
     <p className="text-[9px] sm:text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-0.5 sm:mb-1">{label}</p>
-    <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">{value}</h3>
+    <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
+      {loading ? (
+        <Loader2 className="w-5 h-5 animate-spin inline" />
+      ) : (
+        value
+      )}
+    </h3>
   </div>
 );
 
-const RecentOrder = ({ customer, amount, time, status }: { customer: string, amount: string, time: string, status: string }) => (
+const RecentOrder = ({ orderId, amount, time, status }: { orderId: string, amount: string, time: string, status: string }) => (
   <div className="flex items-center justify-between border-b border-gray-900 pb-8 last:border-0 last:pb-0 group">
     <div className="flex items-center gap-5">
       <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full group-hover:scale-150 transition-transform shadow-[0_0_15px_rgba(234,179,8,0.5)]"></div>
       <div>
-        <p className="text-sm font-bold text-white">{customer}</p>
+        <p className="text-sm font-bold text-white">Order #{orderId}</p>
         <p className="text-[10px] font-semibold text-gray-500 flex items-center gap-2 mt-0.5">
-          {time} <span className="text-gray-800">•</span> <span className="text-yellow-500/80 uppercase tracking-wider">{status}</span>
+          {time} <span className="text-gray-800">•</span> <span className="text-yellow-500/80 uppercase tracking-wider">{getStatusLabel(status)}</span>
         </p>
       </div>
     </div>
     <span className="text-sm font-bold text-white group-hover:text-yellow-500 transition-colors">{amount}</span>
   </div>
 );
+
+const getStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    'new': 'New',
+    'processing': 'Processing',
+    'shipped': 'Shipped',
+    'delivered': 'Delivered',
+    'cancelled': 'Cancelled',
+    'returned': 'Returned'
+  };
+  return labels[status] || status;
+};
 
 export default SellerDashboard;

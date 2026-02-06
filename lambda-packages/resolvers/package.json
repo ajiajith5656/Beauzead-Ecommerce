@@ -1,0 +1,10 @@
+{
+  "name": "stripe-connect-resolvers",
+  "version": "1.0.0",
+  "description": "AppSync Lambda resolvers for Stripe Connect operations",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1693.0",
+    "stripe": "^14.10.0"
+  }
+}

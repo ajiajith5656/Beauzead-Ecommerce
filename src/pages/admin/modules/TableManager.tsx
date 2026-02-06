@@ -23,7 +23,7 @@ interface TableManagerProps {
 export const TableManager: React.FC<TableManagerProps> = ({ config }) => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">{config.name} Management</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-6">{config.name} Management</h2>
       <p className="text-gray-600">Table manager functionality...</p>
     </div>
   );

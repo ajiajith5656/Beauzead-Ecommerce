@@ -1,0 +1,195 @@
+/**
+ * GraphQL Mutations and Queries for Stripe Connect KYC
+ * 
+ * Add these to your AppSync schema, then use these operations in your frontend
+ */
+
+import { gql } from '@apollo/client';
+
+// ========================================
+// MUTATIONS
+// ========================================
+
+export const CREATE_STRIPE_CONNECT_ACCOUNT = gql`
+  mutation CreateStripeConnectAccount($input: CreateStripeConnectAccountInput!) {
+    createStripeConnectAccount(input: $input) {
+      success
+      accountId
+      error
+    }
+  }
+`;
+
+export const GENERATE_STRIPE_ONBOARDING_LINK = gql`
+  mutation GenerateStripeOnboardingLink($input: GenerateOnboardingLinkInput!) {
+    generateStripeOnboardingLink(input: $input) {
+      success
+      url
+      error
+    }
+  }
+`;
+
+export const REFRESH_STRIPE_ACCOUNT_STATUS = gql`
+  mutation RefreshStripeAccountStatus($accountId: String!) {
+    refreshStripeAccountStatus(accountId: $accountId) {
+      success
+      status {
+        accountId
+        chargesEnabled
+        payoutsEnabled
+        detailsSubmitted
+        kycStatus
+        requirements {
+          currentlyDue
+          eventuallyDue
+          pastDue
+          pendingVerification
+        }
+      }
+      error
+    }
+  }
+`;
+
+// ========================================
+// QUERIES
+// ========================================
+
+export const GET_STRIPE_ACCOUNT_STATUS = gql`
+  query GetStripeAccountStatus($accountId: String!) {
+    getStripeAccountStatus(accountId: $accountId) {
+      success
+      status {
+        accountId
+        chargesEnabled
+        payoutsEnabled
+        detailsSubmitted
+        kycStatus
+        requirements {
+          currentlyDue
+          eventuallyDue
+          pastDue
+          pendingVerification
+        }
+      }
+      error
+    }
+  }
+`;
+
+// ========================================
+// TYPE DEFINITIONS (for TypeScript)
+// ========================================
+
+export interface CreateStripeConnectAccountInput {
+  sellerId: string;
+  email: string;
+  country: string;
+  businessType?: string;
+}
+
+export interface GenerateOnboardingLinkInput {
+  sellerId: string;
+  accountId: string;
+  returnUrl: string;
+  refreshUrl: string;
+}
+
+export interface StripeRequirements {
+  currentlyDue: string[];
+  eventuallyDue: string[];
+  pastDue: string[];
+  pendingVerification: string[];
+}
+
+export interface StripeAccountStatus {
+  accountId: string;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted: boolean;
+  kycStatus: string;
+  requirements?: StripeRequirements;
+}
+
+export interface StripeConnectAccountResponse {
+  success: boolean;
+  accountId?: string;
+  error?: string;
+}
+
+export interface StripeOnboardingLinkResponse {
+  success: boolean;
+  url?: string;
+  error?: string;
+}
+
+export interface StripeAccountStatusResponse {
+  success: boolean;
+  status?: StripeAccountStatus;
+  error?: string;
+}
+
+// ========================================
+// APPSYNC SCHEMA (Copy this to AppSync)
+// ========================================
+
+/*
+type Mutation {
+  createStripeConnectAccount(input: CreateStripeConnectAccountInput!): StripeConnectAccountResponse
+  generateStripeOnboardingLink(input: GenerateOnboardingLinkInput!): StripeOnboardingLinkResponse
+  refreshStripeAccountStatus(accountId: String!): StripeAccountStatusResponse
+}
+
+type Query {
+  getStripeAccountStatus(accountId: String!): StripeAccountStatusResponse
+}
+
+input CreateStripeConnectAccountInput {
+  sellerId: String!
+  email: String!
+  country: String!
+  businessType: String
+}
+
+input GenerateOnboardingLinkInput {
+  sellerId: String!
+  accountId: String!
+  returnUrl: String!
+  refreshUrl: String!
+}
+
+type StripeConnectAccountResponse {
+  success: Boolean!
+  accountId: String
+  error: String
+}
+
+type StripeOnboardingLinkResponse {
+  success: Boolean!
+  url: String
+  error: String
+}
+
+type StripeAccountStatusResponse {
+  success: Boolean!
+  status: StripeAccountStatus
+  error: String
+}
+
+type StripeAccountStatus {
+  accountId: String!
+  chargesEnabled: Boolean!
+  payoutsEnabled: Boolean!
+  detailsSubmitted: Boolean!
+  kycStatus: String!
+  requirements: StripeRequirements
+}
+
+type StripeRequirements {
+  currentlyDue: [String]
+  eventuallyDue: [String]
+  pastDue: [String]
+  pendingVerification: [String]
+}
+*/

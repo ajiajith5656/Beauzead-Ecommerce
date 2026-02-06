@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { CardElement, useElements, useStripe, Elements } from '@stripe/react-stripe-js';
 import { AlertCircle, Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
@@ -39,6 +40,7 @@ const CheckoutForm: React.FC<CheckoutProps> = ({
 }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,21 +140,26 @@ const CheckoutForm: React.FC<CheckoutProps> = ({
 
         if (confirmResult.success && confirmResult.orderId) {
           setSuccess(true);
+          const orderData: OrderData = {
+            id: confirmResult.orderId,
+            customerId,
+            customerEmail,
+            totalAmount,
+            orderStatus: (confirmResult.status || 'processing') as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+            paymentStatus: 'completed',
+            paymentIntentId,
+            items,
+            shippingAddress,
+            billingAddress: sameAsShipping ? shippingAddress : billingAddress,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          
+          // Navigate to confirmation page
+          navigate('/checkout/confirmation', { state: { orderData } });
+          
           if (onSuccess) {
-            onSuccess({
-              id: confirmResult.orderId,
-              customerId,
-              customerEmail,
-              totalAmount,
-              orderStatus: (confirmResult.status || 'processing') as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
-              paymentStatus: 'completed',
-              paymentIntentId,
-              items,
-              shippingAddress,
-              billingAddress: sameAsShipping ? shippingAddress : billingAddress,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            });
+            onSuccess(orderData);
           }
         } else {
           setError(confirmResult.error || 'Failed to create order');
@@ -170,7 +177,7 @@ const CheckoutForm: React.FC<CheckoutProps> = ({
   if (success) {
     return (
       <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-5 text-center">
           <CheckCircle2 size={64} className="mx-auto mb-4 text-green-600" />
           <h2 className="text-2xl font-bold text-green-900 mb-2">Payment Successful!</h2>
           <p className="text-green-700 mb-6">Your order has been placed and confirmed.</p>
@@ -196,11 +203,11 @@ const CheckoutForm: React.FC<CheckoutProps> = ({
   return (
     <div className="w-full max-w-2xl mx-auto">
       <button
-        onClick={onCancel}
+        onClick={() => navigate('/checkout/review')}
         className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-6 font-semibold"
       >
         <ArrowLeft size={18} />
-        Back to Cart
+        Back to Review
       </button>
 
       <div className="bg-white rounded-lg shadow-lg p-8">
@@ -356,11 +363,62 @@ const CheckoutForm: React.FC<CheckoutProps> = ({
 // Main component with Stripe Elements provider
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
-const Checkout: React.FC<CheckoutProps> = (props) => {
+const Checkout: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const checkoutData = location.state as CheckoutProps | undefined;
+
+  // Redirect if no checkout data
+  useEffect(() => {
+    if (!checkoutData) {
+      navigate('/cart');
+    }
+  }, [checkoutData, navigate]);
+
+  if (!checkoutData) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm {...props} />
-    </Elements>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between max-w-2xl mx-auto">
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center font-bold mb-2">
+                ✓
+              </div>
+              <span className="text-sm font-semibold text-green-600">Shipping</span>
+            </div>
+            <div className="flex-1 h-1 bg-green-600 mx-4"></div>
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center font-bold mb-2">
+                ✓
+              </div>
+              <span className="text-sm font-semibold text-green-600">Review</span>
+            </div>
+            <div className="flex-1 h-1 bg-blue-600 mx-4"></div>
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mb-2">
+                3
+              </div>
+              <span className="text-sm font-semibold text-blue-600">Payment</span>
+            </div>
+          </div>
+        </div>
+
+        <Elements stripe={stripePromise}>
+          <CheckoutForm {...checkoutData} />
+        </Elements>
+      </div>
+    </div>
   );
 };
 

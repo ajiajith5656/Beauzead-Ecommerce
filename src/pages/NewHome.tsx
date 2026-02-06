@@ -30,10 +30,10 @@ const ProductSection: React.FC<{
   title: string;
   products: typeof mockProducts;
 }> = ({ title, products }) => (
-  <div className="py-8">
+  <div className="py-6">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-gold">{title}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gold">{title}</h2>
         <Link
           to="/products"
           className="flex items-center space-x-2 text-gold hover:text-gold-light transition-colors"
@@ -43,7 +43,7 @@ const ProductSection: React.FC<{
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {products.slice(0, 8).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -96,7 +96,7 @@ export const NewHome: React.FC = () => {
           </p>
           <Link
             to="/seller/signup"
-            className="inline-flex items-center space-x-2 btn-primary text-lg px-8 py-4"
+            className="inline-flex items-center space-x-2 btn-primary text-lg px-5 py-3"
           >
             <span>Get Started Now</span>
             <ArrowRight className="h-5 w-5" />

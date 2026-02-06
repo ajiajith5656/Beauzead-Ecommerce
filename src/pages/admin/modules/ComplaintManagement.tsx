@@ -86,7 +86,7 @@ export const ComplaintManagement: React.FC = () => {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Complaints & Support</h2>
+        <h2 className="text-xl font-bold text-gray-900">Complaints & Support</h2>
         <p className="text-gray-600">Total Complaints: {pagination.total}</p>
       </div>
 
@@ -125,10 +125,10 @@ export const ComplaintManagement: React.FC = () => {
               {complaints.length > 0 ? (
                 complaints.map((complaint) => (
                   <tr key={complaint.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{complaint.id.slice(0, 8)}...</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{complaint.user_id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{complaint.subject}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{complaint.id.slice(0, 8)}...</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{complaint.user_id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{complaint.subject}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         complaint.status === 'resolved' ? 'bg-green-100 text-green-800' :
                         complaint.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
@@ -138,10 +138,10 @@ export const ComplaintManagement: React.FC = () => {
                         {complaint.status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(complaint.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <button
                         onClick={() => {
                           setSelectedComplaint(complaint);
@@ -194,7 +194,7 @@ export const ComplaintManagement: React.FC = () => {
       {showDetails && selectedComplaint && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Complaint Details</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Complaint Details</h2>
 
             <div className="space-y-4 mb-6">
               <div>

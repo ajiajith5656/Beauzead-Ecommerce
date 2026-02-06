@@ -81,14 +81,14 @@ const OrderTracking: React.FC<OrderTrackingProps> = ({ customerId, onOrderSelect
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 size={40} className="text-blue-600 animate-spin" />
+        <Loader2 size={24} className="text-blue-600 animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start gap-3">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
         <AlertCircle size={24} className="text-red-600 flex-shrink-0" />
         <div>
           <h3 className="font-semibold text-red-900">Error Loading Orders</h3>
@@ -101,7 +101,7 @@ const OrderTracking: React.FC<OrderTrackingProps> = ({ customerId, onOrderSelect
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
-        <Package size={48} className="mx-auto mb-4 text-gray-400" />
+        <Package size={36} className="mx-auto mb-4 text-gray-400" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">No Orders Yet</h3>
         <p className="text-gray-600">Start shopping to place your first order!</p>
       </div>
@@ -197,7 +197,7 @@ const OrderTracking: React.FC<OrderTrackingProps> = ({ customerId, onOrderSelect
 
             {/* Expanded View */}
             {selectedOrder?.id === order.id && (
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+              <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <h4 className="text-xs font-semibold text-gray-700 uppercase mb-2">

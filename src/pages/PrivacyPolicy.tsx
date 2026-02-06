@@ -36,7 +36,7 @@ export const PrivacyPolicy: React.FC = () => {
           <h2 className="text-2xl font-bold text-gold mb-6">Information We Collect</h2>
           
           <div className="space-y-6">
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-xl font-semibold text-gold mb-3">Personal Information</h3>
               <p className="text-gray-300 mb-4">We collect information you voluntarily provide to us, such as:</p>
               <ul className="space-y-2 text-gray-300 ml-4">
@@ -49,7 +49,7 @@ export const PrivacyPolicy: React.FC = () => {
               </ul>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-xl font-semibold text-gold mb-3">Automatically Collected Information</h3>
               <p className="text-gray-300 mb-4">When you visit our platform, we automatically collect:</p>
               <ul className="space-y-2 text-gray-300 ml-4">
@@ -60,7 +60,7 @@ export const PrivacyPolicy: React.FC = () => {
               </ul>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-xl font-semibold text-gold mb-3">Third-Party Information</h3>
               <p className="text-gray-300">
                 We may receive information from third-party services, social media platforms, and payment processors to enhance your experience.
@@ -72,7 +72,7 @@ export const PrivacyPolicy: React.FC = () => {
         {/* How We Use Information */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">How We Use Your Information</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-gold">✓</span>
@@ -108,7 +108,7 @@ export const PrivacyPolicy: React.FC = () => {
             <Lock className="w-6 h-6" />
             Data Protection & Security
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               We implement comprehensive security measures to protect your personal information, including:
             </p>
@@ -131,7 +131,7 @@ export const PrivacyPolicy: React.FC = () => {
             <Share2 className="w-6 h-6" />
             Information Sharing & Disclosure
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">We may share your information with:</p>
             <ul className="space-y-2 text-gray-300 ml-4">
               <li>• Service providers and contractors (payment processors, shipping partners)</li>
@@ -148,7 +148,7 @@ export const PrivacyPolicy: React.FC = () => {
         {/* User Rights */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Your Rights & Choices</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <ul className="space-y-3 text-gray-300">
               <li><strong className="text-gold">Access:</strong> Request a copy of your personal information</li>
               <li><strong className="text-gold">Correction:</strong> Update or correct inaccurate data</li>
@@ -162,7 +162,7 @@ export const PrivacyPolicy: React.FC = () => {
         {/* Contact */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Contact Us</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               If you have questions about this Privacy Policy or our privacy practices, please contact us:
             </p>
@@ -176,7 +176,7 @@ export const PrivacyPolicy: React.FC = () => {
 
         {/* Updates */}
         <section className="mb-12">
-          <div className="bg-blue-900 border border-blue-700 rounded-lg p-6">
+          <div className="bg-blue-900 border border-blue-700 rounded-lg p-4">
             <p className="text-blue-100">
               <strong className="text-blue-200">Policy Updates:</strong> We may update this Privacy Policy periodically. We will notify you of significant changes via email or prominent notice on our platform. Your continued use of our services constitutes acceptance of the updated policy.
             </p>

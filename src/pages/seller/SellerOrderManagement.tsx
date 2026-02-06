@@ -1,28 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logger } from '../../utils/logger';
+import { useAuth } from '../../contexts/AuthContext';
+import { generateClient } from 'aws-amplify/api';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, CheckCircle, XCircle,
   Truck, MapPin, User, Phone, TrendingUp,
-  Search, Filter, Download, Eye, AlertCircle, PackageCheck
+  Search, Filter, Download, Eye, AlertCircle, PackageCheck, Loader2
 } from 'lucide-react';
 import { formatPrice } from '../../constants';
+import { ordersBySeller } from '../../graphql/queries';
+import { updateOrder } from '../../graphql/mutations';
+
+const client = generateClient();
 
 interface Order {
   id: string;
-  orderId: string;
-  productImage: string;
-  productName: string;
-  quantity: number;
-  buyerName: string;
-  buyerCity: string;
-  buyerPhone: string;
-  amount: number;
-  paymentStatus: 'paid' | 'cod' | 'refunded';
-  orderStatus: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
-  orderDate: string;
-  trackingId?: string;
-  rejectionReason?: string;
+  order_number: string;
+  items: any[];
+  user_id: string;
+  seller_id: string;
+  status: 'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
+  total_amount: number;
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+  tracking_number?: string;
+  shipping_address: any;
+  created_at: string;
+  updated_at: string;
 }
 
 interface SellerOrderManagementProps {
@@ -32,104 +36,68 @@ interface SellerOrderManagementProps {
 }
 
 const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout, sellerEmail, onNavigate }) => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'new' | 'processing' | 'shipped' | 'delivered' | 'cancelled'>('new');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingId, setTrackingId] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showActionModal, setShowActionModal] = useState<'accept' | 'reject' | 'ship' | 'deliver' | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
 
-  // Mock orders data
-  const mockOrders: Order[] = [
-    {
-      id: '1',
-      orderId: 'BZ-ORD-458921',
-      productImage: 'https://via.placeholder.com/300x300/1f2937/eab308?text=Product',
-      productName: 'Premium Wireless Headphones - Black Edition',
-      quantity: 2,
-      buyerName: 'Sarah Mitchell',
-      buyerCity: 'London',
-      buyerPhone: '****5678',
-      amount: 15999,
-      paymentStatus: 'paid',
-      orderStatus: 'new',
-      orderDate: '2025-12-28 10:30 AM'
-    },
-    {
-      id: '2',
-      orderId: 'BZ-ORD-458920',
-      productImage: 'https://via.placeholder.com/300x300/1f2937/eab308?text=Product',
-      productName: 'Smart Watch Series 5 - Silver',
-      quantity: 1,
-      buyerName: 'James Cooper',
-      buyerCity: 'Manchester',
-      buyerPhone: '****1234',
-      amount: 24999,
-      paymentStatus: 'cod',
-      orderStatus: 'processing',
-      orderDate: '2025-12-27 03:15 PM'
-    },
-    {
-      id: '3',
-      orderId: 'BZ-ORD-458915',
-      productImage: 'https://via.placeholder.com/300x300/1f2937/eab308?text=Product',
-      productName: 'Laptop Stand Aluminum - Space Grey',
-      quantity: 1,
-      buyerName: 'Emma Wilson',
-      buyerCity: 'Birmingham',
-      buyerPhone: '****9876',
-      amount: 4599,
-      paymentStatus: 'paid',
-      orderStatus: 'shipped',
-      orderDate: '2025-12-25 11:20 AM',
-      trackingId: 'TRK-45892-UK'
-    },
-    {
-      id: '4',
-      orderId: 'BZ-ORD-458910',
-      productImage: 'https://via.placeholder.com/300x300/1f2937/eab308?text=Product',
-      productName: 'USB-C Hub 7-in-1 Adapter',
-      quantity: 3,
-      buyerName: 'Oliver Brown',
-      buyerCity: 'Leeds',
-      buyerPhone: '****4567',
-      amount: 8997,
-      paymentStatus: 'paid',
-      orderStatus: 'delivered',
-      orderDate: '2025-12-20 09:45 AM',
-      trackingId: 'TRK-45890-UK'
-    },
-    {
-      id: '5',
-      orderId: 'BZ-ORD-458905',
-      productImage: 'https://via.placeholder.com/300x300/1f2937/eab308?text=Product',
-      productName: 'Mechanical Gaming Keyboard RGB',
-      quantity: 1,
-      buyerName: 'Sophia Taylor',
-      buyerCity: 'Liverpool',
-      buyerPhone: '****7890',
-      amount: 12499,
-      paymentStatus: 'refunded',
-      orderStatus: 'cancelled',
-      orderDate: '2025-12-18 02:30 PM',
-      rejectionReason: 'Product out of stock'
+  // Fetch orders from GraphQL
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get sellerId from user data
+        const sellerId = (user as any)?.attributes?.sub || user?.id || sellerEmail;
+        
+        const response: any = await client.graphql({
+          query: ordersBySeller,
+          variables: {
+            seller_id: sellerId,
+            sortDirection: 'DESC',
+            limit: 100
+          }
+        });
+
+        if (response.data?.ordersBySeller?.items) {
+          setOrders(response.data.ordersBySeller.items);
+        }
+      } catch (err) {
+        logger.error('Failed to fetch orders:', err as Record<string, any>);
+        setError('Failed to load orders. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchOrders();
     }
-  ];
+  }, [user]);
 
-  const filteredOrders = mockOrders
-    .filter(order => order.orderStatus === activeTab)
+  const filteredOrders = orders
+    .filter(order => order.status === activeTab)
     .filter(order => 
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.buyerName.toLowerCase().includes(searchQuery.toLowerCase())
+      order.order_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.items && order.items.some((item: any) => 
+        item.product_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      ))
     );
 
   const orderStats = {
-    new: mockOrders.filter(o => o.orderStatus === 'new').length,
-    processing: mockOrders.filter(o => o.orderStatus === 'processing').length,
-    shipped: mockOrders.filter(o => o.orderStatus === 'shipped').length,
-    delivered: mockOrders.filter(o => o.orderStatus === 'delivered').length,
-    cancelled: mockOrders.filter(o => o.orderStatus === 'cancelled' || o.orderStatus === 'returned').length
+    new: orders.filter(o => o.status === 'new').length,
+    processing: orders.filter(o => o.status === 'processing').length,
+    shipped: orders.filter(o => o.status === 'shipped').length,
+    delivered: orders.filter(o => o.status === 'delivered').length,
+    cancelled: orders.filter(o => o.status === 'cancelled' || o.status === 'returned').length
   };
 
   const handleAcceptOrder = (order: Order) => {
@@ -152,16 +120,45 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
     setShowActionModal('deliver');
   };
 
-  const confirmAction = () => {
-    // Here you would make API call
-    logger.log('Order action confirmed', { action: showActionModal, orderId: selectedOrder?.orderId });
-    setShowActionModal(null);
-    setSelectedOrder(null);
-    setTrackingId('');
-    setRejectionReason('');
+  const confirmAction = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      setUpdating(true);
+      const newStatus = 
+        showActionModal === 'accept' ? 'processing' :
+        showActionModal === 'reject' ? 'cancelled' :
+        showActionModal === 'ship' ? 'shipped' :
+        showActionModal === 'deliver' ? 'delivered' : selectedOrder.status;
+
+      const response: any = await client.graphql({
+        query: updateOrder,
+        variables: {
+          input: {
+            id: selectedOrder.id,
+            status: newStatus,
+            tracking_number: trackingId || undefined
+          }
+        }
+      });
+
+      if (response.data?.updateOrder) {
+        setOrders(orders.map(o => o.id === selectedOrder.id ? response.data.updateOrder : o));
+        setShowActionModal(null);
+        setSelectedOrder(null);
+        setTrackingId('');
+        setRejectionReason('');
+        logger.log('Order updated successfully', { orderId: selectedOrder.order_number, newStatus });
+      }
+    } catch (err) {
+      logger.error('Failed to update order:', err as Record<string, any>);
+      alert('Failed to update order. Please try again.');
+    } finally {
+      setUpdating(false);
+    }
   };
 
-  const getStatusBadge = (status: Order['orderStatus']) => {
+  const getStatusBadge = (status: Order['status']) => {
     const badges = {
       new: { bg: 'bg-blue-500/10', text: 'text-blue-500', border: 'border-blue-500/20', label: 'New Order' },
       processing: { bg: 'bg-yellow-500/10', text: 'text-yellow-500', border: 'border-yellow-500/20', label: 'Processing' },
@@ -178,10 +175,11 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
     );
   };
 
-  const getPaymentBadge = (status: Order['paymentStatus']) => {
+  const getPaymentBadge = (status: Order['payment_status']) => {
     const badges = {
       paid: { bg: 'bg-green-500/10', text: 'text-green-500', label: 'Paid' },
-      cod: { bg: 'bg-orange-500/10', text: 'text-orange-500', label: 'COD' },
+      pending: { bg: 'bg-orange-500/10', text: 'text-orange-500', label: 'Pending' },
+      failed: { bg: 'bg-red-500/10', text: 'text-red-500', label: 'Failed' },
       refunded: { bg: 'bg-gray-500/10', text: 'text-gray-500', label: 'Refunded' }
     };
     const badge = badges[status];
@@ -293,142 +291,160 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
           </div>
 
           {/* Orders List */}
-          {filteredOrders.length === 0 ? (
+          {loading ? (
             <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ShoppingBag size={32} className="text-gray-400" />
+                <Loader2 size={24} className="text-gray-400 animate-spin" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Loading Orders</h3>
+              <p className="text-gray-600 text-sm">Fetching your orders...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Error Loading Orders</h3>
+              <p className="text-gray-600 text-sm">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all"
+              >
+                Retry
+              </button>
+            </div>
+          ) : filteredOrders.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag size={24} className="text-gray-400" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">No Orders Found</h3>
               <p className="text-gray-600 text-sm">No {activeTab} orders at the moment</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredOrders.map((order) => (
-                <div key={order.id} className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-gray-300 transition-all">
-                  {/* Order Header */}
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6 pb-6 border-b border-gray-100">
-                    <div className="flex items-center gap-4">
-                      <div className="text-left">
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Order ID</p>
-                        <p className="text-base font-bold text-gray-900">{order.orderId}</p>
+              {filteredOrders.map((order) => {
+                const firstItem = order.items?.[0];
+                return (
+                  <div key={order.id} className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-gray-300 transition-all">
+                    {/* Order Header */}
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6 pb-6 border-b border-gray-100">
+                      <div className="flex items-center gap-4">
+                        <div className="text-left">
+                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Order ID</p>
+                          <p className="text-base font-bold text-gray-900">{order.order_number}</p>
+                        </div>
+                        <div className="h-12 w-px bg-gray-200" />
+                        <div>
+                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Date</p>
+                          <p className="text-sm font-semibold text-gray-700">
+                            {new Date(order.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="h-12 w-px bg-gray-200" />
-                      <div>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Date</p>
-                        <p className="text-sm font-semibold text-gray-700">{order.orderDate}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {getStatusBadge(order.orderStatus)}
-                      {getPaymentBadge(order.paymentStatus)}
-                    </div>
-                  </div>
-
-                  {/* Order Content */}
-                  <div className="grid md:grid-cols-12 gap-6 mb-6">
-                    {/* Product Info */}
-                    <div className="md:col-span-5 flex gap-4">
-                      <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                        <img src={order.productImage} alt={order.productName} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-gray-900 line-clamp-2 mb-2">{order.productName}</h4>
-                        <p className="text-xs text-gray-600 font-semibold">Quantity: <span className="text-gray-900">{order.quantity}</span></p>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(order.status)}
+                        {getPaymentBadge(order.payment_status)}
                       </div>
                     </div>
 
-                    {/* Buyer Info */}
-                    <div className="md:col-span-4 space-y-2">
-                      <div className="flex items-center gap-2 text-xs">
-                        <User size={14} className="text-gray-400" />
-                        <span className="font-semibold text-gray-900">{order.buyerName}</span>
+                    {/* Order Content */}
+                    <div className="grid md:grid-cols-12 gap-6 mb-6">
+                      {/* Product Info */}
+                      <div className="md:col-span-5 flex gap-4">
+                        <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                          {firstItem?.image_url && (
+                            <img src={firstItem.image_url} alt={firstItem.product_name} className="w-full h-full object-cover" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-gray-900 line-clamp-2 mb-2">{firstItem?.product_name || 'Product'}</h4>
+                          <p className="text-xs text-gray-600 font-semibold">Quantity: <span className="text-gray-900">{firstItem?.quantity || 1}</span></p>
+                          {order.items?.length > 1 && (
+                            <p className="text-xs text-gray-500 mt-1">+{order.items.length - 1} more items</p>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <MapPin size={14} className="text-gray-400" />
-                        <span className="text-gray-600">{order.buyerCity}</span>
+
+                      {/* Shipping Address Info */}
+                      <div className="md:col-span-4 space-y-2">
+                        <div className="flex items-center gap-2 text-xs">
+                          <User size={14} className="text-gray-400" />
+                          <span className="font-semibold text-gray-900">{order.shipping_address?.name || 'Buyer'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <MapPin size={14} className="text-gray-400" />
+                          <span className="text-gray-600">{order.shipping_address?.city || 'City'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <Phone size={14} className="text-gray-400" />
+                          <span className="text-gray-600">{order.shipping_address?.phone || 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <Phone size={14} className="text-gray-400" />
-                        <span className="text-gray-600">{order.buyerPhone}</span>
+
+                      {/* Amount */}
+                      <div className="md:col-span-3 text-right">
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Order Amount</p>
+                        <p className="text-2xl font-bold text-gray-900">{formatPrice(order.total_amount)}</p>
                       </div>
                     </div>
 
-                    {/* Amount */}
-                    <div className="md:col-span-3 text-right">
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Order Amount</p>
-                      <p className="text-2xl font-bold text-gray-900">{formatPrice(order.amount)}</p>
-                    </div>
-                  </div>
-
-                  {/* Tracking ID (if shipped) */}
-                  {order.trackingId && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Truck size={18} className="text-blue-600" />
-                          <div>
-                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Tracking ID</p>
-                            <p className="text-sm font-bold text-blue-900">{order.trackingId}</p>
+                    {/* Tracking ID (if shipped) */}
+                    {order.tracking_number && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Truck size={18} className="text-blue-600" />
+                            <div>
+                              <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Tracking ID</p>
+                              <p className="text-sm font-bold text-blue-900">{order.tracking_number}</p>
+                            </div>
                           </div>
                         </div>
-                        <button className="text-xs font-semibold text-blue-600 hover:underline">Track Shipment</button>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Rejection Reason (if cancelled) */}
-                  {order.rejectionReason && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle size={18} className="text-red-600 mt-0.5" />
-                        <div>
-                          <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest mb-1">Cancellation Reason</p>
-                          <p className="text-sm font-semibold text-red-900">{order.rejectionReason}</p>
-                        </div>
-                      </div>
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-3">
+                      {order.status === 'new' && (
+                        <>
+                          <button 
+                            onClick={() => handleAcceptOrder(order)}
+                            className="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+                          >
+                            <CheckCircle size={16} /> Accept Order
+                          </button>
+                          <button 
+                            onClick={() => handleRejectOrder(order)}
+                            className="flex-1 md:flex-none bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+                          >
+                            <XCircle size={16} /> Reject Order
+                          </button>
+                        </>
+                      )}
+                      {order.status === 'processing' && (
+                        <button 
+                          onClick={() => handleMarkShipped(order)}
+                          className="flex-1 md:flex-none bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+                        >
+                          <Truck size={16} /> Mark as Shipped
+                        </button>
+                      )}
+                      {order.status === 'shipped' && (
+                        <button 
+                          onClick={() => handleMarkDelivered(order)}
+                          className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
+                        >
+                          <PackageCheck size={16} /> Mark as Delivered
+                        </button>
+                      )}
+                      <button className="flex-1 md:flex-none border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2">
+                        <Eye size={16} /> View Details
+                      </button>
                     </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex flex-wrap gap-3">
-                    {order.orderStatus === 'new' && (
-                      <>
-                        <button 
-                          onClick={() => handleAcceptOrder(order)}
-                          className="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
-                        >
-                          <CheckCircle size={16} /> Accept Order
-                        </button>
-                        <button 
-                          onClick={() => handleRejectOrder(order)}
-                          className="flex-1 md:flex-none bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
-                        >
-                          <XCircle size={16} /> Reject Order
-                        </button>
-                      </>
-                    )}
-                    {order.orderStatus === 'processing' && (
-                      <button 
-                        onClick={() => handleMarkShipped(order)}
-                        className="flex-1 md:flex-none bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
-                      >
-                        <Truck size={16} /> Mark as Shipped
-                      </button>
-                    )}
-                    {order.orderStatus === 'shipped' && (
-                      <button 
-                        onClick={() => handleMarkDelivered(order)}
-                        className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2"
-                      >
-                        <PackageCheck size={16} /> Mark as Delivered
-                      </button>
-                    )}
-                    <button className="flex-1 md:flex-none border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-2.5 rounded-xl transition-all text-xs flex items-center justify-center gap-2">
-                      <Eye size={16} /> View Details
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -447,7 +463,7 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
             
             <div className="bg-gray-50 rounded-2xl p-4 mb-6">
               <p className="text-xs font-bold text-gray-500 mb-1">Order ID</p>
-              <p className="text-base font-bold text-gray-900">{selectedOrder.orderId}</p>
+              <p className="text-base font-bold text-gray-900">{selectedOrder.order_number}</p>
             </div>
 
             {showActionModal === 'reject' && (
@@ -459,6 +475,7 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
                   rows={4}
                   placeholder="Enter reason for rejection..."
+                  disabled={updating}
                 />
               </div>
             )}
@@ -472,6 +489,7 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
                   onChange={(e) => setTrackingId(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Enter tracking number..."
+                  disabled={updating}
                 />
               </div>
             )}
@@ -484,24 +502,27 @@ const SellerOrderManagement: React.FC<SellerOrderManagementProps> = ({ onLogout,
                   setTrackingId('');
                   setRejectionReason('');
                 }}
-                className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-all text-sm"
+                disabled={updating}
+                className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-all text-sm disabled:opacity-50"
               >
                 Cancel
               </button>
               <button 
                 onClick={confirmAction}
                 disabled={
+                  updating ||
                   (showActionModal === 'reject' && !rejectionReason) ||
                   (showActionModal === 'ship' && !trackingId)
                 }
-                className={`flex-1 font-semibold px-6 py-3 rounded-xl transition-all text-sm ${
+                className={`flex-1 font-semibold px-6 py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2 ${
                   showActionModal === 'reject' 
                     ? 'bg-red-600 hover:bg-red-700 text-white disabled:opacity-50'
                     : showActionModal === 'ship'
                     ? 'bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white disabled:opacity-50'
                 }`}
               >
+                {updating && <Loader2 size={16} className="animate-spin" />}
                 Confirm
               </button>
             </div>

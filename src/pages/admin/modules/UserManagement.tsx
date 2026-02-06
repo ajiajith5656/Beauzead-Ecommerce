@@ -208,7 +208,7 @@ export const UserManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
+          <h2 className="text-xl font-bold text-gray-900">User Management</h2>
           <p className="text-gray-600">Total Users: {filteredUsers.length}</p>
         </div>
       </div>
@@ -265,11 +265,11 @@ export const UserManagement: React.FC = () => {
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user.userId || user.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
                       {`${user.first_name || ''} ${user.last_name || ''}`.trim() || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         user.profile_type === 'prime'
                           ? 'bg-purple-100 text-purple-800'
@@ -282,8 +282,8 @@ export const UserManagement: React.FC = () => {
                         {user.profile_type?.toUpperCase() || 'MEMBER'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{user.total_purchases || 0}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600">{user.total_purchases || 0}</td>
+                    <td className="px-4 py-3 text-sm">
                       {user.is_banned ? (
                         <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
                           Banned
@@ -294,7 +294,7 @@ export const UserManagement: React.FC = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {

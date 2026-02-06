@@ -136,6 +136,97 @@ type Mutation {
   approveProduct(id: ID!): Product
   rejectProduct(id: ID!): Product
   toggleProductStatus(id: ID!): Product
+  
+  # Stripe Payment Mutations
+  createStripePaymentIntent(input: CreatePaymentIntentInput!): PaymentIntentResponse
+  confirmPaymentAndCreateOrder(input: ConfirmPaymentInput!): ConfirmPaymentResponse
+  processRefund(input: ProcessRefundInput!): RefundResponse
+  processSellerPayout(input: ProcessPayoutInput!): PayoutResponse
+}
+
+# ===== Stripe Payment Input Types =====
+
+input CreatePaymentIntentInput {
+  customerId: String!
+  customerEmail: String!
+  customerName: String!
+  items: [OrderItemInput!]!
+  totalAmount: Float!
+  shippingAddress: AddressInput!
+}
+
+input ConfirmPaymentInput {
+  paymentIntentId: String!
+  customerId: String!
+  items: [OrderItemInput!]!
+  shippingAddress: AddressInput!
+  billingAddress: AddressInput!
+  totalAmount: Float!
+}
+
+input ProcessRefundInput {
+  orderId: String!
+  refundAmount: Float!
+  reason: String
+}
+
+input ProcessPayoutInput {
+  sellerId: String!
+  stripeAccountId: String!
+}
+
+input OrderItemInput {
+  productId: String!
+  productName: String!
+  quantity: Int!
+  price: Float!
+  sellerId: String!
+}
+
+input AddressInput {
+  street: String!
+  city: String!
+  state: String!
+  postalCode: String!
+  country: String!
+}
+
+# ===== Stripe Payment Response Types =====
+
+type PaymentIntentResponse {
+  success: Boolean!
+  clientSecret: String
+  paymentIntentId: String
+  status: String
+  amount: Float
+  error: String
+}
+
+type ConfirmPaymentResponse {
+  success: Boolean!
+  orderId: String
+  status: String
+  paymentStatus: String
+  error: String
+}
+
+type RefundResponse {
+  success: Boolean!
+  refundId: String
+  status: String
+  amount: Float
+  error: String
+}
+
+type PayoutResponse {
+  success: Boolean!
+  payoutId: String
+  amount: Float
+  ordersProcessed: Int
+  grossEarnings: Float
+  platformFee: Float
+  netPayout: Float
+  error: String
 }
 
 schema {

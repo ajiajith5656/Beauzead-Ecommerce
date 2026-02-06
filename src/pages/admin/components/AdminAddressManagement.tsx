@@ -288,14 +288,14 @@ const AdminAddressManagement: React.FC = () => {
                   </div>
                 ) : (
                   <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
-                    <MapPin size={48} className="mx-auto mb-4 text-gray-600" />
+                    <MapPin size={36} className="mx-auto mb-4 text-gray-600" />
                     <p className="text-gray-400">No addresses for this user</p>
                   </div>
                 )}
               </div>
             ) : (
               <div className="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center">
-                <Eye size={48} className="mx-auto mb-4 text-gray-600" />
+                <Eye size={36} className="mx-auto mb-4 text-gray-600" />
                 <p className="text-gray-400">Select a user to view their addresses</p>
               </div>
             )}

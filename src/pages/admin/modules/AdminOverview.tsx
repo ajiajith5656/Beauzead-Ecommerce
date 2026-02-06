@@ -55,9 +55,9 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, icon, color }) =>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-600 text-sm font-medium">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-2">{value}</p>
+          <p className="text-xl font-bold text-gray-900 mt-2">{value}</p>
         </div>
-        <div className="text-3xl opacity-20">{icon}</div>
+        <div className="text-2xl opacity-20">{icon}</div>
       </div>
     </div>
   );
@@ -156,7 +156,7 @@ export const AdminOverview: React.FC = () => {
 
       {/* Business Metrics */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Business Metrics</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Business Metrics</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
             title="Total Sales"
@@ -213,15 +213,15 @@ export const AdminOverview: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">User Registrations (This Month)</h3>
-          <p className="text-3xl font-bold text-blue-600">{data?.user_registrations || 0}</p>
+          <p className="text-2xl font-bold text-blue-600">{data?.user_registrations || 0}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Prime Members</h3>
-          <p className="text-3xl font-bold text-purple-600">{data?.prime_members || 0}</p>
+          <p className="text-2xl font-bold text-purple-600">{data?.prime_members || 0}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Seller Registrations (This Month)</h3>
-          <p className="text-3xl font-bold text-orange-600">{data?.seller_registrations || 0}</p>
+          <p className="text-2xl font-bold text-orange-600">{data?.seller_registrations || 0}</p>
         </div>
       </div>
 

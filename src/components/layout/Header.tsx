@@ -201,7 +201,7 @@ export const Header: React.FC = () => {
                     <User className="h-5 w-5 text-gold" />
                   )}
                   <span className="text-white font-medium text-sm">
-                    Account
+                    Profile
                   </span>
                   <ChevronDown className="h-4 w-4 text-gold" />
                 </button>
@@ -229,11 +229,11 @@ export const Header: React.FC = () => {
                       )}
                     </button>
                     <button
-                      onClick={() => handleNavigation('/user/dashboard')}
+                      onClick={() => handleNavigation('/profile')}
                       disabled={navigationLoading}
                       className="w-full text-left block px-4 py-3 text-sm text-white hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
                     >
-                      {loadingLink === '/user/dashboard' ? (
+                      {loadingLink === '/profile' ? (
                         <>
                           <Loader2 className="inline h-4 w-4 text-gold animate-spin" />
                           Loading...
@@ -241,7 +241,7 @@ export const Header: React.FC = () => {
                       ) : (
                         <>
                           <User className="h-4 w-4 text-gold" />
-                          My Account
+                          Profile
                         </>
                       )}
                     </button>
@@ -410,12 +410,12 @@ export const Header: React.FC = () => {
                   {getDisplayName()}
                 </div>
                 <Link
-                  to="/user/dashboard"
+                  to="/profile"
                   className="block px-3 py-2 text-sm text-white hover:bg-gray-800 rounded transition-all duration-300"
                   onClick={() => setShowMobileMenu(false)}
                 >
                   <User className="inline h-4 w-4 mr-2 text-gold" />
-                  My Profile
+                  Profile
                 </Link>
                 <Link
                   to="/orders"

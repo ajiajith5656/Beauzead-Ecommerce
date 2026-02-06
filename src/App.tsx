@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { WishlistProvider } from './contexts/WishlistContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
+import { useWishlistSync } from './hooks/useWishlistSync';
 import { Login } from './components/auth/Login';
 import { Signup } from './components/auth/Signup';
 import { MyOrders } from './pages/user/MyOrders';
@@ -54,7 +55,10 @@ import UserAddressManagement from './pages/user/AddressManagement';
 import AdminAddressManagement from './pages/admin/components/AdminAddressManagement';
 import OTPVerification from './pages/OTPVerification';
 import NewPassword from './pages/NewPassword';
-// import Checkout from './pages/user/Checkout'; // TODO: Fix props issue
+import Checkout from './pages/user/Checkout';
+import ShippingAddressPage from './pages/user/ShippingAddress';
+import OrderSummaryPage from './pages/user/OrderSummary';
+import OrderConfirmationPage from './pages/user/OrderConfirmation';
 import { ProductListingLayout } from './pages/admin/modules/ProductListingLayout';
 import { AdminListings1 } from './pages/admin/modules/AdminListings1';
 import { AdminListings2 } from './pages/admin/modules/AdminListings2';
@@ -113,6 +117,12 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
+// Auto-sync wishlist when user logs in
+const WishlistAutoSync: React.FC = () => {
+  useWishlistSync();
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -120,6 +130,7 @@ function App() {
         <CartProvider>
           <WishlistProvider>
             <Router>
+              <WishlistAutoSync />
               <RouteGuard>
                 <Routes>
                   <Route path="/" element={<NewHome />} />
@@ -147,8 +158,12 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/products/:productId/review" element={<WriteReview />} />
                   <Route path="/user/addresses" element={<UserAddressManagement />} />
-                  {/* TODO: Fix Checkout route - needs props from cart context */}
-                  {/* <Route path="/checkout" element={<Checkout />} /> */}
+                  
+                  {/* Checkout Flow Routes */}
+                  <Route path="/checkout/shipping" element={<ShippingAddressPage />} />
+                  <Route path="/checkout/review" element={<OrderSummaryPage />} />
+                  <Route path="/checkout/payment" element={<Checkout />} />
+                  <Route path="/checkout/confirmation" element={<OrderConfirmationPage />} />
                   
                   {/* Seller Routes */}
                   <Route path="/seller" element={<SellerLanding />} />

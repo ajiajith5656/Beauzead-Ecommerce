@@ -102,7 +102,7 @@ export const SearchManagement: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Advanced Search</h1>
+          <h1 className="text-xl font-bold text-gray-900">Advanced Search</h1>
           <p className="text-gray-600 mt-2">Search across all tables and resources</p>
         </div>
 
@@ -203,7 +203,7 @@ export const SearchManagement: React.FC = () => {
 
         {/* Help Text */}
         {!isSearching && results.length === 0 && !searchQuery && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 mb-2">Search Tips:</h3>
             <ul className="text-blue-800 text-sm space-y-1">
               <li>• Use the search box to find users, sellers, products, or orders</li>

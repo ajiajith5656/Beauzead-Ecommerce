@@ -273,7 +273,7 @@ export const AdminListings2: React.FC = () => {
               : 'border-gray-300 hover:border-gray-400'
           }`}
         >
-          <Upload className="mx-auto mb-4 text-gray-400" size={48} />
+          <Upload className="mx-auto mb-4 text-gray-400" size={36} />
           <p className="text-gray-600 mb-2">Drag and drop images here, or</p>
           <button
             onClick={() => imageInputRef.current?.click()}

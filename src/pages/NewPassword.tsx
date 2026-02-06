@@ -115,7 +115,7 @@ const NewPassword: React.FC = () => {
         <div className="w-full max-w-md bg-white/95 text-black rounded-2xl shadow-2xl border border-white/40 p-6 md:p-8 text-center">
           <div className="mb-4 flex justify-center">
             <div className="bg-green-100 p-3 rounded-full">
-              <CheckCircle2 size={40} className="text-green-600" />
+              <CheckCircle2 size={24} className="text-green-600" />
             </div>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold mb-2">Password Reset Successful</h1>

@@ -121,7 +121,7 @@ export const ProductImageManagement: React.FC = () => {
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Product Image Management</h1>
+        <h1 className="text-xl font-bold text-gray-900 mb-8">Product Image Management</h1>
 
         {/* Product Selector */}
         <div className="mb-8 bg-white p-6 rounded-lg shadow">
@@ -171,7 +171,7 @@ export const ProductImageManagement: React.FC = () => {
         {/* Images Grid */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="animate-spin text-blue-600" size={40} />
+            <Loader2 className="animate-spin text-blue-600" size={24} />
           </div>
         ) : images.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg">

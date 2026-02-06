@@ -32,7 +32,7 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-gray-900">Profile</h2>
+      <h2 className="text-xl font-bold text-gray-900">Profile</h2>
 
       {error && <ErrorMessage message={error} />}
 

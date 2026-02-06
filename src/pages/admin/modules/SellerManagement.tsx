@@ -120,7 +120,7 @@ export const SellerManagement: React.FC = () => {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Seller Management</h2>
+        <h2 className="text-xl font-bold text-gray-900">Seller Management</h2>
         <p className="text-gray-600">Total Sellers: {pagination.total}</p>
       </div>
 
@@ -175,9 +175,9 @@ export const SellerManagement: React.FC = () => {
               {sellers.length > 0 ? (
                 sellers.map((seller) => (
                   <tr key={seller.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{seller.shop_name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{seller.email}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{seller.shop_name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{seller.email}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         seller.kyc_status === 'approved' ? 'bg-green-100 text-green-800' :
                         seller.kyc_status === 'rejected' ? 'bg-red-100 text-red-800' :
@@ -186,7 +186,7 @@ export const SellerManagement: React.FC = () => {
                         {seller.kyc_status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         seller.badge === 'gold' ? 'bg-yellow-100 text-yellow-800' :
                         seller.badge === 'platinum' ? 'bg-purple-100 text-purple-800' :
@@ -195,8 +195,8 @@ export const SellerManagement: React.FC = () => {
                         {seller.badge?.toUpperCase() || 'STANDARD'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{seller.total_listings}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600">{seller.total_listings}</td>
+                    <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -274,7 +274,7 @@ export const SellerManagement: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Seller Details</h2>
+              <h2 className="text-xl font-bold text-gray-900">Seller Details</h2>
               <button
                 onClick={() => setShowDetails(false)}
                 className="text-gray-500 hover:text-gray-700 text-2xl"

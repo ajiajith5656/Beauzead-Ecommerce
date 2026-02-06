@@ -43,7 +43,7 @@ export const PromotionManagement: React.FC = () => {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Promotions & Offers</h2>
+        <h2 className="text-xl font-bold text-gray-900">Promotions & Offers</h2>
         <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center gap-2">
           <Plus size={20} />
           Create Promo
@@ -68,23 +68,23 @@ export const PromotionManagement: React.FC = () => {
               {promotions.length > 0 ? (
                 promotions.map((promo) => (
                   <tr key={promo.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{promo.title}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{promo.title}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {promo.discount_value}
                       {promo.discount_type === 'percentage' ? '%' : ' $'}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{promo.applicable_to.toUpperCase()}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600">{promo.applicable_to.toUpperCase()}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(promo.end_date).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         promo.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                       }`}>
                         {promo.is_active ? 'ACTIVE' : 'INACTIVE'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2">
                         <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
                           <Edit size={18} />

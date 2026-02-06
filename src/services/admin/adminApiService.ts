@@ -803,22 +803,64 @@ export const updateOrderStatus = async (orderId: string, newStatus: string): Pro
   }
 };
 
-export const processRefund = async (orderId: string, _amount: number): Promise<boolean> => {
+export const processRefund = async (
+  orderId: string,
+  amount: number,
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'abandoned',
+  notes?: string
+): Promise<{
+  success: boolean;
+  refundId?: string;
+  error?: string;
+} | null> => {
   try {
-    await dynamoDBRequest('UpdateItem', {
+    // First, fetch the order to get payment intent ID
+    const orderResult = await dynamoDBRequest('GetItem', {
       TableName: TABLES.ORDERS,
-      Key: { orderId: { S: orderId } },
-      UpdateExpression: 'SET #status = :status, paymentStatus = :payment',
-      ExpressionAttributeNames: { '#status': 'status' },
-      ExpressionAttributeValues: { 
-        ':status': { S: 'refunded' },
-        ':payment': { S: 'refunded' },
-      },
+      Key: { id: { S: orderId } },
     });
-    return true;
+
+    if (!orderResult.Item) {
+      console.error('Order not found:', orderId);
+      return { success: false, error: 'Order not found' };
+    }
+
+    const order = parseItem(orderResult.Item);
+    const paymentIntentId = order.payment_intent_id;
+
+    if (!paymentIntentId) {
+      console.error('Order has no payment intent ID:', orderId);
+      return { success: false, error: 'Order has no payment intent associated' };
+    }
+
+    // Import and use the Stripe service to process refund
+    const { processRefundForOrder } = await import('../stripeService');
+    
+    const refundResult = await processRefundForOrder(
+      orderId,
+      paymentIntentId,
+      amount,
+      reason || 'requested_by_customer',
+      notes
+    );
+
+    if (refundResult.success) {
+      return {
+        success: true,
+        refundId: refundResult.refundId,
+      };
+    } else {
+      return {
+        success: false,
+        error: refundResult.error,
+      };
+    }
   } catch (error) {
     console.error('Failed to process refund:', error);
-    return false;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to process refund',
+    };
   }
 };
 
@@ -1194,6 +1236,46 @@ export const getSellerPayouts = async (
   return { payouts: [], total: 0 };
 };
 
+/**
+ * Process seller payout (Admin-only operation)
+ * Processes payouts to sellers via Stripe Connect
+ */
+export const processSellerPayoutAdmin = async (
+  sellerId: string,
+  startDate?: string,
+  endDate?: string,
+  forceAmount?: number
+): Promise<{
+  success: boolean;
+  payoutId?: string;
+  amount?: number;
+  ordersProcessed?: number;
+  grossEarnings?: number;
+  platformFee?: number;
+  netPayout?: number;
+  error?: string;
+}> => {
+  try {
+    // Import and use the Stripe service to process payout
+    const { processSellerPayout } = await import('../stripeService');
+    
+    const payoutResult = await processSellerPayout(
+      sellerId,
+      startDate,
+      endDate,
+      forceAmount
+    );
+
+    return payoutResult;
+  } catch (error) {
+    console.error('Failed to process seller payout:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to process payout',
+    };
+  }
+};
+
 export const getMembershipPlans = async (): Promise<MembershipPlan[] | null> => {
   return [];
 };
@@ -1317,6 +1399,7 @@ export default {
   getAccountHeads,
   getExpenses,
   getSellerPayouts,
+  processSellerPayoutAdmin,
   getMembershipPlans,
   getTaxRules,
   getPlatformCosts,

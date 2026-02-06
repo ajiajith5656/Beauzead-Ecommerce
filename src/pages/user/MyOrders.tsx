@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { logger } from '../../utils/logger';
+import { generateClient } from 'aws-amplify/api';
+import logger from '../../utils/logger';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Package, ChevronRight, Loader2 } from 'lucide-react';
+import { ordersByUser } from '../../graphql/queries';
+
+const client = generateClient();
 
 interface Order {
   id: string;
@@ -25,50 +29,54 @@ export const MyOrders: React.FC = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    if (!user && !currentAuthUser) {
+    const userId = user?.id || currentAuthUser?.username;
+    if (!userId) {
       navigate('/login');
       return;
     }
 
-    // Simulate fetching orders
+    // Fetch orders from backend
     const loadOrders = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual GraphQL query
-        const mockOrders: Order[] = [
-          {
-            id: '1',
-            orderNumber: 'ORD-001',
-            date: '2026-01-25',
-            total: 4999,
-            status: 'delivered',
-            items: 3,
-            trackingId: 'TRK-123456',
-          },
-          {
-            id: '2',
-            orderNumber: 'ORD-002',
-            date: '2026-01-28',
-            total: 2499,
-            status: 'shipped',
-            items: 1,
-            trackingId: 'TRK-789012',
-          },
-          {
-            id: '3',
-            orderNumber: 'ORD-003',
-            date: '2026-01-29',
-            total: 7999,
-            status: 'processing',
-            items: 5,
-          },
-        ];
         
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setOrders(mockOrders);
+        // Query orders for current user
+        const response: any = await client.graphql({
+          query: ordersByUser,
+          variables: {
+            user_id: userId,
+            sortDirection: 'DESC',
+            limit: 50,
+          },
+        });
+
+        if (response.data?.ordersByUser?.items) {
+          const fetchedOrders = response.data.ordersByUser.items.map((order: any) => {
+            let itemsCount = 0;
+            try {
+              const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+              itemsCount = Array.isArray(items) ? items.length : 0;
+            } catch (e) {
+              itemsCount = 0;
+            }
+
+            return {
+              id: order.id,
+              orderNumber: order.order_number,
+              date: new Date(order.created_at).toLocaleDateString('en-IN'),
+              total: order.total_amount,
+              status: order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+              items: itemsCount,
+              trackingId: order.tracking_number,
+            };
+          });
+
+          setOrders(fetchedOrders);
+        }
       } catch (error) {
-        logger.error(error as Error, { context: 'Failed to load orders' });
+        logger.error(error as Error, { context: 'Failed to load orders from GraphQL' });
+        // Fallback: show empty state
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -167,7 +175,7 @@ export const MyOrders: React.FC = () => {
             {filteredOrders.map((order) => (
               <div
                 key={order.id}
-                className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-gold transition-all duration-300 cursor-pointer group"
+                className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gold transition-all duration-300 cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div>

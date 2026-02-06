@@ -87,7 +87,7 @@ const ProductListingLayoutContent: React.FC = () => {
           <ChevronLeft size={24} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
+          <h1 className="text-xl font-bold text-gray-900">Add New Product</h1>
           <p className="text-gray-600">Step {currentStep} of 6</p>
         </div>
       </div>

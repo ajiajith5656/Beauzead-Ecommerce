@@ -9,7 +9,7 @@ import { Heart, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
 
 export const WishlistPage: React.FC = () => {
   const { user, currentAuthUser } = useAuth();
-  const { items: wishlistItems, removeFromWishlist } = useWishlist();
+  const { items: wishlistItems, removeFromWishlist, loadFromBackend } = useWishlist();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -21,8 +21,23 @@ export const WishlistPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    setLoading(false);
-  }, [user, currentAuthUser, navigate]);
+
+    // Load wishlist from backend
+    const loadWishlist = async () => {
+      try {
+        const userId = user?.id || currentAuthUser?.username;
+        if (userId) {
+          await loadFromBackend(userId);
+        }
+      } catch (error) {
+        console.error('Failed to load wishlist from backend:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWishlist();
+  }, [user, currentAuthUser, navigate, loadFromBackend]);
 
   const handleRemoveItem = async (id: string) => {
     try {

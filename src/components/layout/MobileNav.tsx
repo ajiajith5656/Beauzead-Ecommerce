@@ -12,7 +12,7 @@ export const MobileNav: React.FC = () => {
 
   const handleAccountClick = () => {
     if (user) {
-      navigate('/user/dashboard');
+      navigate('/profile');
     } else {
       navigate('/login');
     }
@@ -58,11 +58,11 @@ export const MobileNav: React.FC = () => {
         <button
           onClick={handleAccountClick}
           className={`flex flex-col items-center space-y-1 px-4 py-2 transition-all duration-300 ${
-            isActive('/user/dashboard') || isActive('/login') ? 'text-gold' : 'text-gray-400'
+            isActive('/profile') || isActive('/login') ? 'text-gold' : 'text-gray-400'
           }`}
         >
           <User className="h-6 w-6" />
-          <span className="text-xs">{user ? 'Account' : 'Login'}</span>
+          <span className="text-xs">{user ? 'Profile' : 'Login'}</span>
         </button>
       </div>
     </nav>

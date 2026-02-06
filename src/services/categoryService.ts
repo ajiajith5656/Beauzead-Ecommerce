@@ -20,12 +20,12 @@ class CategoryService {
    */
   async getAllCategories(limit: number = 100): Promise<Category[] | null> {
     try {
-      const response = await client.graphql({
+      const response: any = await client.graphql({
         query: listCategories,
         variables: { limit },
       });
 
-      const categories = (response.data as any).listCategories?.items || [];
+      const categories = response.data?.listCategories?.items || [];
       return categories.map((cat: any) => ({
         id: cat.id,
         name: cat.name,
@@ -45,12 +45,12 @@ class CategoryService {
    */
   async getCategoryById(categoryId: string): Promise<Category | null> {
     try {
-      const response = await client.graphql({
+      const response: any = await client.graphql({
         query: getCategory,
         variables: { id: categoryId },
       });
 
-      const cat = (response.data as any).getCategory;
+      const cat = response.data?.getCategory;
       if (!cat) return null;
 
       return {
@@ -79,12 +79,12 @@ class CategoryService {
         isActive: categoryData.isActive !== false,
       };
 
-      const response = await client.graphql({
+      const response: any = await client.graphql({
         query: createCategory,
         variables: { input },
       });
 
-      const cat = (response.data as any).createCategory;
+      const cat = response.data?.createCategory;
       if (!cat) return null;
 
       return {
@@ -116,12 +116,12 @@ class CategoryService {
       if (categoryData.imageUrl !== undefined) input.imageUrl = categoryData.imageUrl;
       if (categoryData.isActive !== undefined) input.isActive = categoryData.isActive;
 
-      const response = await client.graphql({
+      const response: any = await client.graphql({
         query: updateCategory,
         variables: { input },
       });
 
-      const cat = (response.data as any).updateCategory;
+      const cat = response.data?.updateCategory;
       if (!cat) return null;
 
       return {

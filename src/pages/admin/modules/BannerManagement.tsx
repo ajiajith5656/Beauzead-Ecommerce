@@ -108,7 +108,7 @@ export const BannerManagement: React.FC = () => {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Banner Management</h2>
+        <h2 className="text-xl font-bold text-gray-900">Banner Management</h2>
         <button
           onClick={() => {
             setEditingId(null);
@@ -169,7 +169,7 @@ export const BannerManagement: React.FC = () => {
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editingId ? 'Edit Banner' : 'Add New Banner'}
             </h2>
             <div className="space-y-4">

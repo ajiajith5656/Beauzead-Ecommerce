@@ -20,7 +20,7 @@ export const RefundPolicy: React.FC = () => {
         {/* Introduction */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-4">Our Commitment to You</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               At Beauzead, we want you to be completely satisfied with your purchase. If you're not happy with your order, we offer a comprehensive refund and return policy to ensure your peace of mind.
             </p>
@@ -37,7 +37,7 @@ export const RefundPolicy: React.FC = () => {
             Return Eligibility
           </h2>
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3">30-Day Return Window</h3>
               <p className="text-gray-300 mb-4">
                 You may return eligible items within 30 days of delivery for a full refund. The return period is counted from the delivery date shown on your order confirmation.
@@ -47,7 +47,7 @@ export const RefundPolicy: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3">Item Condition Requirements</h3>
               <p className="text-gray-300 mb-3">Items must be:</p>
               <ul className="space-y-2 text-gray-300 ml-4">
@@ -67,7 +67,7 @@ export const RefundPolicy: React.FC = () => {
             <AlertCircle className="w-6 h-6" />
             Non-Returnable Items
           </h2>
-          <div className="bg-red-900 border border-red-700 rounded-lg p-6">
+          <div className="bg-red-900 border border-red-700 rounded-lg p-4">
             <p className="text-red-100 mb-4">The following items cannot be returned for a refund:</p>
             <ul className="space-y-2 text-red-100 ml-4">
               <li>• Items marked "Final Sale" or "Non-Returnable"</li>
@@ -117,7 +117,7 @@ export const RefundPolicy: React.FC = () => {
                 description: 'Once we receive and inspect your return, your refund will be processed within 5-10 business days.'
               }
             ].map((item) => (
-              <div key={item.step} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+              <div key={item.step} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gold text-black font-bold">
@@ -137,7 +137,7 @@ export const RefundPolicy: React.FC = () => {
         {/* Refund Processing */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Refund Processing Timeline</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <div className="space-y-4 text-gray-300">
               <div>
                 <p className="font-semibold text-gold mb-2">Receipt & Inspection (2-3 days):</p>
@@ -163,7 +163,7 @@ export const RefundPolicy: React.FC = () => {
         {/* Defective Items */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Defective or Damaged Items</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               If you receive a defective or damaged item, please report it within 7 days of delivery. We offer:
             </p>
@@ -183,7 +183,7 @@ export const RefundPolicy: React.FC = () => {
         {/* Wrong Item */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Wrong Item Received</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               If we sent you the wrong item, contact us immediately. We will:
             </p>
@@ -199,7 +199,7 @@ export const RefundPolicy: React.FC = () => {
         {/* Partial Returns */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Multi-Item Orders & Partial Returns</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               You may return individual items from a multi-item order. Your refund will be calculated based on:
             </p>
@@ -217,7 +217,7 @@ export const RefundPolicy: React.FC = () => {
         {/* International Returns */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">International Orders</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               For international orders, return shipping costs are the responsibility of the customer unless the item is defective or we made an error. Please contact support for specific return instructions for your country.
             </p>
@@ -230,7 +230,7 @@ export const RefundPolicy: React.FC = () => {
             <Mail className="w-6 h-6" />
             Need Help?
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               If you have questions about our Refund Policy or need assistance with a return, please contact our customer support team:
             </p>
@@ -245,7 +245,7 @@ export const RefundPolicy: React.FC = () => {
 
         {/* Policy Changes */}
         <section className="mb-12">
-          <div className="bg-blue-900 border border-blue-700 rounded-lg p-6">
+          <div className="bg-blue-900 border border-blue-700 rounded-lg p-4">
             <p className="text-blue-100">
               <strong className="text-blue-200">Policy Updates:</strong> Beauzead reserves the right to modify this Refund Policy at any time. Changes will be effective immediately upon posting. Your continued use of our platform constitutes acceptance of the updated policy.
             </p>

@@ -82,7 +82,7 @@ export const SystemHealth: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">System Health</h1>
+              <h1 className="text-xl font-bold text-gray-900">System Health</h1>
               <p className="text-gray-600 mt-2">Monitor system status and performance</p>
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -101,7 +101,7 @@ export const SystemHealth: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Overall System Status</h2>
+              <h2 className="text-xl font-bold text-gray-900">Overall System Status</h2>
               <p className="text-gray-600 mt-2">Last updated: just now</p>
             </div>
             <div className="text-center">

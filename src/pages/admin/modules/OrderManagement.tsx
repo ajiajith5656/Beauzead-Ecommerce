@@ -72,11 +72,18 @@ export const OrderManagement: React.FC = () => {
   const handleProcessRefund = async (orderId: string, amount: number) => {
     try {
       setActionLoading(orderId);
-      const success = await adminApiService.processRefund(orderId, amount);
-      if (success) {
-        setSuccess('Refund processed successfully');
+      const result = await adminApiService.processRefund(
+        orderId, 
+        amount,
+        'requested_by_customer',
+        'Admin-initiated refund'
+      );
+      if (result?.success) {
+        setSuccess(`Refund processed successfully. Refund ID: ${result.refundId}`);
         fetchOrders();
         setShowRefundDialog(false);
+      } else {
+        setError(result?.error || 'Failed to process refund');
       }
     } catch (err) {
       setError('Failed to process refund');
@@ -108,7 +115,7 @@ export const OrderManagement: React.FC = () => {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Order Management</h2>
+        <h2 className="text-xl font-bold text-gray-900">Order Management</h2>
         <p className="text-gray-600">Total Orders: {pagination.total}</p>
       </div>
 
@@ -148,10 +155,10 @@ export const OrderManagement: React.FC = () => {
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">{order.id.slice(0, 8)}...</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.user_id}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">${order.total.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">{order.id.slice(0, 8)}...</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{order.user_id}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">${order.total.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
@@ -161,7 +168,7 @@ export const OrderManagement: React.FC = () => {
                         {order.status.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         order.payment_status === 'completed' ? 'bg-green-100 text-green-800' :
                         order.payment_status === 'failed' ? 'bg-red-100 text-red-800' :
@@ -170,10 +177,10 @@ export const OrderManagement: React.FC = () => {
                         {order.payment_status?.toUpperCase() || 'PENDING'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(order.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <button
                         onClick={() => {
                           setSelectedOrder(order);
@@ -227,7 +234,7 @@ export const OrderManagement: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
+              <h2 className="text-xl font-bold text-gray-900">Order Details</h2>
               <button onClick={() => setShowDetails(false)} className="text-2xl">✕</button>
             </div>
 

@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logger } from '../../utils/logger';
+import { useAuth } from '../../contexts/AuthContext';
+import { generateClient } from 'aws-amplify/api';
 import { 
   LayoutDashboard, Package, ShoppingBag, DollarSign, 
   Settings, LogOut, TrendingUp, TrendingDown, 
   Download, AlertCircle, 
   CheckCircle, Clock, ArrowUpRight, ArrowDownRight,
-  Wallet, RefreshCw, Search
+  Wallet, RefreshCw, Search, Loader2, X
 } from 'lucide-react';
 import { formatPrice } from '../../constants';
+import { ordersBySeller } from '../../graphql/queries';
+import { processSellerPayout } from '../../graphql/mutations';
+
+const client = generateClient();
 
 interface Transaction {
   id: string;
@@ -27,103 +33,155 @@ interface SellerWalletProps {
 }
 
 const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNavigate }) => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'credit' | 'debit' | 'pending'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [selectedAccount, setSelectedAccount] = useState('primary');
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState(false);
 
-  // Mock wallet data
-  const walletBalance = {
-    available: 245680,
-    pending: 89450,
-    withdrawn: 1245000,
-    totalEarnings: 1580130
+  // Fetch orders and calculate wallet data
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const sellerId = (user as any)?.attributes?.sub || user?.id || sellerEmail;
+        
+        const response: any = await client.graphql({
+          query: ordersBySeller,
+          variables: {
+            seller_id: sellerId,
+            sortDirection: 'DESC',
+            limit: 100
+          }
+        });
+
+        if (response.data?.ordersBySeller?.items) {
+          setOrders(response.data.ordersBySeller.items);
+        }
+      } catch (err) {
+        logger.error('Failed to fetch wallet data:', err as Record<string, any>);
+        setError('Failed to load wallet data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchWalletData();
+    }
+  }, [user]);
+
+  // Calculate wallet balance from orders
+  const calculateWalletBalance = () => {
+    const PLATFORM_FEE = 0.10; // 10% platform fee
+    
+    let available = 0;
+    let pending = 0;
+    let withdrawn = 0;
+    let totalEarnings = 0;
+
+    orders.forEach((order: any) => {
+      if (!order.total_amount) return;
+      
+      const orderAmount = order.total_amount;
+      const platformFee = Math.round(orderAmount * PLATFORM_FEE);
+      const netAmount = orderAmount - platformFee;
+
+      // Delivered orders → available balance
+      if (order.status === 'delivered') {
+        available += netAmount;
+        totalEarnings += orderAmount;
+      }
+      // Processing/Shipped → pending
+      else if (order.status === 'processing' || order.status === 'shipped') {
+        pending += netAmount;
+        totalEarnings += orderAmount;
+      }
+      // All except cancelled/returned count toward total
+      else if (order.status !== 'cancelled' && order.status !== 'returned') {
+        totalEarnings += orderAmount;
+      }
+    });
+
+    return { available, pending, withdrawn, totalEarnings };
   };
 
-  // Mock transactions
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      date: '2025-12-28 02:30 PM',
-      orderId: 'BZ-ORD-458921',
-      type: 'credit',
-      description: 'Order payment received',
-      amount: 15999,
-      status: 'pending',
-      balance: 245680
-    },
-    {
-      id: '2',
-      date: '2025-12-28 11:45 AM',
-      orderId: 'BZ-ORD-458920',
-      type: 'commission',
-      description: 'Platform commission (8%)',
-      amount: -1999,
-      status: 'completed',
-      balance: 229681
-    },
-    {
-      id: '3',
-      date: '2025-12-27 09:15 AM',
-      orderId: 'BZ-ORD-458915',
-      type: 'credit',
-      description: 'Order delivered - payment released',
-      amount: 24999,
-      status: 'completed',
-      balance: 231680
-    },
-    {
-      id: '4',
-      date: '2025-12-26 04:20 PM',
-      orderId: 'WD-2025-001',
-      type: 'withdrawal',
-      description: 'Withdrawal to bank account',
-      amount: -50000,
-      status: 'completed',
-      balance: 206681
-    },
-    {
-      id: '5',
-      date: '2025-12-25 01:10 PM',
-      orderId: 'BZ-ORD-458910',
-      type: 'credit',
-      description: 'Order payment received',
-      amount: 8997,
-      status: 'completed',
-      balance: 256681
-    },
-    {
-      id: '6',
-      date: '2025-12-24 10:30 AM',
-      orderId: 'BZ-ORD-458905',
-      type: 'refund',
-      description: 'Order cancelled - refund processed',
-      amount: -12499,
-      status: 'completed',
-      balance: 247684
-    },
-    {
-      id: '7',
-      date: '2025-12-23 03:45 PM',
-      orderId: 'BZ-ORD-458900',
-      type: 'credit',
-      description: 'Order payment received',
-      amount: 6799,
-      status: 'completed',
-      balance: 260183
-    },
-    {
-      id: '8',
-      date: '2025-12-22 11:20 AM',
-      orderId: 'BZ-ORD-458895',
-      type: 'commission',
-      description: 'Platform commission (8%)',
-      amount: -543,
-      status: 'completed',
-      balance: 253384
-    }
-  ];
+  // Generate transaction history from orders
+  const generateTransactions = (): Transaction[] => {
+    const transactions: Transaction[] = [];
+    const PLATFORM_FEE = 0.10;
+    let runningBalance = 0;
+
+    // Sort orders by date descending
+    const sortedOrders = [...orders].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    sortedOrders.forEach((order: any) => {
+      if (!order.total_amount) return;
+
+      const orderAmount = order.total_amount;
+      const platformFee = Math.round(orderAmount * PLATFORM_FEE);
+      const netAmount = orderAmount - platformFee;
+
+      // Add credit transaction
+      if (order.status === 'delivered' || order.status === 'processing' || order.status === 'shipped') {
+        runningBalance += netAmount;
+        transactions.push({
+          id: `${order.id}-credit`,
+          date: new Date(order.created_at).toLocaleString(),
+          orderId: order.order_number,
+          type: 'credit',
+          description: `Order payment received - ${order.order_number}`,
+          amount: netAmount,
+          status: order.status === 'delivered' ? 'completed' : 'pending',
+          balance: runningBalance
+        });
+      }
+
+      // Add commission fee
+      if (platformFee > 0) {
+        runningBalance -= platformFee;
+        transactions.push({
+          id: `${order.id}-commission`,
+          date: new Date(order.created_at).toLocaleString(),
+          orderId: order.order_number,
+          type: 'commission',
+          description: `Platform commission (10%)`,
+          amount: -platformFee,
+          status: 'completed',
+          balance: runningBalance
+        });
+      }
+
+      // Handle refunds
+      if (order.status === 'cancelled' || order.status === 'returned') {
+        runningBalance -= netAmount;
+        transactions.push({
+          id: `${order.id}-refund`,
+          date: new Date(order.updated_at).toLocaleString(),
+          orderId: order.order_number,
+          type: 'refund',
+          description: `Order cancelled - refund processed`,
+          amount: -netAmount,
+          status: 'completed',
+          balance: runningBalance
+        });
+      }
+    });
+
+    return transactions;
+  };
+
+  const walletBalance = calculateWalletBalance();
+  const transactions = generateTransactions();
 
   const filteredTransactions = transactions.filter(txn => {
     const matchesFilter = 
@@ -138,6 +196,42 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
     
     return matchesFilter && matchesSearch;
   });
+
+  const handleWithdraw = async () => {
+    if (!withdrawAmount || parseFloat(withdrawAmount) > walletBalance.available) {
+      alert('Invalid withdrawal amount');
+      return;
+    }
+
+    try {
+      setWithdrawing(true);
+      const sellerId = (user as any)?.attributes?.sub || user?.id || sellerEmail;
+      
+      const response: any = await client.graphql({
+        query: processSellerPayout,
+        variables: {
+          input: {
+            sellerId,
+            forceAmount: Math.round(parseFloat(withdrawAmount) * 100)
+          }
+        }
+      });
+
+      if (response.data?.processSellerPayout?.success) {
+        logger.log('Withdrawal successful', response.data.processSellerPayout);
+        alert('Withdrawal request submitted successfully!');
+        setShowWithdrawModal(false);
+        setWithdrawAmount('');
+      } else {
+        alert('Withdrawal failed: ' + (response.data?.processSellerPayout?.error || 'Unknown error'));
+      }
+    } catch (err) {
+      logger.error('Withdrawal error:', err as Record<string, any>);
+      alert('Failed to process withdrawal. Please try again.');
+    } finally {
+      setWithdrawing(false);
+    }
+  };
 
   const getTransactionIcon = (type: Transaction['type']) => {
     switch (type) {
@@ -168,15 +262,8 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
     );
   };
 
-  const handleWithdraw = () => {
-    // API call would go here
-    logger.log('Withdraw request', { amount: withdrawAmount, account: selectedAccount });
-    setShowWithdrawModal(false);
-    setWithdrawAmount('');
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex font-sans">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
       <aside className="w-72 bg-white border-r border-gray-200 hidden lg:flex flex-col p-6 sticky top-0 h-screen">
         <div className="mb-10 cursor-pointer" onClick={() => onNavigate('seller-dashboard')}>
@@ -218,36 +305,44 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
           </div>
 
           {/* Balance Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            <BalanceCard
-              label="Available Balance"
-              amount={walletBalance.available}
-              icon={<Wallet className="text-green-600" />}
-              trend="+12.5%"
-              trendUp={true}
-              actionLabel="Withdraw"
-              onAction={() => setShowWithdrawModal(true)}
-            />
-            <BalanceCard
-              label="Pending Balance"
-              amount={walletBalance.pending}
-              icon={<Clock className="text-yellow-600" />}
-              description="Will be available after delivery"
-            />
-            <BalanceCard
-              label="Total Withdrawn"
-              amount={walletBalance.withdrawn}
-              icon={<ArrowUpRight className="text-blue-600" />}
-              description="Lifetime withdrawals"
-            />
-            <BalanceCard
-              label="Total Earnings"
-              amount={walletBalance.totalEarnings}
-              icon={<TrendingUp className="text-purple-600" />}
-              trend="+24.3%"
-              trendUp={true}
-            />
-          </div>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white border border-gray-200 rounded-2xl p-6 h-32 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+              <BalanceCard
+                label="Available Balance"
+                amount={walletBalance.available}
+                icon={<Wallet className="text-green-600" />}
+                trend="+12.5%"
+                trendUp={true}
+                actionLabel="Withdraw"
+                onAction={() => setShowWithdrawModal(true)}
+              />
+              <BalanceCard
+                label="Pending Balance"
+                amount={walletBalance.pending}
+                icon={<Clock className="text-yellow-600" />}
+                description="Will be available after delivery"
+              />
+              <BalanceCard
+                label="Total Withdrawn"
+                amount={walletBalance.withdrawn}
+                icon={<ArrowUpRight className="text-blue-600" />}
+                description="Lifetime withdrawals"
+              />
+              <BalanceCard
+                label="Total Earnings"
+                amount={walletBalance.totalEarnings}
+                icon={<TrendingUp className="text-purple-600" />}
+                trend="+24.3%"
+                trendUp={true}
+              />
+            </div>
+          )}
 
           {/* Wallet Info Banner */}
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
@@ -289,72 +384,94 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
           </div>
 
           {/* Transactions Table */}
-          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Date & Time</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Transaction</th>
-                    <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Order ID</th>
-                    <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-600 uppercase tracking-widest">Amount</th>
-                    <th className="px-6 py-4 text-center text-[10px] font-bold text-gray-600 uppercase tracking-widest">Status</th>
-                    <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-600 uppercase tracking-widest">Balance</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredTransactions.length === 0 ? (
+          {error ? (
+            <div className="bg-white border border-gray-200 rounded-2xl p-16 text-center">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Error Loading Transactions</h3>
+              <p className="text-gray-600 text-sm">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <td colSpan={6} className="px-6 py-16 text-center">
-                        <div className="flex flex-col items-center">
-                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <Wallet size={24} className="text-gray-400" />
-                          </div>
-                          <p className="text-gray-600 font-semibold">No transactions found</p>
-                          <p className="text-gray-500 text-sm mt-1">Try adjusting your filters</p>
-                        </div>
-                      </td>
+                      <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Date & Time</th>
+                      <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Transaction</th>
+                      <th className="px-4 py-3 text-left text-[10px] font-bold text-gray-600 uppercase tracking-widest">Order ID</th>
+                      <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-600 uppercase tracking-widest">Amount</th>
+                      <th className="px-4 py-3 text-center text-[10px] font-bold text-gray-600 uppercase tracking-widest">Status</th>
+                      <th className="px-4 py-3 text-right text-[10px] font-bold text-gray-600 uppercase tracking-widest">Balance</th>
                     </tr>
-                  ) : (
-                    filteredTransactions.map((txn) => (
-                      <tr key={txn.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                              {getTransactionIcon(txn.type)}
-                            </div>
-                            <p className="text-xs font-semibold text-gray-700">{txn.date}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-bold text-gray-900">{txn.description}</p>
-                          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mt-0.5">
-                            {txn.type.replace('-', ' ')}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-xs font-mono font-bold text-blue-600">{txn.orderId}</p>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <p className={`text-sm font-bold ${
-                            txn.amount > 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {txn.amount > 0 ? '+' : ''}{formatPrice(txn.amount)}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {getStatusBadge(txn.status)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <p className="text-sm font-bold text-gray-900">{formatPrice(txn.balance)}</p>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {loading ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center">
+                          <Loader2 size={24} className="text-gray-400 animate-spin mx-auto" />
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : filteredTransactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-16 text-center">
+                          <div className="flex flex-col items-center">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                              <Wallet size={24} className="text-gray-400" />
+                            </div>
+                            <p className="text-gray-600 font-semibold">No transactions found</p>
+                            <p className="text-gray-500 text-sm mt-1">Try adjusting your filters</p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredTransactions.map((txn) => (
+                        <tr key={txn.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                                {getTransactionIcon(txn.type)}
+                              </div>
+                              <p className="text-xs font-semibold text-gray-700">{txn.date}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="text-sm font-bold text-gray-900">{txn.description}</p>
+                            <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold mt-0.5">
+                              {txn.type.replace('-', ' ')}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="text-xs font-mono font-bold text-blue-600">{txn.orderId}</p>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <p className={`text-sm font-bold ${
+                              txn.amount > 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {txn.amount > 0 ? '+' : ''}{formatPrice(txn.amount)}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {getStatusBadge(txn.status)}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <p className="text-sm font-bold text-gray-900">{formatPrice(txn.balance)}</p>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Pagination */}
           {filteredTransactions.length > 0 && (
@@ -373,8 +490,12 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
           <div className="bg-white rounded-3xl p-8 max-w-lg w-full">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-gray-900">Withdraw Funds</h3>
-              <button onClick={() => setShowWithdrawModal(false)} className="text-gray-400 hover:text-gray-600">
-                <LogOut size={24} />
+              <button 
+                onClick={() => setShowWithdrawModal(false)}
+                disabled={withdrawing}
+                className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+              >
+                <X size={24} />
               </button>
             </div>
 
@@ -393,7 +514,8 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
                   type="number"
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-4 text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={withdrawing}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-4 text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   placeholder="0.00"
                   max={walletBalance.available}
                 />
@@ -401,25 +523,29 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
               <div className="flex justify-between mt-3">
                 <button 
                   onClick={() => setWithdrawAmount((walletBalance.available / 4).toString())}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  disabled={withdrawing}
+                  className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
                 >
                   25%
                 </button>
                 <button 
                   onClick={() => setWithdrawAmount((walletBalance.available / 2).toString())}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  disabled={withdrawing}
+                  className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
                 >
                   50%
                 </button>
                 <button 
                   onClick={() => setWithdrawAmount((walletBalance.available * 0.75).toString())}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  disabled={withdrawing}
+                  className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
                 >
                   75%
                 </button>
                 <button 
                   onClick={() => setWithdrawAmount(walletBalance.available.toString())}
-                  className="text-xs font-semibold text-blue-600 hover:underline"
+                  disabled={withdrawing}
+                  className="text-xs font-semibold text-blue-600 hover:underline disabled:opacity-50"
                 >
                   Max
                 </button>
@@ -439,6 +565,7 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
                     value="primary"
                     checked={selectedAccount === 'primary'}
                     onChange={(e) => setSelectedAccount(e.target.value)}
+                    disabled={withdrawing}
                     className="w-4 h-4 text-blue-600"
                   />
                   <div className="flex-1">
@@ -464,15 +591,22 @@ const SellerWallet: React.FC<SellerWalletProps> = ({ onLogout, sellerEmail, onNa
             <div className="flex gap-3">
               <button 
                 onClick={() => setShowWithdrawModal(false)}
-                className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-all text-sm"
+                disabled={withdrawing}
+                className="flex-1 border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold px-6 py-3 rounded-xl transition-all text-sm disabled:opacity-50"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleWithdraw}
-                disabled={!withdrawAmount || parseFloat(withdrawAmount) > walletBalance.available}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={
+                  withdrawing ||
+                  !withdrawAmount || 
+                  parseFloat(withdrawAmount) > walletBalance.available ||
+                  parseFloat(withdrawAmount) <= 0
+                }
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {withdrawing && <Loader2 size={16} className="animate-spin" />}
                 Request Withdrawal
               </button>
             </div>

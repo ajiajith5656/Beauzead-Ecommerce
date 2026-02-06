@@ -241,7 +241,7 @@ export const UserSettings: React.FC = () => {
             <div className="lg:col-span-3">
               {/* Profile Tab */}
               {activeTab === 'profile' && (
-                <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 space-y-6">
+                <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-6">Profile Information</h2>
 
                   {/* Full Name */}
@@ -300,7 +300,7 @@ export const UserSettings: React.FC = () => {
 
               {/* Security Tab */}
               {activeTab === 'security' && (
-                <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 space-y-6">
+                <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-6">Security Settings</h2>
 
                   {/* Current Password */}
@@ -383,7 +383,7 @@ export const UserSettings: React.FC = () => {
 
               {/* Notifications Tab */}
               {activeTab === 'notifications' && (
-                <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 space-y-6">
+                <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 space-y-6">
                   <h2 className="text-2xl font-bold text-white mb-6">Notification Preferences</h2>
 
                   {/* Email Notifications */}

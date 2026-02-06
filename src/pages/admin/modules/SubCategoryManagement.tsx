@@ -129,7 +129,7 @@ export const SubCategoryManagement: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sub-Categories</h1>
+            <h1 className="text-xl font-bold text-gray-900">Sub-Categories</h1>
             <p className="text-gray-600 mt-2">Manage subcategories for each category</p>
           </div>
           <button
@@ -225,7 +225,7 @@ export const SubCategoryManagement: React.FC = () => {
         {/* Subcategories List */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="animate-spin text-blue-600" size={40} />
+            <Loader2 className="animate-spin text-blue-600" size={24} />
           </div>
         ) : !selectedCategory ? (
           <div className="text-center py-12 bg-white rounded-lg">
@@ -257,14 +257,14 @@ export const SubCategoryManagement: React.FC = () => {
               <tbody className="divide-y">
                 {subcategories.map((sub) => (
                   <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{sub.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{sub.name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
                       {sub.description || '—'}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-gray-600">
                       {sub.imageUrl ? '✓' : '—'}
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
+                    <td className="px-4 py-3 text-right space-x-2">
                       <button
                         onClick={() => handleEdit(sub)}
                         className="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1"

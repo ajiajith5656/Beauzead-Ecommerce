@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { logger } from '../../utils/logger';
+import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/api';
+import logger from '../../utils/logger';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Package, Truck, RotateCcw, Download } from 'lucide-react';
+import { Package, Truck, RotateCcw, Download, Loader2 } from 'lucide-react';
+import { getOrder } from '../../graphql/queries';
+
+const client = generateClient();
 
 interface OrderItem {
   id: string;
@@ -10,6 +14,18 @@ interface OrderItem {
   quantity: number;
   price: number;
   image: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  total: number;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  paymentMethod: string;
+  items: OrderItem[];
 }
 
 interface ShipmentTracking {
@@ -24,53 +40,86 @@ export const OrderDetails: React.FC = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'items' | 'tracking' | 'invoice'>('items');
+  const [loading, setLoading] = useState(true);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [shipping, setShipping] = useState<ShipmentTracking | null>(null);
 
-  // Mock data - TODO: Fetch from API
-  const order = {
-    id: orderId || 'ORD-001',
-    date: '2024-01-15',
-    status: 'shipped',
-    total: 4599.99,
-    subtotal: 4299.99,
-    shipping: 200,
-    tax: 100,
-    paymentMethod: 'Credit Card',
-    items: [
-      {
-        id: '1',
-        productId: 'PROD-001',
-        productName: 'Premium Headphones',
-        quantity: 1,
-        price: 2999.99,
-        image: 'https://via.placeholder.com/150'
-      },
-      {
-        id: '2',
-        productId: 'PROD-002',
-        productName: 'Phone Case',
-        quantity: 2,
-        price: 599.99,
-        image: 'https://via.placeholder.com/150'
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!orderId) return;
+
+      try {
+        setLoading(true);
+
+        // Fetch order from GraphQL
+        const response: any = await client.graphql({
+          query: getOrder,
+          variables: { id: orderId },
+        });
+
+        const orderData = response.data?.getOrder;
+        if (orderData) {
+          // Parse items from JSON
+          let orderItems: OrderItem[] = [];
+          try {
+            const items = typeof orderData.items === 'string' ? JSON.parse(orderData.items) : orderData.items;
+            orderItems = Array.isArray(items)
+              ? items.map((item: any, index: number) => ({
+                  id: `${index}`,
+                  productId: item.productId,
+                  productName: item.productName,
+                  quantity: item.quantity,
+                  price: item.price,
+                  image: item.image || 'https://via.placeholder.com/150',
+                }))
+              : [];
+          } catch (e) {
+            logger.error(e as Error, { context: 'Failed to parse order items' });
+            orderItems = [];
+          }
+
+          // Format order data
+          const formattedOrder: Order = {
+            id: orderData.id,
+            date: new Date(orderData.created_at).toLocaleDateString('en-IN'),
+            status: orderData.status,
+            total: orderData.total_amount,
+            subtotal: orderData.subtotal,
+            shipping: orderData.shipping_cost,
+            tax: orderData.tax_amount,
+            paymentMethod: orderData.payment_method || 'Card',
+            items: orderItems,
+          };
+
+          setOrder(formattedOrder);
+
+          // Set shipping tracking info
+          setShipping({
+            status: orderData.status === 'delivered' ? 'delivered' : 'in_transit',
+            estimatedDelivery: new Date(orderData.updated_at).toLocaleDateString('en-IN'),
+            carrier: 'Courier Partner',
+            trackingNumber: orderData.tracking_number || 'N/A',
+            lastUpdate: new Date(orderData.updated_at).toLocaleString('en-IN'),
+          });
+        }
+      } catch (error) {
+        logger.error(error as Error, { context: 'Failed to fetch order details' });
+      } finally {
+        setLoading(false);
       }
-    ] as OrderItem[]
-  };
+    };
 
-  const shipping: ShipmentTracking = {
-    status: 'in_transit',
-    estimatedDelivery: '2024-01-18',
-    carrier: 'FedEx',
-    trackingNumber: 'FDX123456789',
-    lastUpdate: '2024-01-16 10:30 AM'
-  };
+    fetchOrderDetails();
+  }, [orderId]);
 
   const handleInitiateReturn = (itemId: string) => {
     logger.log('Return initiated', { itemId });
-    // TODO: Implement return initiation
+    // TODO: Implement return initiation with backend API
   };
 
   const handleDownloadInvoice = () => {
     logger.log('Invoice downloaded', { orderId });
-    // TODO: Implement invoice download
+    // TODO: Implement invoice download from backend
   };
 
   const getStatusColor = (status: string) => {
@@ -96,21 +145,41 @@ export const OrderDetails: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
-              <p className="text-gray-600 mt-2">Order ID: {order.id}</p>
-            </div>
-            <div className="text-right">
-              <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                {getStatusLabel(order.status)}
-              </span>
-              <p className="text-gray-600 text-sm mt-2">Order Date: {order.date}</p>
-            </div>
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
+            <span className="text-lg text-gray-700">Loading order details...</span>
           </div>
-        </div>
+        ) : !order ? (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Order Not Found</h2>
+            <p className="text-gray-600 mb-6">We couldn't find the order you're looking for.</p>
+            <button
+              onClick={() => navigate('/user/orders')}
+              className="text-blue-600 hover:text-blue-700 font-medium"
+            >
+              ← Back to Orders
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+                  <p className="text-gray-600 mt-2">Order ID: {order.id}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                    {getStatusLabel(order.status)}
+                  </span>
+                  <p className="text-gray-600 text-sm mt-2">Order Date: {order.date}</p>
+                </div>
+              </div>
+            </div>
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -205,9 +274,9 @@ export const OrderDetails: React.FC = () => {
             )}
 
             {/* Tracking Tab */}
-            {activeTab === 'tracking' && (
+            {activeTab === 'tracking' && shipping && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <Truck className="w-6 h-6 text-blue-600" />
                     <h3 className="text-lg font-semibold text-gray-900">Shipment Status</h3>
@@ -279,7 +348,7 @@ export const OrderDetails: React.FC = () => {
             {/* Invoice Tab */}
             {activeTab === 'invoice' && (
               <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-gray-700 mb-4">
                     Download your order invoice for your records.
                   </p>
@@ -292,7 +361,7 @@ export const OrderDetails: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
+                <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900 mb-4">Invoice Details</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
@@ -325,6 +394,8 @@ export const OrderDetails: React.FC = () => {
         >
           ← Back to Orders
         </button>
+          </>
+        )}
       </div>
     </div>
   );

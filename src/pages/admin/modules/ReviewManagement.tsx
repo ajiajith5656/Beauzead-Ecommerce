@@ -84,7 +84,7 @@ export const ReviewManagement: React.FC = () => {
         </div>
       )}
 
-      <h2 className="text-2xl font-bold text-gray-900">Reviews & Ratings</h2>
+      <h2 className="text-xl font-bold text-gray-900">Reviews & Ratings</h2>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
@@ -103,20 +103,20 @@ export const ReviewManagement: React.FC = () => {
               {reviews.length > 0 ? (
                 reviews.map((review) => (
                   <tr key={review.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{review.product_id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{review.user_id}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{review.product_id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{review.user_id}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
                       {review.rating} ⭐
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{review.comment}</td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{review.comment}</td>
+                    <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         review.is_verified ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                       }`}>
                         {review.is_verified ? 'Yes' : 'No'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm">
+                    <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleFlagReview(review.id)}

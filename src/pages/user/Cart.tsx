@@ -51,14 +51,20 @@ export const CartPage: React.FC = () => {
     }
   };
 
-  const handleApplyCoupon = () => {
-    // Simulate coupon validation
-    if (couponCode.toUpperCase() === 'SAVE20') {
-      setDiscount(0.2); // 20% discount
-    } else if (couponCode.toUpperCase() === 'SAVE10') {
-      setDiscount(0.1); // 10% discount
-    } else {
-      alert('Invalid coupon code');
+  const handleApplyCoupon = async () => {
+    try {
+      if (!couponCode.trim()) {
+        alert('Please enter a coupon code');
+        return;
+      }
+
+      // TODO: Call backend coupon validation API
+      // For now, show a message that coupon validation is coming soon
+      setDiscount(0);
+      alert('Coupon validation service is coming soon. Please check back later.');
+    } catch (error) {
+      console.error('Coupon validation error:', error);
+      alert('Failed to validate coupon code');
     }
   };
 
@@ -68,8 +74,8 @@ export const CartPage: React.FC = () => {
   const total = subtotal - discountAmount + tax;
 
   const handleCheckout = () => {
-    // TODO: Implement checkout flow
-    navigate('/checkout');
+    // Navigate to shipping address page to start checkout flow
+    navigate('/checkout/shipping');
   };
 
   return (
@@ -171,7 +177,7 @@ export const CartPage: React.FC = () => {
                     type="text"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    placeholder="Enter coupon code (e.g., SAVE20)"
+                    placeholder="Enter coupon code"
                     className="flex-grow bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-gold"
                   />
                   <button
@@ -182,13 +188,13 @@ export const CartPage: React.FC = () => {
                     Apply
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Try codes: SAVE10, SAVE20</p>
+                <p className="text-xs text-gray-500 mt-2">Coupon codes available from the seller</p>
               </div>
             </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 sticky top-24 space-y-4">
+              <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 sticky top-24 space-y-4">
                 <h3 className="text-xl font-bold text-white mb-6">Order Summary</h3>
 
                 <div className="space-y-3 border-b border-gray-700 pb-4">

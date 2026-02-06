@@ -102,22 +102,22 @@ export const CategoryProducts: React.FC = () => {
     <div className="min-h-screen bg-black pb-16 md:pb-0">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gold mb-2">
+            <h1 className="text-xl font-bold text-gold mb-1.5">
               {category.icon} {category.name}
             </h1>
-            <p className="text-gray-400">{filteredProducts.length} products</p>
+            <p className="text-sm text-gray-400">{filteredProducts.length} products</p>
           </div>
           
           {/* Mobile Menu Button */}
           <button
             onClick={() => setShowSidebar(!showSidebar)}
-            className="md:hidden p-2 bg-gray-900 text-gold rounded-lg hover:bg-gray-800 transition-colors"
+            className="md:hidden p-1.5 bg-gray-900 text-gold rounded-lg hover:bg-gray-800 transition-colors"
           >
-            {showSidebar ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {showSidebar ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
@@ -126,13 +126,13 @@ export const CategoryProducts: React.FC = () => {
           <aside
             className={`${
               showSidebar ? 'block' : 'hidden'
-            } md:block bg-gray-900 border border-gray-800 rounded-lg p-6 h-fit sticky top-24 md:col-span-1`}
+            } md:block bg-gray-900 border border-gray-800 rounded-lg p-4 h-fit sticky top-24 md:col-span-1`}
           >
-            <h2 className="text-xl font-bold text-white mb-6">Filters</h2>
+            <h2 className="text-lg font-bold text-white mb-4">Filters</h2>
 
             {/* Sort By */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <div className="mb-6">
+              <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
                 <Package className="h-4 w-4 text-gold" />
                 Sort By
               </h3>
@@ -155,8 +155,8 @@ export const CategoryProducts: React.FC = () => {
             </div>
 
             {/* Price Range Filter */}
-            <div className="mb-8 pb-8 border-b border-gray-700">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="mb-6 pb-6 border-b border-gray-700">
+              <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-gold" />
                 Price Range
               </h3>
@@ -191,8 +191,8 @@ export const CategoryProducts: React.FC = () => {
             </div>
 
             {/* Rating Filter */}
-            <div className="mb-8 pb-8 border-b border-gray-700">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <div className="mb-6 pb-6 border-b border-gray-700">
+              <h3 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
                 <Star className="h-4 w-4 text-gold" />
                 Rating
               </h3>

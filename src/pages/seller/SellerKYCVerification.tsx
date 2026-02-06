@@ -625,7 +625,7 @@ const SellerKYCVerification: React.FC<SellerKYCVerificationProps> = ({
                     }
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
-                  <Upload size={32} className="mx-auto mb-2 text-gray-500" />
+                  <Upload size={24} className="mx-auto mb-2 text-gray-500" />
                   <p className="text-sm font-semibold text-white">
                     {formData.id_document_file
                       ? formData.id_document_file.name
@@ -803,7 +803,7 @@ const SellerKYCVerification: React.FC<SellerKYCVerificationProps> = ({
                     }
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
-                  <Upload size={32} className="mx-auto mb-2 text-gray-500" />
+                  <Upload size={24} className="mx-auto mb-2 text-gray-500" />
                   <p className="text-sm font-semibold text-white">
                     {formData.address_proof_file
                       ? formData.address_proof_file.name
@@ -954,7 +954,7 @@ const SellerKYCVerification: React.FC<SellerKYCVerificationProps> = ({
                     }
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
-                  <Upload size={32} className="mx-auto mb-2 text-gray-500" />
+                  <Upload size={24} className="mx-auto mb-2 text-gray-500" />
                   <p className="text-sm font-semibold text-white">
                     {formData.bank_statement_file
                       ? formData.bank_statement_file.name
@@ -985,7 +985,7 @@ const SellerKYCVerification: React.FC<SellerKYCVerificationProps> = ({
               </p>
             </div>
 
-            <div className="space-y-4 bg-black border border-gray-800 rounded-lg p-6">
+            <div className="space-y-4 bg-black border border-gray-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"

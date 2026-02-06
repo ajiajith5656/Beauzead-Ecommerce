@@ -52,8 +52,8 @@ export const createPaymentIntent = async (
     // Amount in cents
     const amountInCents = Math.round(orderData.totalAmount * 100);
 
-    // Create payment intent via GraphQL mutation
-    const mutation = `
+    // Use the GraphQL mutation from mutations.js
+    const mutation = /* GraphQL */ `
       mutation CreateStripePaymentIntent($input: CreatePaymentIntentInput!) {
         createStripePaymentIntent(input: $input) {
           success
@@ -74,7 +74,7 @@ export const createPaymentIntent = async (
         amount: amountInCents,
         currency: 'usd',
         metadata: {
-          itemCount: orderData.items.length,
+          itemCount: orderData.items.length.toString(),
           items: JSON.stringify(orderData.items),
           shippingAddress: JSON.stringify(orderData.shippingAddress),
         },
@@ -523,3 +523,163 @@ export const updateOrderStatus = async (
     };
   }
 };
+
+/**
+ * Process refund for an order (admin/support operation)
+ */
+export const processRefundForOrder = async (
+  orderId: string,
+  paymentIntentId: string,
+  amount?: number,
+  reason: 'duplicate' | 'fraudulent' | 'requested_by_customer' | 'abandoned' = 'requested_by_customer',
+  notes?: string
+): Promise<{
+  success: boolean;
+  refundId?: string;
+  status?: string;
+  amount?: number;
+  error?: string;
+}> => {
+  try {
+    const mutation = /* GraphQL */ `
+      mutation ProcessRefund($input: ProcessRefundInput!) {
+        processRefund(input: $input) {
+          success
+          refundId
+          status
+          amount
+          error
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        orderId,
+        paymentIntentId,
+        amount: amount ? Math.round(amount * 100) : undefined,
+        reason,
+        notes,
+      },
+    };
+
+    const response: any = await client.graphql({
+      query: mutation,
+      variables,
+    });
+
+    if (response.errors) {
+      console.error('GraphQL Error:', response.errors);
+      return {
+        success: false,
+        error: response.errors[0]?.message || 'Failed to process refund',
+      };
+    }
+
+    const refundResult = response.data?.processRefund;
+
+    if (!refundResult?.success) {
+      return {
+        success: false,
+        error: refundResult?.error || 'Failed to process refund',
+      };
+    }
+
+    return {
+      success: true,
+      refundId: refundResult?.refundId,
+      status: refundResult?.status,
+      amount: refundResult?.amount,
+    };
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    return {
+      success: false,
+      error: `Failed to process refund: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+};
+
+/**
+ * Process seller payout (admin-only operation)
+ */
+export const processSellerPayout = async (
+  sellerId: string,
+  startDate?: string,
+  endDate?: string,
+  forceAmount?: number
+): Promise<{
+  success: boolean;
+  payoutId?: string;
+  amount?: number;
+  ordersProcessed?: number;
+  grossEarnings?: number;
+  platformFee?: number;
+  netPayout?: number;
+  error?: string;
+}> => {
+  try {
+    const mutation = /* GraphQL */ `
+      mutation ProcessSellerPayout($input: ProcessPayoutInput!) {
+        processSellerPayout(input: $input) {
+          success
+          payoutId
+          amount
+          ordersProcessed
+          grossEarnings
+          platformFee
+          netPayout
+          error
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        sellerId,
+        startDate,
+        endDate,
+        forceAmount: forceAmount ? Math.round(forceAmount * 100) : undefined,
+      },
+    };
+
+    const response: any = await client.graphql({
+      query: mutation,
+      variables,
+    });
+
+    if (response.errors) {
+      console.error('GraphQL Error:', response.errors);
+      return {
+        success: false,
+        error: response.errors[0]?.message || 'Failed to process payout',
+      };
+    }
+
+    const payoutResult = response.data?.processSellerPayout;
+
+    if (!payoutResult?.success) {
+      return {
+        success: false,
+        error: payoutResult?.error || 'Failed to process payout',
+      };
+    }
+
+    return {
+      success: true,
+      payoutId: payoutResult?.payoutId,
+      amount: payoutResult?.amount,
+      ordersProcessed: payoutResult?.ordersProcessed,
+      grossEarnings: payoutResult?.grossEarnings,
+      platformFee: payoutResult?.platformFee,
+      netPayout: payoutResult?.netPayout,
+    };
+  } catch (error) {
+    console.error('Error processing seller payout:', error);
+    return {
+      success: false,
+      error: `Failed to process payout: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+};
+

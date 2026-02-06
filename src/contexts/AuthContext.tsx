@@ -210,9 +210,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { success: true, userId: signupResult.userId, isSignUpComplete: signupResult.isSignUpComplete };
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error as Error, { context: 'Signup error' });
-      return { success: false, error };
+      
+      // Handle Zod validation errors
+      if (error.name === 'ZodError' && error.issues) {
+        const firstError = error.issues[0];
+        const errorMessage = firstError?.message || 'Validation failed';
+        return { 
+          success: false, 
+          error: { message: errorMessage } 
+        };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        error: { message: error.message || 'Failed to sign up' } 
+      };
     }
   };
 
@@ -261,9 +276,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isSignedIn: result.isSignedIn,
         role: finalRole,
       };
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error as Error, { context: 'Signin error' });
-      return { success: false, error };
+      
+      // Handle Zod validation errors
+      if (error.name === 'ZodError' && error.issues) {
+        const firstError = error.issues[0];
+        const errorMessage = firstError?.message || 'Validation failed';
+        return { 
+          success: false, 
+          error: { message: errorMessage } 
+        };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        error: { message: error.message || 'Failed to sign in' } 
+      };
     }
   };
 
@@ -297,9 +327,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const result = await amplifyAuthService.initiatePasswordReset(validatedData.email);
       logger.auth('Password reset initiated', validatedData.email);
       return { success: true, ...result };
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error as Error, { context: 'Password reset error' });
-      return { success: false, error };
+      
+      // Handle Zod validation errors
+      if (error.name === 'ZodError' && error.issues) {
+        const firstError = error.issues[0];
+        const errorMessage = firstError?.message || 'Validation failed';
+        return { 
+          success: false, 
+          error: { message: errorMessage } 
+        };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        error: { message: error.message || 'Failed to reset password' } 
+      };
     }
   };
 
@@ -308,9 +353,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await amplifyAuthService.confirmPasswordReset(email, code, newPassword);
       logger.auth('Password reset confirmed', email);
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       logger.error(error as Error, { context: 'Confirm password reset error' });
-      return { success: false, error };
+      
+      // Handle Zod validation errors
+      if (error.name === 'ZodError' && error.issues) {
+        const firstError = error.issues[0];
+        const errorMessage = firstError?.message || 'Validation failed';
+        return { 
+          success: false, 
+          error: { message: errorMessage } 
+        };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        error: { message: error.message || 'Failed to confirm password reset' } 
+      };
     }
   };
 
@@ -335,10 +395,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Handle case where user is already confirmed
       if (error.name === 'NotAuthorizedException' || error.message?.includes('already') || error.message?.includes('CONFIRMED')) {
-        return { success: false, error, alreadyConfirmed: true };
+        return { 
+          success: false, 
+          error: { message: error.message || 'User already confirmed' },
+          alreadyConfirmed: true 
+        };
       }
       
-      return { success: false, error };
+      // Handle Zod validation errors
+      if (error.name === 'ZodError' && error.issues) {
+        const firstError = error.issues[0];
+        const errorMessage = firstError?.message || 'Validation failed';
+        return { 
+          success: false, 
+          error: { message: errorMessage } 
+        };
+      }
+      
+      // Handle other errors
+      return { 
+        success: false, 
+        error: { message: error.message || 'Failed to confirm signup' } 
+      };
     }
   };
 

@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/api';
 import { logger } from '../../utils/logger';
 import { Header } from '../../components/layout/Header';
 import { Footer } from '../../components/layout/Footer';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Check, Trash2, Loader2 } from 'lucide-react';
+import { Bell, Check, Trash2, Loader2, Package, Tag, AlertCircle } from 'lucide-react';
+import { ordersByUser } from '../../graphql/queries';
+
+const client = generateClient();
 
 interface Notification {
   id: string;
@@ -30,118 +34,123 @@ export const NotificationsPage: React.FC = () => {
       return;
     }
 
-    // Simulate fetching notifications
-    const loadNotifications = async () => {
-      try {
-        setLoading(true);
-        // TODO: Replace with actual GraphQL query
-        const mockNotifications: Notification[] = [
-          {
-            id: '1',
-            title: 'Order Confirmed',
-            message: 'Your order ORD-001 has been confirmed and is being processed.',
-            type: 'order',
-            timestamp: '2026-01-29T10:30:00',
-            read: false,
-            actionUrl: '/orders',
-          },
-          {
-            id: '2',
-            title: 'Delivery Update',
-            message: 'Your order ORD-002 is out for delivery. Expected delivery today.',
-            type: 'order',
-            timestamp: '2026-01-28T14:15:00',
-            read: false,
-            actionUrl: '/orders',
-          },
-          {
-            id: '3',
-            title: 'Special Offer',
-            message: 'Get 30% off on Electronics! Limited time offer.',
-            type: 'promotion',
-            timestamp: '2026-01-27T08:00:00',
-            read: true,
-          },
-          {
-            id: '4',
-            title: 'Review Reminder',
-            message: 'Share your experience with the products you purchased.',
-            type: 'review',
-            timestamp: '2026-01-26T16:45:00',
-            read: true,
-          },
-          {
-            id: '5',
-            title: 'System Maintenance',
-            message: 'Platform will undergo maintenance on Jan 30, 2-4 AM IST.',
-            type: 'system',
-            timestamp: '2026-01-25T12:00:00',
-            read: true,
-          },
-        ];
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setNotifications(mockNotifications);
-      } catch (error) {
-        logger.error(error as Error, { context: 'Failed to load notifications' });
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Load notifications from orders
     loadNotifications();
   }, [user, currentAuthUser, navigate]);
 
-  const filteredNotifications = selectedFilter === 'all' 
-    ? notifications 
-    : selectedFilter === 'unread'
-    ? notifications.filter((n) => !n.read)
-    : notifications.filter((n) => n.read);
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+      const userId = user?.id || currentAuthUser?.username;
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
+      // Fetch user's orders to generate notifications
+      const response: any = await client.graphql({
+        query: ordersByUser,
+        variables: {
+          user_id: userId,
+          sortDirection: 'DESC',
+          limit: 20,
+        },
+      });
+
+      const orders = response.data?.ordersByUser?.items || [];
+      const generatedNotifications: Notification[] = [];
+
+      // Create notifications from orders
+      orders.forEach((order: any) => {
+        const baseTimestamp = new Date(order.created_at || new Date()).getTime();
+
+        // Order confirmation notification
+        generatedNotifications.push({
+          id: `order_${order.id}_confirm`,
+          title: 'Order Confirmed',
+          message: `Your order ${order.order_number} has been confirmed and is being processed.`,
+          type: 'order',
+          timestamp: new Date(baseTimestamp).toISOString(),
+          read: false,
+          actionUrl: `/orders/${order.id}`,
+        });
+
+        // Status-based notifications
+        if (order.status === 'shipped' || order.status === 'delivered') {
+          generatedNotifications.push({
+            id: `order_${order.id}_status`,
+            title: order.status === 'delivered' ? 'Order Delivered' : 'Order Shipped',
+            message:
+              order.status === 'delivered'
+                ? `Your order ${order.order_number} has been delivered.`
+                : `Your order ${order.order_number} is out for delivery. ${order.tracking_number ? `Tracking: ${order.tracking_number}` : ''}`,
+            type: 'order',
+            timestamp: new Date(baseTimestamp + 86400000).toISOString(),
+            read: order.status === 'delivered',
+            actionUrl: `/orders/${order.id}`,
+          });
+        }
+      });
+
+      // Add system notification
+      generatedNotifications.push({
+        id: 'system_maintenance',
+        title: 'Account Features',
+        message: 'Keep your profile and addresses updated for better shopping experience.',
+        type: 'system',
+        timestamp: new Date().toISOString(),
+        read: true,
+      });
+
+      // Mark older notifications as read
+      const sortedNotifications = generatedNotifications
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .map((notif, index) => ({
+          ...notif,
+          read: index > 4, // Last read are the oldest ones
+        }));
+
+      setNotifications(sortedNotifications);
+    } catch (error) {
+      logger.error(error as Error, { context: 'Failed to load notifications' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMarkAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    setNotifications(
+      notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   };
 
   const handleDelete = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    setNotifications(notifications.filter((n) => n.id !== id));
   };
 
   const handleMarkAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'order':
-        return 'bg-blue-900 text-blue-200';
-      case 'promotion':
-        return 'bg-green-900 text-green-200';
-      case 'system':
-        return 'bg-gray-700 text-gray-200';
-      case 'review':
-        return 'bg-purple-900 text-purple-200';
-      default:
-        return 'bg-gray-700 text-gray-200';
-    }
-  };
+  const filteredNotifications =
+    selectedFilter === 'all'
+      ? notifications
+      : selectedFilter === 'unread'
+        ? notifications.filter((n) => !n.read)
+        : notifications.filter((n) => n.read);
 
-  const getTypeIcon = (type: string) => {
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'order':
-        return '📦';
+        return <Package className="w-5 h-5 text-blue-400" />;
       case 'promotion':
-        return '🎉';
+        return <Tag className="w-5 h-5 text-green-400" />;
       case 'system':
-        return '⚙️';
-      case 'review':
-        return '⭐';
+        return <AlertCircle className="w-5 h-5 text-yellow-400" />;
       default:
-        return '•';
+        return <Bell className="w-5 h-5 text-gray-400" />;
     }
   };
 
@@ -159,126 +168,135 @@ export const NotificationsPage: React.FC = () => {
     return date.toLocaleDateString();
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+          <span className="text-lg text-gray-700">Loading notifications...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <>
       <Header />
-
-      <main className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        {/* Page Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gold mb-2">Notifications</h1>
-            <p className="text-gray-400">Stay updated with your latest activities</p>
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          {/* Header */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+                <p className="text-gray-600 mt-2">Stay updated with your orders and promotions</p>
+              </div>
+              {unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
           </div>
-          {unreadCount > 0 && (
-            <button
-              onClick={handleMarkAllAsRead}
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-            >
-              Mark all as read
-            </button>
-          )}
-        </div>
 
-        {/* Filter Buttons */}
-        <div className="flex gap-3 mb-8">
-          {(['all', 'unread', 'read'] as const).map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setSelectedFilter(filter)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                selectedFilter === filter
-                  ? 'bg-gold text-black'
-                  : 'bg-gray-800 text-white hover:bg-gray-700'
-              }`}
-            >
-              {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              {filter === 'unread' && ` (${unreadCount})`}
-            </button>
-          ))}
-        </div>
-
-        {/* Loading State */}
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 text-gold animate-spin mr-3" />
-            <span className="text-white text-lg">Loading notifications...</span>
-          </div>
-        ) : filteredNotifications.length === 0 ? (
-          <div className="bg-gray-900 border-2 border-dashed border-gray-700 rounded-lg p-12 text-center">
-            <Bell className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">No Notifications</h2>
-            <p className="text-gray-400">
-              You're all caught up! Check back later for updates.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`border rounded-lg p-4 transition-all duration-300 flex items-start gap-4 group ${
-                  notification.read
-                    ? 'bg-gray-900 border-gray-800 hover:border-gray-700'
-                    : 'bg-gray-800 border-gold hover:bg-gray-750'
+          {/* Filter Tabs */}
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex gap-4 border-b">
+            {(['all', 'unread', 'read'] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setSelectedFilter(filter)}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  selectedFilter === filter
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {/* Icon */}
-                <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-2xl ${getTypeColor(notification.type)}`}>
-                  {getTypeIcon(notification.type)}
-                </div>
+                {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                {filter === 'unread' && unreadCount > 0 && (
+                  <span className="ml-2 bg-red-600 text-white text-xs rounded-full px-2 py-0.5">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
 
-                {/* Content */}
-                <div className="flex-grow min-w-0">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-grow">
-                      <h3 className={`font-bold mb-1 ${notification.read ? 'text-gray-300' : 'text-white'}`}>
-                        {notification.title}
-                      </h3>
-                      <p className={`text-sm mb-2 ${notification.read ? 'text-gray-500' : 'text-gray-300'}`}>
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-gray-600">{formatTime(notification.timestamp)}</p>
+          {/* Notifications List */}
+          <div className="space-y-4">
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`bg-white rounded-lg shadow p-4 border-l-4 transition-all ${
+                    notification.read
+                      ? 'border-gray-300'
+                      : 'border-blue-600 bg-blue-50'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className={`flex-shrink-0 mt-1 ${!notification.read && 'text-blue-600'}`}>
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`font-semibold ${notification.read ? 'text-gray-700' : 'text-gray-900'}`}>
+                          {notification.title}
+                        </h3>
+                        <p className={`text-sm mt-1 ${notification.read ? 'text-gray-600' : 'text-gray-700'}`}>
+                          {notification.message}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">{formatTime(notification.timestamp)}</p>
+                        {notification.actionUrl && (
+                          <button
+                            onClick={() => navigate(notification.actionUrl!)}
+                            className="text-blue-600 text-sm font-medium hover:text-blue-700 mt-2"
+                          >
+                            View Details →
+                          </button>
+                        )}
+                      </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       {!notification.read && (
                         <button
                           onClick={() => handleMarkAsRead(notification.id)}
-                          className="p-2 hover:bg-gray-700 rounded-lg transition-all duration-300 text-gold"
+                          className="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-blue-600 transition-colors"
                           title="Mark as read"
                         >
-                          <Check className="h-5 w-5" />
+                          <Check className="h-4 w-4" />
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(notification.id)}
-                        className="p-2 hover:bg-red-900 hover:text-red-400 rounded-lg transition-all duration-300 text-gray-400"
+                        className="p-2 hover:bg-gray-100 rounded text-gray-600 hover:text-red-600 transition-colors"
                         title="Delete"
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
-
-                  {/* Action Link */}
-                  {notification.actionUrl && (
-                    <button
-                      onClick={() => navigate(notification.actionUrl!)}
-                      className="text-gold text-sm font-medium hover:text-yellow-400 transition-all duration-300 mt-2"
-                    >
-                      View Details →
-                    </button>
-                  )}
                 </div>
+              ))
+            ) : (
+              <div className="bg-white rounded-lg shadow p-12 text-center">
+                <Bell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">No Notifications</h2>
+                <p className="text-gray-600">
+                  You're all caught up! Check back later for updates.
+                </p>
               </div>
-            ))}
+            )}
           </div>
-        )}
-      </main>
-
+        </div>
+      </div>
       <Footer />
-    </div>
+    </>
   );
 };
+
+export default NotificationsPage;

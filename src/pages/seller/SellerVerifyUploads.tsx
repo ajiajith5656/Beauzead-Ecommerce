@@ -142,7 +142,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
           <CheckCircle2 size={56} className="text-green-500 animate-in zoom-in duration-500" />
         </div>
         <h2 className="text-xl font-semibold mb-4">Successfully Submitted</h2>
-        <div className="bg-[#0a0a0a] border border-gray-900 rounded-2xl px-8 py-4 mb-8">
+        <div className="bg-[#0a0a0a] border border-gray-900 rounded-2xl px-5 py-3 mb-8">
           <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">Seller Verification ID</p>
           <p className="text-xl font-mono text-yellow-500 font-bold">{submissionId}</p>
         </div>
@@ -211,7 +211,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
 
               {item.status === 'uploading' && (
                 <>
-                  <Loader2 className="animate-spin text-yellow-500 mb-4" size={32} />
+                  <Loader2 className="animate-spin text-yellow-500 mb-4" size={24} />
                   <h3 className="text-sm font-semibold mb-2">Uploading Indication...</h3>
                   <div className="w-full max-w-[160px] h-1.5 bg-gray-900 rounded-full overflow-hidden mb-2">
                     <div className="h-full bg-yellow-500 transition-all duration-300" style={{ width: `${item.progress}%` }}></div>
@@ -224,7 +224,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
               {item.status === 'completed' && (
                 <>
                   <div className="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-500 mb-4">
-                    <CheckCircle2 size={32} />
+                    <CheckCircle2 size={24} />
                   </div>
                   <h3 className="text-sm font-semibold mb-1">{item.label}</h3>
                   <p className="text-[10px] text-gray-500 mb-3 truncate max-w-[200px] italic">{item.fileName}</p>
@@ -244,7 +244,7 @@ const SellerVerifyUploads: React.FC<SellerVerifyUploadsProps> = ({
         <div className="mt-16 bg-[#0a0a0a] border border-gray-900 rounded-[2.5rem] p-10 relative overflow-hidden">
           {isSubmitting && (
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-4">
-              <Loader2 className="animate-spin text-yellow-500" size={40} />
+              <Loader2 className="animate-spin text-yellow-500" size={24} />
               <p className="text-sm font-bold text-white uppercase tracking-[0.2em]">Synchronizing Storage...</p>
             </div>
           )}

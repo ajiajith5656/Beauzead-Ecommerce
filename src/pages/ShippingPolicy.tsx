@@ -58,7 +58,7 @@ export const ShippingPolicy: React.FC = () => {
                 description: 'Worldwide shipping to selected countries'
               }
             ].map((method, idx) => (
-              <div key={idx} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+              <div key={idx} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                 <h3 className="text-lg font-semibold text-gold mb-3">{method.name}</h3>
                 <p className="text-gray-300 mb-3">{method.description}</p>
                 <div className="grid grid-cols-2 gap-4">
@@ -85,7 +85,7 @@ export const ShippingPolicy: React.FC = () => {
             <Clock className="w-6 h-6" />
             Delivery Time Frames
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <ul className="space-y-3 text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-gold">✓</span>
@@ -110,7 +110,7 @@ export const ShippingPolicy: React.FC = () => {
         {/* Shipping Address */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Shipping Address Requirements</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">To ensure successful delivery, please:</p>
             <ul className="space-y-2 text-gray-300 ml-4 mb-4">
               <li>• Provide a complete and accurate delivery address</li>
@@ -130,7 +130,7 @@ export const ShippingPolicy: React.FC = () => {
         {/* Order Tracking */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Order Tracking & Updates</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               Once your order is shipped, you will receive a tracking number via email. You can:
             </p>
@@ -150,19 +150,19 @@ export const ShippingPolicy: React.FC = () => {
             International Shipping
           </h2>
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3">Eligible Countries</h3>
               <p className="text-gray-300 mb-3">
                 We ship to most countries in Europe, North America, and selected other regions. Check your country's availability at checkout.
               </p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3">Customs & Import Duties</h3>
               <p className="text-gray-300">
                 International orders are subject to customs regulations and may incur import duties, taxes, or fees. These are the responsibility of the recipient and are not included in shipping costs.
               </p>
             </div>
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3">Restricted Items</h3>
               <p className="text-gray-300">
                 Certain items cannot be shipped internationally. These will be marked as "UK Only" in the product listing.
@@ -177,7 +177,7 @@ export const ShippingPolicy: React.FC = () => {
             <AlertCircle className="w-6 h-6" />
             Damage & Lost Packages
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <div className="space-y-4 text-gray-300">
               <div>
                 <p className="font-semibold text-gold mb-2">Upon Delivery:</p>
@@ -198,7 +198,7 @@ export const ShippingPolicy: React.FC = () => {
         {/* Special Handling */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Special Handling & Fragile Items</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               All items are carefully packaged to minimize damage during transit. For fragile items, we use additional protective materials.
             </p>
@@ -214,7 +214,7 @@ export const ShippingPolicy: React.FC = () => {
         {/* Contact */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">Shipping Support</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               For shipping inquiries or concerns, please contact our customer support team:
             </p>

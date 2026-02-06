@@ -168,7 +168,7 @@ export const ProductVariantManagement: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Product Variants</h1>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">Product Variants</h1>
             <p className="text-gray-600">Manage product variants with different colors, sizes, and prices</p>
           </div>
           <button
@@ -209,18 +209,18 @@ export const ProductVariantManagement: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">SKU</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Color</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Size</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Price</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Stock</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">SKU</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Color</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Size</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Price</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Stock</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {variants.map((variant) => (
                 <tr key={variant.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-sm text-gray-900">{variant.sku}</span>
                       <button
@@ -232,7 +232,7 @@ export const ProductVariantManagement: React.FC = () => {
                       </button>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       {variant.color && (
                         <div
@@ -245,13 +245,13 @@ export const ProductVariantManagement: React.FC = () => {
                       <span className="text-gray-900">{variant.color || 'N/A'}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <span className="text-gray-900">
                       {variant.sizeValue} {variant.sizeSystem && `(${variant.sizeSystem})`}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-900 font-semibold">₹{variant.price}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3 text-gray-900 font-semibold">₹{variant.price}</td>
+                  <td className="px-4 py-3">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${
                         variant.stock > 20
@@ -264,7 +264,7 @@ export const ProductVariantManagement: React.FC = () => {
                       {variant.stock} units
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
@@ -336,7 +336,7 @@ export const ProductVariantManagement: React.FC = () => {
       {showAddVariant && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
               {editingVariant ? 'Edit Variant' : 'Add New Variant'}
             </h2>
 
@@ -485,7 +485,7 @@ export const ProductVariantManagement: React.FC = () => {
       {showAddColor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Color</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Add New Color</h2>
 
             <div className="space-y-6">
               <div>

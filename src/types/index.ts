@@ -40,7 +40,7 @@ export interface Seller {
   phone: string;
   total_listings: number;
   badge?: 'silver' | 'gold' | 'platinum';
-  kyc_status: 'pending' | 'approved' | 'rejected';
+  kyc_status: 'pending' | 'approved' | 'rejected' | 'verified' | 'action_required' | 'restricted';
   product_approval_status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   seller_type?: 'individual' | 'brand' | 'freelancing';
@@ -48,6 +48,14 @@ export interface Seller {
   total_revenue?: number;
   total_orders?: number;
   rating?: number;
+  
+  // Stripe Connect fields
+  stripe_account_id?: string;
+  stripe_onboarding_completed?: boolean;
+  payouts_enabled?: boolean;
+  charges_enabled?: boolean;
+  kyc_last_update?: string;
+  stripe_account_type?: 'express' | 'standard' | 'custom';
 }
 
 export interface Product {

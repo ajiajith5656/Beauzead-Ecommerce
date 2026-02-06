@@ -20,7 +20,7 @@ export const TermsService: React.FC = () => {
         {/* Introduction */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-4">1. Agreement to Terms</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               By accessing and using Beauzead ("Platform"), you accept and agree to be bound by and comply with these Terms of Service. If you do not agree to abide by the above, please do not use this service.
             </p>
@@ -34,7 +34,7 @@ export const TermsService: React.FC = () => {
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">2. Use License</h2>
           <div className="space-y-4">
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3 flex items-center gap-2">
                 <CheckCircle className="w-5 h-5" />
                 Permitted Uses
@@ -48,7 +48,7 @@ export const TermsService: React.FC = () => {
               </ul>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-lg font-semibold text-gold mb-3 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
                 Prohibited Uses
@@ -72,7 +72,7 @@ export const TermsService: React.FC = () => {
             <Users className="w-6 h-6" />
             3. User Accounts & Registration
           </h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <div className="space-y-4 text-gray-300">
               <div>
                 <p className="font-semibold text-gold mb-2">Account Responsibility:</p>
@@ -93,7 +93,7 @@ export const TermsService: React.FC = () => {
         {/* Product Information & Accuracy */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">4. Product Information & Accuracy</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               Beauzead makes every effort to ensure that product descriptions, prices, and availability are accurate. However, Beauzead does not guarantee accuracy and completeness of product information.
             </p>
@@ -115,7 +115,7 @@ export const TermsService: React.FC = () => {
         {/* Payment & Pricing */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">5. Payment & Pricing</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <div className="space-y-4 text-gray-300">
               <div>
                 <p className="font-semibold text-gold mb-2">Payment Terms:</p>
@@ -136,7 +136,7 @@ export const TermsService: React.FC = () => {
         {/* Shipping & Delivery */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">6. Shipping & Delivery</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               Delivery times are estimates only and not guaranteed. Beauzead is not responsible for delays caused by carriers, customs, or circumstances beyond our control.
             </p>
@@ -152,7 +152,7 @@ export const TermsService: React.FC = () => {
         {/* Limitation of Liability */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">7. Limitation of Liability</h2>
-          <div className="bg-yellow-900 border border-yellow-700 rounded-lg p-6 text-yellow-100">
+          <div className="bg-yellow-900 border border-yellow-700 rounded-lg p-4 text-yellow-100">
             <p className="mb-4">
               TO THE FULLEST EXTENT PERMITTED BY LAW, BEAUZEAD SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE PLATFORM OR SERVICES.
             </p>
@@ -165,7 +165,7 @@ export const TermsService: React.FC = () => {
         {/* Dispute Resolution */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">8. Dispute Resolution</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               Any dispute arising from these Terms or your use of the Platform shall be governed by and construed in accordance with the laws of the United Kingdom.
             </p>
@@ -181,7 +181,7 @@ export const TermsService: React.FC = () => {
         {/* Termination */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">9. Termination</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-gray-300">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-gray-300">
             <p className="mb-4">
               Beauzead may terminate or suspend your account and access to the Platform immediately, without notice, for conduct that Beauzead believes violates these Terms or is unlawful, harmful, or abusive.
             </p>
@@ -194,7 +194,7 @@ export const TermsService: React.FC = () => {
         {/* Contact */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gold mb-6">10. Contact Information</h2>
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <p className="text-gray-300 mb-4">
               For questions about these Terms of Service, please contact:
             </p>

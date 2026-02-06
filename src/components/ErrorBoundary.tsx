@@ -50,7 +50,7 @@ class ErrorBoundary extends Component<Props, State> {
       // Default fallback UI
       return (
         <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-gray-900 border-2 border-red-500 rounded-lg p-8 text-center">
+          <div className="max-w-md w-full bg-gray-900 border-2 border-red-500 rounded-lg p-5 text-center">
             <div className="mb-6">
               <svg
                 className="mx-auto h-16 w-16 text-red-500"

@@ -519,7 +519,7 @@ const SellerSignup: React.FC = () => {
           <div className="text-center">
             <div className="flex justify-center mb-8">
               <div className="w-24 h-24 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500">
-                <CheckCircle2 size={48} className="animate-bounce" />
+                <CheckCircle2 size={36} className="animate-bounce" />
               </div>
             </div>
             <h1 className="text-3xl md:text-4xl font-semibold mb-4 text-black">

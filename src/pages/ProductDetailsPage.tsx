@@ -464,7 +464,7 @@ const ProductDetailsPage: React.FC = () => {
             {!user ? (
               <div className="text-center py-6 md:py-8">
                 <div className="w-16 md:w-20 h-16 md:h-20 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8">
-                  <Lock size={32} className="text-yellow-500" />
+                  <Lock size={24} className="text-yellow-500" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4 uppercase">Authentication Required</h3>
                 <p className="text-gray-500 text-xs md:text-sm font-medium mb-8 md:mb-10">
@@ -501,7 +501,7 @@ const ProductDetailsPage: React.FC = () => {
                         }`}
                       >
                         <Star
-                          size={28}
+                          size={22}
                           className={reviewFormData.rating >= star ? 'fill-yellow-500' : ''}
                         />
                       </button>

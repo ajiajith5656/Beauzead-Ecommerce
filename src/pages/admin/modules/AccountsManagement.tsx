@@ -311,7 +311,7 @@ export const AccountsManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Accounts & Finance</h2>
+          <h2 className="text-xl font-bold text-gray-900">Accounts & Finance</h2>
           <p className="text-gray-600">Manage your business finances and accounting</p>
         </div>
         <div className="flex items-center gap-3">
@@ -364,7 +364,7 @@ export const AccountsManagement: React.FC = () => {
                   12.5%
                 </span>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mt-3">
+              <p className="text-xl font-bold text-gray-900 mt-3">
                 {formatCurrency(summary?.total_revenue || 0, summary?.currency)}
               </p>
               <p className="text-gray-500 text-sm mt-1">Total Revenue</p>
@@ -380,7 +380,7 @@ export const AccountsManagement: React.FC = () => {
                   3.2%
                 </span>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mt-3">
+              <p className="text-xl font-bold text-gray-900 mt-3">
                 {formatCurrency(summary?.total_expenses || 0, summary?.currency)}
               </p>
               <p className="text-gray-500 text-sm mt-1">Total Expenses</p>
@@ -392,7 +392,7 @@ export const AccountsManagement: React.FC = () => {
                   <DollarSign className="text-blue-600" size={24} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mt-3">
+              <p className="text-xl font-bold text-gray-900 mt-3">
                 {formatCurrency(summary?.net_profit || 0, summary?.currency)}
               </p>
               <p className="text-gray-500 text-sm mt-1">Net Profit</p>
@@ -404,7 +404,7 @@ export const AccountsManagement: React.FC = () => {
                   <Wallet className="text-purple-600" size={24} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mt-3">
+              <p className="text-xl font-bold text-gray-900 mt-3">
                 {formatCurrency(summary?.total_payouts || 0, summary?.currency)}
               </p>
               <p className="text-gray-500 text-sm mt-1">Seller Payouts</p>
@@ -416,7 +416,7 @@ export const AccountsManagement: React.FC = () => {
                   <Percent className="text-amber-600" size={24} />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900 mt-3">
+              <p className="text-xl font-bold text-gray-900 mt-3">
                 {formatCurrency(summary?.total_taxes || 0, summary?.currency)}
               </p>
               <p className="text-gray-500 text-sm mt-1">Total Taxes</p>
@@ -645,16 +645,16 @@ export const AccountsManagement: React.FC = () => {
                 {daybook.length > 0 ? (
                   daybook.map((entry) => (
                     <tr key={entry.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-700">{entry.date}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500 font-mono">{entry.reference || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{entry.description}</td>
-                      <td className="px-6 py-4 text-sm text-red-600 text-right font-medium">
+                      <td className="px-4 py-3 text-sm text-gray-700">{entry.date}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 font-mono">{entry.reference || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{entry.description}</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right font-medium">
                         {entry.debit > 0 ? formatCurrency(entry.debit) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-green-600 text-right font-medium">
+                      <td className="px-4 py-3 text-sm text-green-600 text-right font-medium">
                         {entry.credit > 0 ? formatCurrency(entry.credit) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right font-semibold">
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
                         {formatCurrency(entry.balance)}
                       </td>
                     </tr>
@@ -670,7 +670,7 @@ export const AccountsManagement: React.FC = () => {
             </table>
           </div>
           {/* Pagination */}
-          <div className="px-6 py-4 border-t flex items-center justify-between">
+          <div className="px-4 py-3 border-t flex items-center justify-between">
             <p className="text-sm text-gray-500">
               Showing {((daybookPagination.page - 1) * daybookPagination.limit) + 1} to{' '}
               {Math.min(daybookPagination.page * daybookPagination.limit, daybookPagination.total)} of{' '}
@@ -731,16 +731,16 @@ export const AccountsManagement: React.FC = () => {
                 {bankBook.length > 0 ? (
                   bankBook.map((entry) => (
                     <tr key={entry.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-700">{entry.date}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500 font-mono">{entry.bank_reference || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{entry.description}</td>
-                      <td className="px-6 py-4 text-sm text-red-600 text-right font-medium">
+                      <td className="px-4 py-3 text-sm text-gray-700">{entry.date}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 font-mono">{entry.bank_reference || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{entry.description}</td>
+                      <td className="px-4 py-3 text-sm text-red-600 text-right font-medium">
                         {entry.debit > 0 ? formatCurrency(entry.debit) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-green-600 text-right font-medium">
+                      <td className="px-4 py-3 text-sm text-green-600 text-right font-medium">
                         {entry.credit > 0 ? formatCurrency(entry.credit) : '—'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right font-semibold">
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
                         {formatCurrency(entry.balance)}
                       </td>
                     </tr>
@@ -756,7 +756,7 @@ export const AccountsManagement: React.FC = () => {
             </table>
           </div>
           {/* Pagination */}
-          <div className="px-6 py-4 border-t flex items-center justify-between">
+          <div className="px-4 py-3 border-t flex items-center justify-between">
             <p className="text-sm text-gray-500">
               Page {bankPagination.page} of {Math.ceil(bankPagination.total / bankPagination.limit) || 1}
             </p>
@@ -810,14 +810,14 @@ export const AccountsManagement: React.FC = () => {
                 {expenses.length > 0 ? (
                   expenses.map((expense) => (
                     <tr key={expense.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-700">{expense.date}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">{expense.category}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{expense.description || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{expense.vendor || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right font-semibold">
+                      <td className="px-4 py-3 text-sm text-gray-700">{expense.date}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">{expense.category}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{expense.description || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{expense.vendor || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
                         {formatCurrency(expense.amount)}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           expense.status === 'paid' ? 'bg-green-100 text-green-700' :
                           expense.status === 'pending' ? 'bg-amber-100 text-amber-700' :
@@ -826,7 +826,7 @@ export const AccountsManagement: React.FC = () => {
                           {expense.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-blue-600">
                             <Edit size={16} />
@@ -889,11 +889,11 @@ export const AccountsManagement: React.FC = () => {
                 {payouts.length > 0 ? (
                   payouts.map((payout) => (
                     <tr key={payout.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-mono text-gray-900">{payout.seller_id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-right font-semibold">
+                      <td className="px-4 py-3 text-sm font-mono text-gray-900">{payout.seller_id}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right font-semibold">
                         {formatCurrency(payout.amount, payout.currency)}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           payout.status === 'completed' ? 'bg-green-100 text-green-700' :
                           payout.status === 'approved' ? 'bg-blue-100 text-blue-700' :
@@ -903,9 +903,9 @@ export const AccountsManagement: React.FC = () => {
                           {payout.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{payout.scheduled_at || '—'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{payout.processed_at || '—'}</td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-sm text-gray-600">{payout.scheduled_at || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{payout.processed_at || '—'}</td>
+                      <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded">
                             View
